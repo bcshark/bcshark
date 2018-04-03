@@ -1,7 +1,7 @@
 import logging
 import threading
 
-from collectors.collector_factory import collector_factory
+from .collector_factory import collector_factory
 
 TIMEOUT_COLLECT_IN_SECONDS = 60
 
@@ -24,8 +24,8 @@ if __name__ == '__main__':
         'symbols': [ 'btcusdt', 'eosbtc', 'ethbtc' ]
     }
     factory = collector_factory(settings)
-
     threads = []
+
     collectors = factory.get_all_collectors()
     for collector in collectors:
         threads.append(threading.Thread(target=collector.collect))
