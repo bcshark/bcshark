@@ -12,7 +12,17 @@ if __name__ == '__main__':
     global factory
     global settings
 
-    settings = { 'logger': logger }
+    settings = { 
+        'logger': logger, 
+        'influxdb': {
+            'host': '127.0.0.1',
+            'port': 8086,
+            'username': 'root',
+            'password': 'root',
+            'database': 'market_index'
+        },
+        'symbols': [ 'btcusdt', 'eosbtc', 'ethbtc' ]
+    }
     factory = collector_factory(settings)
 
     threads = []
@@ -25,4 +35,7 @@ if __name__ == '__main__':
 
     for thread in threads:
         thread.join(TIMEOUT_COLLECT_IN_SECONDS)
+
+    for collector in collectors:
+        collector.dispose()
 

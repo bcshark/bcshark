@@ -2,16 +2,13 @@ from .huobi import collector_huobi
 
 class collector_factory(object):
     def __init__(this, settings):
-        global logger
-        logger = settings['logger']
-
         this.settings = settings
 
     def get_collector(this, collector_name):
         collector = None
 
         if collector_name == 'huobi':
-            collector = collector_huobi(logger)
+            collector = collector_huobi(this.settings)
 
         return collector
 
