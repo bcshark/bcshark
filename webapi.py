@@ -4,7 +4,7 @@ import json
 
 from influxdb import InfluxDBClient
 
-from flask import Flask, render_template
+from flask import Flask
 from flask_cors import CORS
 
 from services.kline_service import kline_service
@@ -14,10 +14,6 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app)
-
-@app.route('/')
-def index():
-    return render_template('index.html')
 
 @app.route('/api/kline')
 def api_kline():
@@ -47,4 +43,4 @@ if __name__ == '__main__':
     influxdb_conf = settings['influxdb']
     client = InfluxDBClient(host = influxdb_conf['host'], port = influxdb_conf['port'], database = influxdb_conf['database'])
 
-    app.run(debug = True)
+    app.run(debug = True, host = '0.0.0.0', port = 5000)
