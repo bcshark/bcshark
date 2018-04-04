@@ -15,15 +15,33 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/api/kline')
-def api_kline():
-
-    print 'receive request for kline update'
-
+@app.route('/api/kline/<market>/<symbol>', methods=['GET'])
+def api_kline(market, symbol):
     global client
 
     service = kline_service(client)
-    kline =  service.get_kline_by_time_range(time.time(), time.time())
+    kline =  service.get_kline_by_market_symbol(market, symbol)
+
+    columns = kline['series'][0]['columns']
+    for i in range(0, len(columns) - 1):
+        if columns[i] == 'time':
+            time_index = i
+        elif columns[i] == 'open':
+            open_index = i
+        elif columns[i] == 'close':
+            close_index = i
+        elif columns[i] == 'low':
+            low_index = i
+        elif columns[i] == 'high':
+            high_index = i
+
+    kline = [[
+        value[time_index],
+        value[open_index],
+        value[close_index],
+        value[low_index],
+        value[high_index]
+    ] for value in kline['series'][0]['values']]
 
     return json.dumps(kline)
 
