@@ -1,8 +1,25 @@
 <div cg-busy="{ promise: promise }">
-	<div class="fix-title-bar">
-		Market Index K-Line
-	</div>
-	<div class="fix-content">
-		<div id="kline-chart" style="width: 640px; height: 480px;"></div>		
+	<nav class="navbar navbar-default" role="navigation">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" ng-click="isNavCollapsed = !isNavCollapsed">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="#">
+				Market Index K-Line
+			</a>
+		</div>
+		<div class="collapse navbar-collapse" uib-collapse="isNavCollapsed">
+			<ul class="nav navbar-nav">
+				<li><a class="navbar-item" ng-click="switchSymbol('btcusdt')">BTC - USDT</a></li>
+				<li><a class="navbar-item"  ng-click="switchSymbol('ethbtc')">ETH - BTC</a></li>
+				<li><a class="navbar-item"  ng-click="switchSymbol('eosbtc')">EOS - BTC</a></li>
+			</ul>
+		</div>
+	</nav>
+	<div class="content">
+		<div id="kline-chart" style="margin-left: auto; margin-right: auto; width: 640px; height: 480px;"></div>		
 	</div>
 </div>

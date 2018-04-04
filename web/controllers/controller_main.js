@@ -1,4 +1,4 @@
-angular.module('MarketIndex', ['ngRoute', 'cgBusy'])
+angular.module('MarketIndex', ['ngRoute', 'cgBusy', 'ui.bootstrap'])
 
 .controller('MainController', function($scope, $route, $routeParams, $location) {
 	$scope.$route = $route;
