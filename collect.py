@@ -1,7 +1,7 @@
 import logging
 import threading
 
-from .collector_factory import collector_factory
+from collectors.collector_factory import collector_factory
 
 TIMEOUT_COLLECT_IN_SECONDS = 60
 
@@ -14,6 +14,7 @@ if __name__ == '__main__':
 
     settings = { 
         'logger': logger, 
+        'timezone_offset': -8 * 3600,
         'influxdb': {
             'host': '127.0.0.1',
             'port': 8086,

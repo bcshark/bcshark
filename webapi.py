@@ -17,6 +17,9 @@ CORS(app)
 
 @app.route('/api/kline')
 def api_kline():
+
+    print 'receive request for kline update'
+
     global client
 
     service = kline_service(client)
@@ -30,6 +33,7 @@ if __name__ == '__main__':
 
     settings = { 
         'logger': logger, 
+        'timezone_offset': -8 * 3600,
         'influxdb': {
             'host': '127.0.0.1',
             'port': 8086,
@@ -43,4 +47,4 @@ if __name__ == '__main__':
     influxdb_conf = settings['influxdb']
     client = InfluxDBClient(host = influxdb_conf['host'], port = influxdb_conf['port'], database = influxdb_conf['database'])
 
-    app.run(debug = True, host = '0.0.0.0', port = 5000)
+    app.run(debug = True, threaded = True, host = '0.0.0.0', port = 5000)

@@ -9,6 +9,7 @@ class collector(object):
         this.settings = settings
         this.logger = settings['logger']
         this.symbols = settings['symbols']
+        this.timezone_offset = settings['timezone_offset']
         this.client = None
 
     def dispose(this):
@@ -40,8 +41,9 @@ class collector(object):
                 'market': market_name,
                 'symbol': symbol_name
             },
-            'time': tick['id'] * 100000000,
+            'time': get_timestamp_str(tick['id'], this.timezone_offset),
             'fields': {
+                'time': tick['id'] + this.timezone_offset,
                 'open': tick['open'],
                 'close': tick['close'],
                 'low': tick['low'],
