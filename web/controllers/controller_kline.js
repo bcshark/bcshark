@@ -75,12 +75,14 @@ var KlineController = ['$scope', '$http', function($scope, $http) {
 						}
 					},
 					legend: {
+						bottom: 10,
 						data: ['日K', 'MA5', 'MA10', 'MA20', 'MA30']
 					},
 					grid: {
 						left: '10%',
 						right: '10%',
-						bottom: '15%'
+						bottom: 100
+						// bottom: '15%'
 					},
 					xAxis: {
 						type: 'category',
@@ -110,7 +112,9 @@ var KlineController = ['$scope', '$http', function($scope, $http) {
 							type: 'slider',
 							y: '90%',
 							start: 50,
-							end: 100
+							end: 100,
+							top: 410,
+							bottom: 40
 						}
 					],
 					series: [
