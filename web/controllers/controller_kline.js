@@ -79,9 +79,10 @@ var KlineController = ['$scope', '$http', function($scope, $http) {
 						data: ['日K', 'MA5', 'MA10', 'MA20', 'MA30']
 					},
 					grid: {
-						left: '10%',
-						right: '10%',
+						left: 60,
 						bottom: 100
+						// left: '10%',
+						// right: '10%',
 						// bottom: '15%'
 					},
 					xAxis: {
