@@ -20,7 +20,7 @@ def api_kline(market, symbol):
     global client
 
     service = kline_service(client)
-    kline =  service.get_kline_by_market_symbol(market, symbol)
+    kline =  service.get_kline_by_market_symbol(market, symbol, settings['kline']['size'])
 
     columns = kline['series'][0]['columns']
     for i in range(0, len(columns) - 1):
@@ -58,6 +58,9 @@ if __name__ == '__main__':
             'username': 'root',
             'password': 'root',
             'database': 'market_index'
+        },
+        'kline': {
+            'size': 200
         },
         'symbols': [ 'btcusdt', 'eosbtc', 'ethbtc' ]
     }

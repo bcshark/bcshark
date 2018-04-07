@@ -22,6 +22,9 @@ if __name__ == '__main__':
             'password': 'root',
             'database': 'market_index'
         },
+        'kline': {
+            'size': 200
+        },
         'symbols': [ 'btcusdt', 'eosbtc', 'ethbtc' ]
     }
     factory = collector_factory(settings)

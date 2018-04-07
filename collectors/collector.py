@@ -24,9 +24,9 @@ class collector(object):
 
         return this.client
 
-    def http_request_json(this, url):
+    def http_request_json(this, url, headers):
         try:
-            res = requests.get(url)
+            res = requests.get(url, headers=headers)
 
             return res.json()
         except Exception, e:
@@ -41,16 +41,16 @@ class collector(object):
                 'market': market_name,
                 'symbol': symbol_name
             },
-            'time': get_timestamp_str(tick['id'], this.timezone_offset),
+            'time': get_timestamp_str(tick.time, this.timezone_offset),
             'fields': {
-                'time': tick['id'] + this.timezone_offset,
-                'open': tick['open'],
-                'close': tick['close'],
-                'low': tick['low'],
-                'high': tick['high'],
-                'amount': tick['amount'],
-                'volume': tick['vol'],
-                'count': tick['count']
+                'time': tick.time + this.timezone_offset,
+                'open': tick.open,
+                'close': tick.close,
+                'low': tick.low,
+                'high': tick.high,
+                'amount': tick.amount,
+                'volume': tick.volume,
+                'count': tick.count
             }
         } for tick in ticks ]
 
