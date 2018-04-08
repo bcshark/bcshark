@@ -1,5 +1,3 @@
-from .utility import *
-
 class kline_service(object):
     def __init__(this, client):
         this.client = client
@@ -14,6 +12,7 @@ class kline_service(object):
         ticks = [
             list(row) for row in rows             
         ]
+        ticks.sort(lambda x, y: int(x[0] - y[0]))
         result = {
             'series': [
                 {
