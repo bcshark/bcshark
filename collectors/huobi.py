@@ -14,7 +14,7 @@ class collector_huobi(collector):
     def __init__(this, settings):
         super(collector_huobi, this).__init__(settings)
 
-        this.period = DEFAULT_PERIOD
+        this.period = this.DEFAULT_PERIOD
 
     def translate(this, objs):
         ticks = []
