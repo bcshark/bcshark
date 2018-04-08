@@ -39,12 +39,13 @@ class mysqldb_adapter(database_adapter):
         seperator = ","
 
         cursor.execute("insert into market_ticks(timestamp, open, close, high, low, amount, volume, count, market, symbol) values %s" % seperator.join(values))
+        this.client.commit()
+
         cursor.close()
 
     def query(this, sql):
         cursor = this.client.cursor()
         cursor.execute(sql)
-        result_set = cursor.fetchall()
-        print result_set
+        rows = cursor.fetchall()
         cursor.close()
-        return result_set.raw
+        return rows

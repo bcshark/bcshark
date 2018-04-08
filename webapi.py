@@ -4,6 +4,7 @@ import json
 
 from adapters.influxdb_adapter import influxdb_adapter
 from adapters.mysqldb_adapter import mysqldb_adapter
+from adapters.utility import *
 
 from flask import Flask
 from flask_cors import CORS
@@ -26,7 +27,7 @@ def api_kline(market, symbol):
     client.close()
 
     columns = kline['series'][0]['columns']
-    for i in range(0, len(columns) - 1):
+    for i in range(0, len(columns)):
         if columns[i] == 'time':
             time_index = i
         elif columns[i] == 'open':
@@ -38,12 +39,14 @@ def api_kline(market, symbol):
         elif columns[i] == 'high':
             high_index = i
 
+    timezone_offset = settings['timezone_offset']
+
     kline = [[
-        value[time_index],
-        value[open_index],
-        value[close_index],
-        value[low_index],
-        value[high_index]
+        get_timestamp_str(value[time_index], 0),
+        float(value[open_index]),
+        float(value[close_index]),
+        float(value[low_index]),
+        float(value[high_index])
     ] for value in kline['series'][0]['values']]
 
     return json.dumps(kline)
