@@ -1,6 +1,6 @@
 import requests
 
-from .market_tick import  market_tick
+from model.market_tick import  market_tick
 from .collector import collector
 from .utility import *
 
@@ -19,6 +19,7 @@ class collector_huobi(collector):
         for obj in objs:
             tick = market_tick()
             tick.time = obj['id']
+            tick.timezone_offset = this.timezone_offset
             tick.open = obj['open']
             tick.close = obj['close']
             tick.low = obj['low']
@@ -44,7 +45,7 @@ class collector_huobi(collector):
                 continue
 
             ticks = this.translate(data['data'])
-            this.bulk_save_tick('huobi', symbol, ticks)
+            this.bulk_save_ticks('huobi', symbol, ticks)
 
             this.logger.info('get response from huobi')
 

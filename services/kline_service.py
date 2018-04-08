@@ -7,6 +7,5 @@ class kline_service(object):
         return result_set.raw
 
     def get_kline_by_market_symbol(this, market, symbol, size):
-        sql = "select * from ticks_huobi where market = '%s' and symbol = '%s' limit %d" % (market, symbol, size)
-        result_set = this.client.query(sql)
-        return result_set.raw
+        sql = "select * from ticks_huobi where market = '%s' and symbol = '%s' order by time desc limit %d" % (market, symbol, size)
+        return this.client.query(sql)

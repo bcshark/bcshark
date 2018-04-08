@@ -2,7 +2,7 @@ import time
 import logging
 import json
 
-from influxdb import InfluxDBClient
+from adapters.influxdb_adapter import influxdb_adapter
 
 from flask import Flask
 from flask_cors import CORS
@@ -17,10 +17,12 @@ CORS(app)
 
 @app.route('/api/kline/<market>/<symbol>', methods=['GET'])
 def api_kline(market, symbol):
-    global client
+    client = settings['db_adapter']
 
+    client.open()
     service = kline_service(client)
     kline =  service.get_kline_by_market_symbol(market, symbol, settings['kline']['size'])
+    client.close()
 
     columns = kline['series'][0]['columns']
     for i in range(0, len(columns) - 1):
@@ -47,7 +49,6 @@ def api_kline(market, symbol):
 
 if __name__ == '__main__':
     global settings
-    global client
 
     settings = { 
         'logger': logger, 
@@ -59,13 +60,18 @@ if __name__ == '__main__':
             'password': 'root',
             'database': 'market_index'
         },
+        'mysqldb': {
+            'host': '127.0.0.1',
+            'port': 3306,
+            'username': 'root',
+            'password': '76f4dd9b',
+            'database': 'market_index'
+        },
         'kline': {
             'size': 200
         },
         'symbols': [ 'btcusdt', 'eosbtc', 'ethbtc' ]
     }
-
-    influxdb_conf = settings['influxdb']
-    client = InfluxDBClient(host = influxdb_conf['host'], port = influxdb_conf['port'], database = influxdb_conf['database'])
+    settings['db_adapter'] = influxdb_adapter(settings['influxdb'])
 
     app.run(debug = True, threaded = True, host = '0.0.0.0', port = 5000)

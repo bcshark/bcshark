@@ -2,6 +2,7 @@ import logging
 import threading
 
 from collectors.collector_factory import collector_factory
+from adapters.influxdb_adapter import influxdb_adapter
 
 TIMEOUT_COLLECT_IN_SECONDS = 60
 
@@ -22,13 +23,23 @@ if __name__ == '__main__':
             'password': 'root',
             'database': 'market_index'
         },
+        'mysqldb': {
+            'host': '127.0.0.1',
+            'port': 3306,
+            'username': 'root',
+            'password': '76f4dd9b',
+            'database': 'market_index'
+        },
         'kline': {
             'size': 200
         },
         'symbols': [ 'btcusdt', 'eosbtc', 'ethbtc' ]
     }
+    settings['db_adapter'] = influxdb_adapter(settings['influxdb'])
     factory = collector_factory(settings)
     threads = []
+
+    settings['db_adapter'].open()
 
     collectors = factory.get_all_collectors()
     for collector in collectors:
@@ -40,6 +51,5 @@ if __name__ == '__main__':
     for thread in threads:
         thread.join(TIMEOUT_COLLECT_IN_SECONDS)
 
-    for collector in collectors:
-        collector.dispose()
+    settings['db_adapter'].close()
 
