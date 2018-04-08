@@ -3,6 +3,7 @@ import logging
 import json
 
 from adapters.influxdb_adapter import influxdb_adapter
+from adapters.mysqldb_adapter import mysqldb_adapter
 
 from flask import Flask
 from flask_cors import CORS
@@ -72,6 +73,7 @@ if __name__ == '__main__':
         },
         'symbols': [ 'btcusdt', 'eosbtc', 'ethbtc' ]
     }
-    settings['db_adapter'] = influxdb_adapter(settings['influxdb'])
+    #settings['db_adapter'] = influxdb_adapter(settings['influxdb'])
+    settings['db_adapter'] = mysqldb_adapter(settings['mysqldb'])
 
     app.run(debug = True, threaded = True, host = '0.0.0.0', port = 5000)

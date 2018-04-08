@@ -3,6 +3,7 @@ import threading
 
 from collectors.collector_factory import collector_factory
 from adapters.influxdb_adapter import influxdb_adapter
+from adapters.mysqldb_adapter import mysqldb_adapter
 
 TIMEOUT_COLLECT_IN_SECONDS = 60
 
@@ -35,7 +36,8 @@ if __name__ == '__main__':
         },
         'symbols': [ 'btcusdt', 'eosbtc', 'ethbtc' ]
     }
-    settings['db_adapter'] = influxdb_adapter(settings['influxdb'])
+    #settings['db_adapter'] = influxdb_adapter(settings['influxdb'])
+    settings['db_adapter'] = mysqldb_adapter(settings['mysqldb'])
     factory = collector_factory(settings)
     threads = []
 

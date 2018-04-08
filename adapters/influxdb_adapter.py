@@ -46,8 +46,6 @@ class influxdb_adapter(database_adapter):
             }
         } for tick in ticks]
 
-        print ticks[0].timezone_offset
-
         this.client.write_points(points)
 
     def query(this, sql):
