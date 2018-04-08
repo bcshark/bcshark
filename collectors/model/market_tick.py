@@ -63,3 +63,11 @@ class market_tick(object):
     def count(this, value):
         this._count = value
 
+    @property
+    def period(this):
+        return this._period
+
+    @period.setter
+    def period(this, value):
+        this._period = value
+

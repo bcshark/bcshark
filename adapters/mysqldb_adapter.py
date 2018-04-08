@@ -25,7 +25,7 @@ class mysqldb_adapter(database_adapter):
 
         try:
             values = [
-                "(%s, %s, %s, %s, %s, %s, %s, %s, '%s', '%s')" % (
+                "(%s, %s, %s, %s, %s, %s, %s, %s, '%s', '%s', '%s')" % (
                     tick.time + tick.timezone_offset,
                     tick.open,
                     tick.close,
@@ -35,13 +35,14 @@ class mysqldb_adapter(database_adapter):
                     tick.volume,
                     tick.count,
                     market_name,
-                    symbol_name
+                    symbol_name,
+                    tick.period
                 )
                 for tick in ticks         
             ]
             seperator = ","
 
-            cursor.execute("insert into market_ticks(timestamp, open, close, high, low, amount, volume, count, market, symbol) values %s" % seperator.join(values))
+            cursor.execute("insert into market_ticks(timestamp, open, close, high, low, amount, volume, count, market, symbol, period) values %s" % seperator.join(values))
             this.client.commit()
         finally:
             cursor.close()
