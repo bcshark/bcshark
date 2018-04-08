@@ -18,34 +18,41 @@ class mysqldb_adapter(database_adapter):
     def close(this):
         if this.client:
             this.client.close()
+            this.client = None
 
     def bulk_save_ticks(this, market_name, symbol_name, ticks):
         cursor = this.client.cursor()
-        values = [
-            "(%s, %s, %s, %s, %s, %s, %s, %s, '%s', '%s')" % (
-                tick.time + tick.timezone_offset,
-                tick.open,
-                tick.close,
-                tick.high,
-                tick.low,
-                tick.amount,
-                tick.volume,
-                tick.count,
-                market_name,
-                symbol_name
-            )
-            for tick in ticks         
-        ]
-        seperator = ","
 
-        cursor.execute("insert into market_ticks(timestamp, open, close, high, low, amount, volume, count, market, symbol) values %s" % seperator.join(values))
-        this.client.commit()
+        try:
+            values = [
+                "(%s, %s, %s, %s, %s, %s, %s, %s, '%s', '%s')" % (
+                    tick.time + tick.timezone_offset,
+                    tick.open,
+                    tick.close,
+                    tick.high,
+                    tick.low,
+                    tick.amount,
+                    tick.volume,
+                    tick.count,
+                    market_name,
+                    symbol_name
+                )
+                for tick in ticks         
+            ]
+            seperator = ","
 
-        cursor.close()
+            cursor.execute("insert into market_ticks(timestamp, open, close, high, low, amount, volume, count, market, symbol) values %s" % seperator.join(values))
+            this.client.commit()
+        finally:
+            cursor.close()
 
     def query(this, sql):
         cursor = this.client.cursor()
-        cursor.execute(sql)
-        rows = cursor.fetchall()
-        cursor.close()
-        return rows
+
+        try:
+            cursor.execute(sql)
+            rows = cursor.fetchall()
+            return rows
+        finally:
+            cursor.close()
+

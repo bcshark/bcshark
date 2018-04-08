@@ -19,6 +19,7 @@ class influxdb_adapter(database_adapter):
     def close(this):
         if this.client:
             this.client.close()
+            this.client = None
 
     def create_database_if_not_exists(this, database_name):
         if not filter(lambda db : db['name'] == database_name, this.client.get_list_database()):
