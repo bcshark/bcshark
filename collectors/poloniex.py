@@ -13,6 +13,8 @@ class collector_poloniex(collector):
         this.period = this.DEFAULT_PERIOD
 
     def translate(this, objs):
+        print objs
+
         ticks = []
         tick = market_tick()
         tick.time = objs[0]["date"]
@@ -32,7 +34,7 @@ class collector_poloniex(collector):
         time_second = int(time.time())
         time_second = time_second - time_second % 100 -300 ## possible to miss data each 5 mins ?
         for symbol in this.symbols:
-            url = "public?command=returnChartData&currencyPair=%s&start=%s&period=%s" % (symbol, time_second, this.DEFAULT_SIZE)
+            url = "public?command=returnChartData&currencyPair=%s&start=%s&period=%s" % (symbol, time_second, this.DEFAULT_PERIOD)
             url = this.API_URL % url
             data = this.http_request_json(url, None)
 
