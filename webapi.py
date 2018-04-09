@@ -1,5 +1,6 @@
 import time
 import logging
+import logging.handlers
 import json
 
 from lib.config import ConfigurationManager
@@ -12,8 +13,15 @@ from flask_cors import CORS
 
 from services.kline_service import kline_service
 
+formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
+
+file_logger_handler = logging.handlers.TimedRotatingFileHandler('logs/webapi.log', when = 'D', interval = 1, backupCount = 10)
+file_logger_handler.suffix = "%Y-%m-%d_%H-%M-%S.log"
+file_logger_handler.setFormatter(formatter)
+file_logger_handler.setLevel(logging.DEBUG)
+logger.addHandler(file_logger_handler)
 
 app = Flask(__name__)
 CORS(app)

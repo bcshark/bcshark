@@ -1,4 +1,5 @@
 import logging
+import logging.handlers
 import threading
 
 from lib.config import ConfigurationManager
@@ -8,8 +9,15 @@ from adapters.mysqldb_adapter import mysqldb_adapter
 
 TIMEOUT_COLLECT_IN_SECONDS = 60
 
-logging.basicConfig(level=logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
+
+file_logger_handler = logging.handlers.TimedRotatingFileHandler('logs/collect.log', when = 'D', interval = 1, backupCount = 10)
+file_logger_handler.suffix = "%Y-%m-%d_%H-%M-%S.log"
+file_logger_handler.setFormatter(formatter)
+file_logger_handler.setLevel(logging.DEBUG)
+logger.addHandler(file_logger_handler)
 
 if __name__ == '__main__':
     global factory
