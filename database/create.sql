@@ -2,7 +2,7 @@ CREATE DATABASE IF NOT EXISTS market_index DEFAULT CHARSET utf8 COLLATE utf8_gen
 
 CREATE TABLE `market_ticks` (
 	  `id` int(11) NOT NULL AUTO_INCREMENT,
-	  `timestamp` bigint(18) DEFAULT NULL,
+	  `time` bigint(18) DEFAULT NULL,
 	  `open` decimal(18,9) DEFAULT NULL,
 	  `close` decimal(18,9) DEFAULT NULL,
 	  `high` decimal(18,9) DEFAULT NULL,
@@ -15,6 +15,6 @@ CREATE TABLE `market_ticks` (
 	  `period` varchar(45) DEFAULT NULL,
 	  PRIMARY KEY (`id`),
 	  UNIQUE KEY `id_UNIQUE` (`id`),
-	  KEY `IDX_TIMESTAMP` (`timestamp`)
+	  KEY `IDX_TIMESTAMP` (`time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

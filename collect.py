@@ -1,6 +1,7 @@
 import logging
 import threading
 
+from lib.config import ConfigurationManager
 from collectors.collector_factory import collector_factory
 from adapters.influxdb_adapter import influxdb_adapter
 from adapters.mysqldb_adapter import mysqldb_adapter
@@ -12,32 +13,12 @@ logger = logging.getLogger(__name__)
 
 if __name__ == '__main__':
     global factory
-    global settings
 
-    settings = { 
-        'logger': logger, 
-        'timezone_offset': -8 * 3600,
-        'influxdb': {
-            'host': '127.0.0.1',
-            'port': 8086,
-            'username': 'root',
-            'password': 'root',
-            'database': 'market_index'
-        },
-        'mysqldb': {
-            'host': '127.0.0.1',
-            'port': 3306,
-            'username': 'root',
-            'password': '76f4dd9b',
-            'database': 'market_index'
-        },
-        'kline': {
-            'size': 200
-        },
-        'symbols': [ 'btcusdt', 'eosbtc', 'ethbtc' ]
-    }
+    settings = ConfigurationManager('config/global.json')
+    settings['logger'] = logger
     settings['db_adapter'] = influxdb_adapter(settings['influxdb'])
     #settings['db_adapter'] = mysqldb_adapter(settings['mysqldb'])
+
     factory = collector_factory(settings)
     threads = []
 

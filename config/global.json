@@ -1,0 +1,21 @@
+{ 
+	"timezone_offset": -28800,
+	"influxdb": {
+		"host": "127.0.0.1",
+		"port": 8086,
+		"username": "root",
+		"password": "root",
+		"database": "market_index"
+	},
+	"mysqldb": {
+		"host": "127.0.0.1",
+		"port": 3306,
+		"username": "root",
+		"password": "76f4dd9b",
+		"database": "market_index"
+	},
+	"kline": {
+		"size": 200
+	},
+	"symbols": [ "btcusdt", "eosbtc", "ethbtc" ]
+}

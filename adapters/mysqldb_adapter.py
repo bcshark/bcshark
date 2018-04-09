@@ -42,7 +42,7 @@ class mysqldb_adapter(database_adapter):
             ]
             seperator = ","
 
-            cursor.execute("insert into market_ticks(timestamp, open, close, high, low, amount, volume, count, market, symbol, period) values %s" % seperator.join(values))
+            cursor.execute("insert into market_ticks(time, open, close, high, low, amount, volume, count, market, symbol, period) values %s" % seperator.join(values))
             this.client.commit()
         finally:
             cursor.close()
@@ -53,7 +53,21 @@ class mysqldb_adapter(database_adapter):
         try:
             cursor.execute(sql)
             rows = cursor.fetchall()
-            return rows
+            ticks = [
+                list(row) for row in rows             
+            ]
+
+            ticks.sort(lambda x, y: int(x[0] - y[0]))
+            result = {
+                'series': [
+                    {
+                        'columns': [ 'time', 'open', 'close', 'low', 'high' ],
+                        'values': ticks
+                    }
+                ]
+            }
+
+            return result
         finally:
             cursor.close()
 
