@@ -37,13 +37,15 @@ class influxdb_adapter(database_adapter):
             'time': get_timestamp_str(tick.time, tick.timezone_offset),
             'fields': {
                 'time': tick.time + tick.timezone_offset,
+                'timestamp': tick.time,
                 'open': tick.open,
                 'close': tick.close,
                 'low': tick.low,
                 'high': tick.high,
                 'amount': tick.amount,
                 'volume': tick.volume,
-                'count': tick.count
+                'count': tick.count,
+                'period': tick.period
             }
         } for tick in ticks]
 

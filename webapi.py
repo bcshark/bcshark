@@ -76,7 +76,7 @@ if __name__ == '__main__':
         },
         'symbols': [ 'btcusdt', 'eosbtc', 'ethbtc' ]
     }
-    #settings['db_adapter'] = influxdb_adapter(settings['influxdb'])
-    settings['db_adapter'] = mysqldb_adapter(settings['mysqldb'])
+    settings['db_adapter'] = influxdb_adapter(settings['influxdb'])
+    #settings['db_adapter'] = mysqldb_adapter(settings['mysqldb'])
 
     app.run(debug = True, threaded = True, host = '0.0.0.0', port = 5000)
