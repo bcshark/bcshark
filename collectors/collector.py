@@ -20,4 +20,3 @@ class collector(object):
 
     def bulk_save_ticks(this, market_name, symbol_name, ticks):
         this.db_adapter.bulk_save_ticks(market_name, symbol_name, ticks)
-
