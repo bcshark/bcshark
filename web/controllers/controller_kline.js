@@ -8,10 +8,23 @@ var KlineController = ['$scope', '$http', function($scope, $http) {
 
 	$scope.isNavCollapsed = true;
 	$scope.selectedSymbol = 'btcusdt';
+	$scope.market_dropdown = {
+		isopen : false,
+		isdisabled : false
+	};
+	$scope.markets = [
+		{ title : 'Huobi', name : 'huobi' },
+		{ title : 'Binance', name : 'binance' }
+	];
 
 	$scope.switchSymbol = function(symbol) {
 		$scope.selectedSymbol = symbol;
 		$scope.isNavCollapsed = true;
+		getMarketTicks();
+	}
+
+	$scope.switchMarket = function(market) {
+		$scope.selectedMarket = market;
 		getMarketTicks();
 	}
 
@@ -59,7 +72,7 @@ var KlineController = ['$scope', '$http', function($scope, $http) {
 	}
 
 	function getMarketTicks() {
-		$scope.promise = $http.get('http://192.168.56.101:5000/api/kline/huobi/' + $scope.selectedSymbol)
+		$scope.promise = $http.get('http://192.168.56.101:5000/api/kline/' + $scope.selectedMarket.name + '/' + $scope.selectedSymbol)
 			.then(function(res) {
 				data0 = splitData(res.data);
 
@@ -254,5 +267,5 @@ var KlineController = ['$scope', '$http', function($scope, $http) {
 		);
 	}
 
-	getMarketTicks();
+	$scope.switchMarket($scope.markets[0]);
 }];

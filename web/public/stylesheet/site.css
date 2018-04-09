@@ -19,3 +19,11 @@
 .navbar-item {
 	cursor: pointer;
 }
+
+.market-dropdown {
+	position: relative; 
+	top: 0; 
+	right: 10; 
+	float: right;
+	z-index: 99;
+}

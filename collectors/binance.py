@@ -19,7 +19,7 @@ class collector_binance(collector):
         ticks = []
         for obj in objs:
             tick = market_tick()
-            tick.time = obj[6]
+            tick.time = obj[6] / 1000
             tick.timezone_offset = this.timezone_offset
             tick.open = obj[1]
             tick.close = obj[4]
