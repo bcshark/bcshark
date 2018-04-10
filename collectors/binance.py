@@ -14,6 +14,7 @@ class collector_binance(collector):
         super(collector_binance, this).__init__(settings)
 
         this.period = this.DEFAULT_PERIOD
+        this.symbols_binance = this.symbols['default']
 
     def translate(this, objs):
         ticks = []
@@ -37,7 +38,7 @@ class collector_binance(collector):
     def collect(this):
         timestamp = current_timestamp_str() 
 
-        for symbol in this.symbols:
+        for symbol in this.symbols_binance:
             url = "klines?symbol=%s&interval=%s&limit=%d" % (symbol.upper(), this.DEFAULT_PERIOD, this.DEFAULT_SIZE)
             url = this.API_URL % url
             data = this.http_request_json(url, None)

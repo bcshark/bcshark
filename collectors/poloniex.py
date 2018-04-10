@@ -11,6 +11,7 @@ class collector_poloniex(collector):
     def __init__(this, settings):
         super(collector_poloniex, this).__init__(settings)
         this.period = this.DEFAULT_PERIOD
+        this.symbols_poloniex = this.symbols['poloniex']
 
     def translate(this, objs):
         print objs
@@ -33,10 +34,16 @@ class collector_poloniex(collector):
         return ticks
 
     def collect(this):
+        symbol_index = -1
 
         time_second = int(time.time())
-        time_second = time_second - time_second % 100 -300 ## possible to miss data each 5 mins ?
+        time_second = time_second - time_second % 60 - 300 ## possible to miss data each 5 mins ?
         for symbol in this.symbols_poloniex:
+            symbol_index += 1
+
+            if symbol == "":
+                continue
+
             url = "public?command=returnChartData&currencyPair=%s&start=%s&period=%s" % (symbol, time_second, this.DEFAULT_PERIOD)
             url = this.API_URL % url
             data = this.http_request_json(url, None)
@@ -49,8 +56,13 @@ class collector_poloniex(collector):
             if ticks[0].time == 0:
                 this.logger.info('empty data for poloniex, ignore it')
                 return
-            this.bulk_save_ticks('poloniex', symbol, ticks)
+            this.bulk_save_ticks('poloniex', this.get_generic_symbol_name(symbol_index), ticks)
             this.logger.info('get response from poloniex')
+
+    def get_generic_symbol_name(this, symbol_index):
+        symbols_default = this.symbols['default']
+
+        return symbols_default[symbol_index]
 
     def get_generic_period_name(this, period_name):
 

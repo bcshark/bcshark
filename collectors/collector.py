@@ -3,18 +3,18 @@ import requests
 from .utility import *
 
 class collector(object):
+    DEFAULT_TIMEOUT_IN_SECONDS = 1;
+
     def __init__(this, settings):
         this.settings = settings
         this.logger = settings['logger']
         this.db_adapter = settings['db_adapter']
         this.symbols = settings['symbols']
-        this.symbols_okex = settings['symbols_okex']
-        this.symbols_poloniex = settings['symbols_poloniex']
         this.timezone_offset = settings['timezone_offset']
 
     def http_request_json(this, url, headers):
         try:
-            res = requests.get(url, headers = headers)
+            res = requests.get(url, headers = headers, timeout = this.DEFAULT_TIMEOUT_IN_SECONDS)
 
             return res.json()
         except Exception, e:

@@ -7,12 +7,13 @@ from .utility import *
 class collector_okex(collector):
     API_URL = "https://www.okex.com/api/v1/%s"
     DEFAULT_PERIOD = "1min"
-    DEFAULT_SIZE = 1
+    DEFAULT_SIZE = 200
     DEFAULT_TYPE = "this_week"
 
     def __init__(this, settings):
         super(collector_okex, this).__init__(settings)
         this.period = this.DEFAULT_PERIOD
+        this.symbols_okex = this.symbols['okex']
 
     def translate(this, objs):
         ticks = []
@@ -34,8 +35,14 @@ class collector_okex(collector):
         return ticks
 
     def collect(this):
+        symbol_index = 0
 
         for symbol in this.symbols_okex:
+            symbol_index += 1
+
+            if symbol == "":
+                continue
+
             url = "future_kline.do?symbol=%s&type=%s&contract_type=%s&size=%s" % (symbol, this.DEFAULT_PERIOD, this.DEFAULT_TYPE, this.DEFAULT_SIZE)
             url = this.API_URL % url
             data = this.http_request_json(url, None)
@@ -45,9 +52,14 @@ class collector_okex(collector):
                 continue
 
             ticks = this.translate(data)
-            this.bulk_save_ticks('okex', symbol, ticks)
+            this.bulk_save_ticks('okex', this.get_generic_symbol_name(symbol_index), ticks)
 
             this.logger.info('get response from okex')
+
+    def get_generic_symbol_name(this, symbol_index):
+        symbols_default = this.symbols['default']
+
+        return symbols_default[symbol_index]
 
     def get_generic_period_name(this, period_name):
 

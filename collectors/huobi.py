@@ -14,6 +14,7 @@ class collector_huobi(collector):
         super(collector_huobi, this).__init__(settings)
 
         this.period = this.DEFAULT_PERIOD
+        this.symbols_huobi = this.symbols['default']
 
     def translate(this, objs):
         ticks = []
@@ -37,7 +38,7 @@ class collector_huobi(collector):
     def collect(this):
         timestamp = current_timestamp_str() 
 
-        for symbol in this.symbols:
+        for symbol in this.symbols_huobi:
             url = "kline?Timestamp=%s&peroid=%s&size=%s&symbol=%s" % (timestamp, this.DEFAULT_PERIOD, this.DEFAULT_SIZE, symbol)
             url = this.API_URL % url
             data = this.http_request_json(url, None)
