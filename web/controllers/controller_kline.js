@@ -14,7 +14,10 @@ var KlineController = ['$scope', '$http', function($scope, $http) {
 	};
 	$scope.markets = [
 		{ title : 'Huobi', name : 'huobi' },
-		{ title : 'Binance', name : 'binance' }
+		{ title : 'Binance', name : 'binance' },
+		{ title : 'okex', name : 'okex' },
+		{ title : 'poloniex', name : 'poloniex' },
+		{ title : 'okcoin', name : 'okcoin' }
 	];
 
 	$scope.switchSymbol = function(symbol) {
