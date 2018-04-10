@@ -1,6 +1,7 @@
 class kline_service(object):
-    def __init__(this, client):
+    def __init__(this, client, settings):
         this.client = client
+        this.settings = settings
 
     def get_kline_by_time_range(this, start, end):
         result_set = this.client.query('select * from market_ticks')

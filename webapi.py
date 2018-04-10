@@ -31,7 +31,7 @@ def api_kline(market, symbol):
     client = settings['db_adapter']
 
     client.open()
-    service = kline_service(client)
+    service = kline_service(client, settings)
     kline =  service.get_kline_by_market_symbol(market, symbol, settings['kline']['size'])
     client.close()
 
