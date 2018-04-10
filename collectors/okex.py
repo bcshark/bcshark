@@ -47,7 +47,7 @@ class collector_okex(collector):
             url = this.API_URL % url
             data = this.http_request_json(url, None)
 
-            if not data or not isinstance(data, list:
+            if not data or not isinstance(data, list):
                 this.logger.error('cannot get response from okex (%s)' % symbol)
                 continue
 

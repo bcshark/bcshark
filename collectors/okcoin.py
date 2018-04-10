@@ -48,7 +48,7 @@ class collector_okcoin(collector):
             url = this.API_URL % url
             data = this.http_request_json(url, None)
 
-            if not data or not isinstance(data, list:
+            if not data or not isinstance(data, list):
                 this.logger.error('cannot get response from okcoin (%s)' % symbol)
                 continue
 
