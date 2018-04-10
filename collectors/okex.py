@@ -35,7 +35,7 @@ class collector_okex(collector):
         return ticks
 
     def collect(this):
-        symbol_index = 0
+        symbol_index = -1
 
         for symbol in this.symbols_okex:
             symbol_index += 1

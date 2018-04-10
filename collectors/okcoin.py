@@ -34,7 +34,7 @@ class collector_okcoin(collector):
         return ticks
 
     def collect(this):
-        symbol_index = 0
+        symbol_index = -1
 
         time_second = int(time.time())
         time_second = time_second - time_second % 60 - 300 ## possible to miss data each 5 mins ?
