@@ -21,6 +21,8 @@ class collector_factory(object):
             collector = collector_poloniex(this.settings)
         elif collector_name == 'okcoin':
             collector = collector_okcoin(this.settings)
+        elif collector_name == 'gdax':
+            collector = collector_okcoin(this.settings)
 
         return collector
 
@@ -30,7 +32,8 @@ class collector_factory(object):
             this.get_collector('binance'),
             this.get_collector('okex'),
             this.get_collector('poloniex'),
-            this.get_collector('okcoin')
+            this.get_collector('okcoin'),
+            this.get_collector('gdax')
         ]
 
         return collectors

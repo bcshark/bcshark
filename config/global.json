@@ -21,6 +21,7 @@
 		"default": [ "btcusdt", "eosbtc", "ethbtc" ],
 		"okex": [ "btc_usd", "eos_btc", "eth_btc" ],
 		"okcoin": [ "btc_usd", "eos_btc", "eth_btc" ],
-		"poloniex": [ "USDT_BTC", "EOS_BTC", "ETH_BTC" ]
+		"poloniex": [ "USDT_BTC", "EOS_BTC", "ETH_BTC" ],
+		"gdax": [ "BTC-USD" ]
 	}
 }
