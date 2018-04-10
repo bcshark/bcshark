@@ -1,7 +1,7 @@
 import time
 
 def get_timestamp_str(time_in_seconds, timezone_offset):
-    if not time_in_seconds is long and not time_in_seconds is int:
+    if isinstance(time_in_seconds, str) or isinstance(time_in_seconds, unicode):
         return time_in_seconds
     return time.strftime('%Y-%m-%dT%H:%M:%SZ', time.localtime(time_in_seconds + timezone_offset))
 
