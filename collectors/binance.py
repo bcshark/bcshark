@@ -43,7 +43,7 @@ class collector_binance(collector):
             url = this.API_URL % url
             data = this.http_request_json(url, None)
         
-            if not data:
+            if not data or not isinstance(data, list):
                 this.logger.error('cannot get response from binance (%s)' % symbol)
                 continue
 

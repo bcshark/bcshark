@@ -43,7 +43,7 @@ class collector_huobi(collector):
             url = this.API_URL % url
             data = this.http_request_json(url, None)
         
-            if not data:
+            if not data or not data.has_key('data'):
                 this.logger.error('cannot get response from huobi (%s)' % symbol)
                 continue
 
