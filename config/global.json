@@ -17,5 +17,7 @@
 	"kline": {
 		"size": 200
 	},
-	"symbols": [ "btcusdt", "eosbtc", "ethbtc" ]
+	"symbols": [ "btcusdt", "eosbtc", "ethbtc" ],
+	"symbols_okex": [ "btc_usd" ],
+	"symbols_poloniex": [ "USDT_BTC" ]
 }

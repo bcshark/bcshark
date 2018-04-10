@@ -18,13 +18,16 @@ class collector_okex(collector):
         ticks = []
         for obj in objs:
             tick = market_tick()
+            tick.timezone_offset = this.timezone_offset
             tick.time = obj[0]
             tick.open = obj[1]
             tick.high = obj[2]
             tick.low = obj[3]
             tick.close = obj[4]
             tick.volume = obj[5]
-            tick.period = this.period
+            tick.amount = 0
+            tick.count = 0
+            tick.period = this.get_generic_period_name(this.period)
 
             ticks.append(tick)
 
@@ -32,7 +35,7 @@ class collector_okex(collector):
 
     def collect(this):
 
-        for symbol in this.symbols:
+        for symbol in this.symbols_okex:
             url = "future_kline.do?symbol=%s&type=%s&contract_type=%s&size=%s" % (symbol, this.DEFAULT_PERIOD, this.DEFAULT_TYPE, this.DEFAULT_SIZE)
             url = this.API_URL % url
             data = this.http_request_json(url, None)
@@ -42,7 +45,10 @@ class collector_okex(collector):
                 continue
 
             ticks = this.translate(data)
-            this.bulk_save_tick('okex', symbol, ticks)
+            this.bulk_save_ticks('okex', symbol, ticks)
 
             this.logger.info('get response from okex')
 
+    def get_generic_period_name(this, period_name):
+
+        return this.DEFAULT_PERIOD

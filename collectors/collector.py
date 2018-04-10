@@ -8,6 +8,8 @@ class collector(object):
         this.logger = settings['logger']
         this.db_adapter = settings['db_adapter']
         this.symbols = settings['symbols']
+        this.symbols_okex = settings['symbols_okex']
+        this.symbols_poloniex = settings['symbols_poloniex']
         this.timezone_offset = settings['timezone_offset']
 
     def http_request_json(this, url, headers):
