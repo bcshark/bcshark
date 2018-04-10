@@ -20,7 +20,7 @@ class collector_okex(collector):
         for obj in objs:
             tick = market_tick()
             tick.timezone_offset = this.timezone_offset
-            tick.time = obj[0]
+            tick.time = obj[0] / 1000
             tick.open = obj[1]
             tick.high = obj[2]
             tick.low = obj[3]
