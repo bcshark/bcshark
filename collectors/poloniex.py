@@ -14,8 +14,6 @@ class collector_poloniex(collector):
         this.symbols_poloniex = this.symbols['poloniex']
 
     def translate(this, objs):
-        print objs
-
         ticks = []
         tick = market_tick()
         tick.time = objs[0]["date"]
