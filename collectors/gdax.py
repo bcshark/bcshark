@@ -17,20 +17,21 @@ class collector_gdax(collector):
 
     def translate(this, objs):
         ticks = []
-        tick = market_tick()
-        tick.timezone_offset = this.timezone_offset
-        tick = market_tick()
-        tick.time = objs[0][0]
-        tick.open = objs[0][3]
-        tick.high = objs[0][2]
-        tick.low = objs[0][1]
-        tick.close = objs[0][4]
-        tick.volume = objs[0][5]
-        tick.amount = 0
-        tick.count = 0
-        tick.period = this.period
 
-        ticks.append(tick)
+        for obj in objs:
+            tick = market_tick()
+            tick.timezone_offset = this.timezone_offset
+            tick.time = objs[0][0]
+            tick.open = objs[0][3]
+            tick.high = objs[0][2]
+            tick.low = objs[0][1]
+            tick.close = objs[0][4]
+            tick.volume = objs[0][5]
+            tick.amount = 0
+            tick.count = 0
+            tick.period = this.period
+
+            ticks.append(tick)
 
         return ticks
 
