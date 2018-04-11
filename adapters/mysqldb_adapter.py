@@ -57,7 +57,6 @@ class mysqldb_adapter(database_adapter):
                 list(row) for row in rows             
             ]
 
-            ticks.sort(lambda x, y: int(x[0] - y[0]))
             result = {
                 'series': [
                     {

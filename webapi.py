@@ -50,13 +50,16 @@ def api_kline(market, symbol):
 
     timezone_offset = settings['timezone_offset']
 
+    ticks = kline['series'][0]['values']
+    ticks.sort(lambda x, y: int(x[time_index] - y[time_index]))
+
     kline = [[
-        get_timestamp_str(value[time_index], 0),
-        float(value[open_index]),
-        float(value[close_index]),
-        float(value[low_index]),
-        float(value[high_index])
-    ] for value in kline['series'][0]['values']]
+        get_timestamp_str(tick[time_index], 0),
+        float(tick[open_index]),
+        float(tick[close_index]),
+        float(tick[low_index]),
+        float(tick[high_index])
+    ] for tick in ticks]
 
     return json.dumps(kline)
 
