@@ -33,7 +33,7 @@ class collector_factory(object):
         collectors = []
 
         for market in markets:
-            collectors.append(market)
+            collectors.append(this.get_collector(market))
 
         return collectors
 
