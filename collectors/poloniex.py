@@ -58,7 +58,7 @@ class collector_poloniex(collector):
             this.logger.info('get response from poloniex')
 
     def get_generic_symbol_name(this, symbol_index):
-        symbols_default = this.symbols['poloniex']
+        symbols_default = this.symbols['default']
 
         return symbols_default[symbol_index]
 

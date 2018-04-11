@@ -18,10 +18,10 @@
 		"size": 200
 	},
 	"symbols": {
-		"default": [ "btcusdt", "eosbtc", "ethbtc" ],
-		"okex": [ "btc_usd", "eos_btc", "eth_btc" ],
-		"okcoin": [ "btc_usd", "eos_btc", "eth_btc" ],
-		"poloniex": [ "USDT_BTC", "EOS_BTC", "ETH_BTC" ],
-		"gdax": [ "BTC-USD" ]
+		"default":	[ "btcusdt",	"eosbtc", 	"ethbtc",	"usdtbtc" 	],
+		"okex": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"" 			],
+		"okcoin": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"" 			],
+		"poloniex": [ "", 			"EOS_BTC", 	"ETH_BTC",	"USDT_BTC" 	],
+		"gdax": 	[ "BTC-USD", 	"", 		"",			"" 			]
 	}
 }

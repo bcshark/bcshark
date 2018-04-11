@@ -60,7 +60,7 @@ class collector_gdax(collector):
             this.logger.info('get response from gdax')
 
     def get_generic_symbol_name(this, symbol_index):
-        symbols_default = this.symbols['gdax']
+        symbols_default = this.symbols['default']
 
         return symbols_default[symbol_index]
 

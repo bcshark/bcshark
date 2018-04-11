@@ -22,7 +22,7 @@ class collector_factory(object):
         elif collector_name == 'okcoin':
             collector = collector_okcoin(this.settings)
         elif collector_name == 'gdax':
-            collector = collector_okcoin(this.settings)
+            collector = collector_gdax(this.settings)
 
         return collector
 
