@@ -28,14 +28,12 @@ class collector_factory(object):
         return collector
 
     def get_all_collectors(this):
-        collectors = [ 
-            this.get_collector('huobi'), 
-            this.get_collector('binance'),
-            this.get_collector('okex'),
-            this.get_collector('poloniex'),
-            this.get_collector('okcoin'),
-            this.get_collector('gdax')
-        ]
+        markets = this.settings['markets']
+
+        collectors = []
+
+        for market in markets:
+            collectors.append(market)
 
         return collectors
 
