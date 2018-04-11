@@ -51,7 +51,7 @@ def api_kline(market, symbol):
     timezone_offset = settings['timezone_offset']
 
     ticks = kline['series'][0]['values']
-    ticks.sort(lambda x, y: cmp(x[time_index], y[time_index])
+    ticks.sort(lambda x, y: cmp(x[time_index], y[time_index]))
 
     kline = [[
         get_timestamp_str(tick[time_index], 0),
