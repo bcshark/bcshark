@@ -1,23 +1,25 @@
 <div cg-busy="{ promise: promise }">
-	<nav class="navbar navbar-default" role="navigation">
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle" ng-click="isNavCollapsed = !isNavCollapsed">
-				<span class="sr-only">Toggle navigation</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
-			<a class="navbar-brand" href="#">
-				<i class="fas fa-chart-line" style="padding-right: 10px;"></i>Market Index K-Line
-			</a>
-		</div>
-		<div class="collapse navbar-collapse" uib-collapse="isNavCollapsed">
-			<ul class="nav navbar-nav">
-				<li ng-repeat="symbol in symbols"><a class="navbar-item" ng-click="switchSymbol(symbol.name)"><i class="fas fa-square" style="padding-right: 10px;"></i>{{ symbol.title }}</a></li>
-			</ul>
-		</div>
-	</nav>
-	<div class="content">
+	<div class="fix-title-bar">
+		<nav class="navbar navbar-default" role="navigation">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" ng-click="isNavCollapsed = !isNavCollapsed">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#">
+					<i class="fas fa-chart-line" style="padding-right: 10px;"></i>Market Index K-Line
+				</a>
+			</div>
+			<div class="collapse navbar-collapse" uib-collapse="isNavCollapsed">
+				<ul class="nav navbar-nav">
+					<li ng-repeat="symbol in symbols"><a class="navbar-item" ng-click="switchSymbol(symbol.name)"><i class="fas fa-square" style="padding-right: 10px;"></i>{{ symbol.title }}</a></li>
+				</ul>
+			</div>
+		</nav>
+	</div>
+	<div class="fix-content">
 		<div class="btn-group market-dropdown" uib-dropdown is-open="market_dropdown.isopen">
 			<button id="market-dropdown" type="button" class="btn btn-default"  uib-dropdown-toggle ng-disabled="disabled">
 				Market: {{ selectedMarket.title }}<span class="caret" style="margin-left: 5px;"></span>
