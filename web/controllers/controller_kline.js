@@ -1,13 +1,13 @@
-var KlineController = ['$scope', '$http', function($scope, $http) {
+var KlineController = ['$scope', '$http', '$timeout', function($scope, $http, $timeout) {
 	var myChart = echarts.init(document.getElementById('kline-chart'));
 
 	var upColor = '#ec0000';
 	var upBorderColor = '#8A0000';
 	var downColor = '#00da3c';
 	var downBorderColor = '#008F28';
+	var nextTickPromise = null;
 
 	$scope.isNavCollapsed = true;
-	$scope.selectedSymbol = 'btcusdt';
 	$scope.market_dropdown = {
 		isopen : false,
 		isdisabled : false
@@ -25,6 +25,8 @@ var KlineController = ['$scope', '$http', function($scope, $http) {
 		{ title : 'OkCoin', name : 'okcoin' },
 		{ title : 'GDAX', name : 'gdax' }
 	];
+	$scope.selectedSymbol = 'btcusdt';
+	$scope.selectedMarket = $scope.markets[0]
 
 	$scope.switchSymbol = function(symbol) {
 		$scope.selectedSymbol = symbol;
@@ -37,8 +39,8 @@ var KlineController = ['$scope', '$http', function($scope, $http) {
 		getMarketTicks();
 	}
 
-	// 数据意义：开盘(open)，收盘(close)，最低(lowest)，最高(highest)
 	/*
+	// 数据意义：开盘(open)，收盘(close)，最低(lowest)，最高(highest)
 	var data0 = splitData([
 		['2013/1/24', 2320.26,2320.26,2287.3,2362.94],
 		['2013/1/25', 2300,2291.3,2288.26,2308.38],
@@ -64,7 +66,7 @@ var KlineController = ['$scope', '$http', function($scope, $http) {
 		};
 	}
 
-	function calculateMA(dayCount) {
+	function calculateMA(data0, dayCount) {
 		var result = [];
 		for (var i = 0, len = data0.values.length; i < len; i++) {
 			if (i < dayCount) {
@@ -276,5 +278,5 @@ var KlineController = ['$scope', '$http', function($scope, $http) {
 		);
 	}
 
-	$scope.switchMarket($scope.markets[0]);
+	nextTickPromise = $timeout(getMarketTicks, 1000);
 }];
