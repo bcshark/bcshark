@@ -21,4 +21,10 @@ class collector(object):
             return None
 
     def bulk_save_ticks(this, market_name, symbol_name, ticks):
+        sql = "select max(time), market, symbol from market_ticks where market = '%s' and symbol = '%s' group by market, symbol" % (market_name, symbol_name)
+        ret = this.db_adapter.query(sql)
+        ret = ret['series'][0]['values'][0][1]
+
+        ticks = filter(lambda x: x.time + x.timezone_offset > ret, ticks)
         this.db_adapter.bulk_save_ticks(market_name, symbol_name, ticks)
+
