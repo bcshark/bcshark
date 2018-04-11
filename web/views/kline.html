@@ -13,9 +13,7 @@
 		</div>
 		<div class="collapse navbar-collapse" uib-collapse="isNavCollapsed">
 			<ul class="nav navbar-nav">
-				<li><a class="navbar-item" ng-click="switchSymbol('btcusdt')"><i class="fas fa-square" style="padding-right: 10px;"></i>BTC - USDT</a></li>
-				<li><a class="navbar-item"  ng-click="switchSymbol('ethbtc')"><i class="fas fa-square" style="padding-right: 10px;"></i>ETH - BTC</a></li>
-				<li><a class="navbar-item"  ng-click="switchSymbol('eosbtc')"><i class="fas fa-square" style="padding-right: 10px;"></i>EOS - BTC</a></li>
+				<li ng-repeat="symbol in symbols"><a class="navbar-item" ng-click="switchSymbol(symbol.name)"><i class="fas fa-square" style="padding-right: 10px;"></i>{{ symbol.title }}</a></li>
 			</ul>
 		</div>
 	</nav>

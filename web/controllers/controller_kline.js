@@ -12,12 +12,18 @@ var KlineController = ['$scope', '$http', function($scope, $http) {
 		isopen : false,
 		isdisabled : false
 	};
+	$scope.symbols = [
+		{ title : 'BTC - USDT', name : 'btcusdt' },
+		{ title : 'ETH - BTC', name : 'ethbtc' },
+		{ title : 'EOS - BTC', name : 'eosbtc' }
+	];
 	$scope.markets = [
 		{ title : 'Huobi', name : 'huobi' },
 		{ title : 'Binance', name : 'binance' },
-		{ title : 'okex', name : 'okex' },
-		{ title : 'poloniex', name : 'poloniex' },
-		{ title : 'okcoin', name : 'okcoin' }
+		{ title : 'OKEX', name : 'okex' },
+		{ title : 'Poloniex', name : 'poloniex' },
+		{ title : 'OkCoin', name : 'okcoin' },
+		{ title : 'GDAX', name : 'gdax' }
 	];
 
 	$scope.switchSymbol = function(symbol) {
