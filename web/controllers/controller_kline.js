@@ -1,4 +1,4 @@
-var KlineController = ['$scope', '$http', '$timeout', function($scope, $http, $timeout) {
+var KlineController = ['$scope', '$http', '$interval', function($scope, $http, $interval) {
 	var myChart = echarts.init(document.getElementById('kline-chart'));
 
 	var upColor = '#ec0000';
@@ -83,7 +83,8 @@ var KlineController = ['$scope', '$http', '$timeout', function($scope, $http, $t
 	}
 
 	function getMarketTicks() {
-		$scope.promise = $http.get('http://192.168.56.101:5000/api/kline/' + $scope.selectedMarket.name + '/' + $scope.selectedSymbol)
+		//$scope.promise = $http.get('http://192.168.56.101:5000/api/kline/' + $scope.selectedMarket.name + '/' + $scope.selectedSymbol)
+		$http.get('http://192.168.56.101:5000/api/kline/' + $scope.selectedMarket.name + '/' + $scope.selectedSymbol)
 			.then(function(res) {
 				data0 = splitData(res.data);
 
@@ -278,5 +279,5 @@ var KlineController = ['$scope', '$http', '$timeout', function($scope, $http, $t
 		);
 	}
 
-	nextTickPromise = $timeout(getMarketTicks, 1000);
+	nextTickPromise = $interval(getMarketTicks, 1000, -1);
 }];
