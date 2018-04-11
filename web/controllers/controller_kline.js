@@ -279,5 +279,6 @@ var KlineController = ['$scope', '$http', '$interval', function($scope, $http, $
 		);
 	}
 
-	nextTickPromise = $interval(getMarketTicks, 1000, -1);
+	nextTickPromise = $interval(getMarketTicks, 20000, -1);
+	getMarketTicks();
 }];
