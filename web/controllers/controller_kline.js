@@ -83,7 +83,6 @@ var KlineController = ['$scope', '$http', '$interval', function($scope, $http, $
 	}
 
 	var isInitialized = false;
-	var option = null;
 
 	function getMarketTicks() {
 		//$scope.promise = $http.get('http://192.168.56.101:5000/api/kline/' + $scope.selectedMarket.name + '/' + $scope.selectedSymbol)
@@ -92,12 +91,18 @@ var KlineController = ['$scope', '$http', '$interval', function($scope, $http, $
 				data0 = splitData(res.data);
 
 				if (isInitialized) {
-					option.xAxis = data0.categoryData;
-					option.series[0].data = data0.values;
-					option.series[1].data = calculateMA(data0, 5);
-					option.series[2].data = calculateMA(data0, 10);
-					option.series[3].data = calculateMA(data0, 20);
-					option.series[4].data = calculateMA(data0, 30);
+					option = {
+						xAxis: { data: data0.categoryData },
+						series: [ 
+							{ data: data0.values },
+							{ data: calculateMA(data0, 5) },
+							{ data: calculateMA(data0, 10) },
+							{ data: calculateMA(data0, 20) },
+							{ data: calculateMA(data0, 30) } 
+						]
+					};
+
+					myChart.setOption(option);				
 				} else {
 					option = {
 						title: {
