@@ -3,6 +3,7 @@ from .binance import collector_binance
 from .okex import collector_okex
 from .poloniex import collector_poloniex
 from .okcoin import collector_okcoin
+from .gdax import collector_gdax
 
 class collector_factory(object):
     def __init__(this, settings):
