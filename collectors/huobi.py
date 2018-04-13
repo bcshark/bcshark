@@ -5,13 +5,11 @@ from .collector import collector
 from .utility import *
 
 class collector_huobi(collector):
-    API_URL = "https://api.huobi.pro/market/history/%s"
-
     DEFAULT_PERIOD = "1min"
     DEFAULT_SIZE = 200
 
-    def __init__(this, settings):
-        super(collector_huobi, this).__init__(settings)
+    def __init__(this, settings, market_settings):
+        super(collector_huobi, this).__init__(settings, market_settings)
 
         this.period = this.DEFAULT_PERIOD
         this.symbols_huobi = this.symbols['default']
@@ -35,12 +33,15 @@ class collector_huobi(collector):
 
         return ticks
 
-    def collect(this):
+    def collect_ws(this):
+        print 'huobi collect ws'
+
+    def collect_rest(this):
         timestamp = current_timestamp_str() 
 
         for symbol in this.symbols_huobi:
             url = "kline?Timestamp=%s&peroid=%s&size=%s&symbol=%s" % (timestamp, this.DEFAULT_PERIOD, this.DEFAULT_SIZE, symbol)
-            url = this.API_URL % url
+            url = this.REST_URL + url
             data = this.http_request_json(url, None)
         
             if not data or not data.has_key('data'):

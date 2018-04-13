@@ -5,11 +5,11 @@ from .collector import collector
 from .utility import *
 
 class collector_poloniex(collector):
-    API_URL = "https://poloniex.com/%s"
     DEFAULT_PERIOD = "300"
 
-    def __init__(this, settings):
-        super(collector_poloniex, this).__init__(settings)
+    def __init__(this, settings, market_settings):
+        super(collector_poloniex, this).__init__(settings, market_settings)
+
         this.period = this.DEFAULT_PERIOD
         this.symbols_poloniex = this.symbols['poloniex']
 
@@ -31,7 +31,7 @@ class collector_poloniex(collector):
 
         return ticks
 
-    def collect(this):
+    def collect_rest(this):
         symbol_index = -1
 
         time_second = int(time.time())
@@ -43,7 +43,7 @@ class collector_poloniex(collector):
                 continue
 
             url = "public?command=returnChartData&currencyPair=%s&start=%s&period=%s" % (symbol, time_second, this.DEFAULT_PERIOD)
-            url = this.API_URL % url
+            url = this.REST_URL + url
             data = this.http_request_json(url, None)
 
             if not data or not isinstance(data, list):

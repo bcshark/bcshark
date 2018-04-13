@@ -5,13 +5,12 @@ from .collector import collector
 from .utility import *
 
 class collector_okex(collector):
-    API_URL = "https://www.okex.com/api/v1/%s"
     DEFAULT_PERIOD = "1min"
     DEFAULT_SIZE = 200
     DEFAULT_TYPE = "this_week"
 
-    def __init__(this, settings):
-        super(collector_okex, this).__init__(settings)
+    def __init__(this, settings, market_settings):
+        super(collector_okex, this).__init__(settings, market_settings)
         this.period = this.DEFAULT_PERIOD
         this.symbols_okex = this.symbols['okex']
 
@@ -34,7 +33,7 @@ class collector_okex(collector):
 
         return ticks
 
-    def collect(this):
+    def collect_rest(this):
         symbol_index = -1
 
         for symbol in this.symbols_okex:
@@ -44,7 +43,7 @@ class collector_okex(collector):
                 continue
 
             url = "future_kline.do?symbol=%s&type=%s&contract_type=%s&size=%s" % (symbol, this.DEFAULT_PERIOD, this.DEFAULT_TYPE, this.DEFAULT_SIZE)
-            url = this.API_URL % url
+            url = this.REST_URL + url
             data = this.http_request_json(url, None)
 
             if not data or not isinstance(data, list):

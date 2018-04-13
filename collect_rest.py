@@ -32,9 +32,9 @@ if __name__ == '__main__':
 
     settings['db_adapter'].open()
 
-    collectors = factory.get_all_collectors()
+    collectors = factory.get_all_rest_collectors()
     for collector in collectors:
-        threads.append(threading.Thread(target=collector.collect))
+        threads.append(threading.Thread(target=collector.collect_rest))
 
     for thread in threads:
         thread.start()

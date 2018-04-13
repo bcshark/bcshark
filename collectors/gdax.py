@@ -6,12 +6,11 @@ from .collector import collector
 from .utility import *
 
 class collector_gdax(collector):
-    API_URL = "https://api.gdax.com/%s"
     DEFAULT_SIZE = 60
     DEFAULT_PERIOD = "1min"
 
-    def __init__(this, settings):
-        super(collector_gdax, this).__init__(settings)
+    def __init__(this, settings, market_settings):
+        super(collector_gdax, this).__init__(settings, market_settings)
         this.period = this.DEFAULT_PERIOD
         this.symbols_gdax = this.symbols['gdax']
 
@@ -35,7 +34,7 @@ class collector_gdax(collector):
 
         return ticks
 
-    def collect(this):
+    def collect_rest(this):
         symbol_index = -1
 
         start = (datetime.datetime.utcnow()-datetime.timedelta(minutes=1)).strftime('%Y-%m-%dT%H:%MZ')
@@ -48,7 +47,7 @@ class collector_gdax(collector):
                 continue
 
             url = "products/%s/candles?start=%s&end=%s&granularity=%s" % (symbol, start, end, this.DEFAULT_SIZE)
-            url = this.API_URL % url
+            url = this.REST_URL + url
             data = this.http_request_json(url, None)
 
             if not data or not isinstance(data, list):

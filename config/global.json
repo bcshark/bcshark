@@ -24,5 +24,37 @@
 		"poloniex": [ "", 			"EOS_BTC", 	"ETH_BTC",	"USDT_BTC",	"ETC_BTC" 	],
 		"gdax": 	[ "BTC-USD", 	"", 		"",			"",			""			]
 	},
-	"markets": [ "huobi", "binance", "okex", "poloniex", "okcoin", "gdax" ]
+	"markets": {
+		"huobi": { 
+			"api": { 
+				"rest": "https://api.huobi.pro/market/history/", 
+				"ws": "wss://api.huobipro.com/ws"
+			}
+		},
+		"binance": { 
+			"api": { 
+				"rest": "https://api.binance.com/api/v1/" 
+			} 
+		},
+		"okex": { 
+			"api": { 
+				"rest": "https://www.okex.com/api/v1/" 
+			} 
+		},
+		"poloniex": { 
+			"api": { 
+				"rest": "https://poloniex.com/" 
+			} 
+		},
+		"okcoin": { 
+			"api": { 
+				"rest": "https://www.okcoin.com/api/v1/" 
+			} 
+		},
+		"gdax": { 
+			"api": { 
+				"rest": "https://api.gdax.com/" 
+			} 
+		}
+	}
 }

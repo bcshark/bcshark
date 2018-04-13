@@ -5,13 +5,11 @@ from .collector import collector
 from .utility import *
 
 class collector_binance(collector):
-    API_URL = "https://api.binance.com/api/v1/%s"
-
     DEFAULT_PERIOD = "1m"
     DEFAULT_SIZE = 200
 
-    def __init__(this, settings):
-        super(collector_binance, this).__init__(settings)
+    def __init__(this, settings, market_settings):
+        super(collector_binance, this).__init__(settings, market_settings)
 
         this.period = this.DEFAULT_PERIOD
         this.symbols_binance = this.symbols['default']
@@ -35,12 +33,15 @@ class collector_binance(collector):
 
         return ticks
 
-    def collect(this):
+    def collect_ws(this):
+        pass
+
+    def collect_rest(this):
         timestamp = current_timestamp_str() 
 
         for symbol in this.symbols_binance:
             url = "klines?symbol=%s&interval=%s&limit=%d" % (symbol.upper(), this.DEFAULT_PERIOD, this.DEFAULT_SIZE)
-            url = this.API_URL % url
+            url = this.REST_URL + url
             data = this.http_request_json(url, None)
         
             if not data or not isinstance(data, list):

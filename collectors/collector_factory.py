@@ -9,31 +9,52 @@ class collector_factory(object):
     def __init__(this, settings):
         this.settings = settings
 
-    def get_collector(this, collector_name):
-        collector = None
+    def get_market_settings(this, market_name):
+        markets = this.settings['markets']
 
-        if collector_name == 'huobi':
-            collector = collector_huobi(this.settings)
-        elif collector_name == 'binance':
-            collector = collector_binance(this.settings)
-        elif collector_name == 'okex':
-            collector = collector_okex(this.settings)
-        elif collector_name == 'poloniex':
-            collector = collector_poloniex(this.settings)
-        elif collector_name == 'okcoin':
-            collector = collector_okcoin(this.settings)
-        elif collector_name == 'gdax':
-            collector = collector_gdax(this.settings)
+        if markets.has_key(market_name):
+            return markets[market_name]
+
+        return None
+
+    def get_collector(this, market_name):
+        collector = None
+        market_settings = this.get_market_settings(market_name)
+
+        if market_name == 'huobi':
+            collector = collector_huobi(this.settings, market_settings)
+        elif market_name == 'binance':
+            collector = collector_binance(this.settings, market_settings)
+        elif market_name == 'okex':
+            collector = collector_okex(this.settings, market_settings)
+        elif market_name == 'poloniex':
+            collector = collector_poloniex(this.settings, market_settings)
+        elif market_name == 'okcoin':
+            collector = collector_okcoin(this.settings, market_settings)
+        elif market_name == 'gdax':
+            collector = collector_gdax(this.settings, market_settings)
 
         return collector
 
-    def get_all_collectors(this):
+    def get_all_rest_collectors(this):
         markets = this.settings['markets']
 
         collectors = []
 
-        for market in markets:
-            collectors.append(this.get_collector(market))
+        for market, settings in markets.items():
+            if settings.has_key('api') and settings['api'].has_key('rest'):
+                collectors.append(this.get_collector(market))
+
+        return collectors
+
+    def get_all_ws_collectors(this):
+        markets = this.settings['markets']
+
+        collectors = []
+
+        for market, settings in markets.items():
+            if settings.has_key('api') and settings['api'].has_key('ws'):
+                collectors.append(this.get_collector(market))
 
         return collectors
 

@@ -29,7 +29,7 @@ CORS(app)
 @app.route('/api/kline/<market>/<symbol>', methods=['GET'])
 def api_kline(market, symbol):
     client = settings['db_adapter']
-    support_markets = settings['markets']
+    support_markets = settings['markets'].keys()
     support_symbols = settings['symbols']['default']
 
     if not market in support_markets or not symbol in support_symbols:
