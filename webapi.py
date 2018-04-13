@@ -33,7 +33,7 @@ def api_kline(market, symbol):
     support_symbols = settings['symbols']['default']
 
     if not market in support_markets or not symbol in support_symbols:
-        return 'unsupport'
+        return 'not supported'
 
     client.open()
     service = kline_service(client, settings)
