@@ -1,4 +1,5 @@
 import requests
+import json
 
 from model.market_tick import  market_tick
 from .collector import collector
@@ -33,8 +34,16 @@ class collector_huobi(collector):
 
         return ticks
 
+    def on_message(this, websocket_client, message):
+        this.logger.info('receive message from huobi websocket: %s', message)
+
+        message_json = json.loads(message)
+
+        if message_json.has_key('ping'):
+            this.send_ws_message(json.dumps({ 'pong': message_json['ping'] }))
+
     def collect_ws(this):
-        print 'huobi collect ws'
+        this.start_listen_websocket(this.WS_URL, this)
 
     def collect_rest(this):
         timestamp = current_timestamp_str() 

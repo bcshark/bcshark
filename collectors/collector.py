@@ -1,4 +1,6 @@
 import requests
+import StringIO
+import gzip
 
 from websocket import WebSocketApp
 
@@ -28,6 +30,27 @@ class collector(object):
             return this.market_settings['api']['ws']
         return None
 
+    def on_open(this, websocket_client):
+        print 'on open'
+
+    def on_close(this, websocket_client):
+        print 'on close'
+
+    def on_raw_message(this, websocket_client, raw_message):
+        if this.on_message:
+            with gzip.GzipFile(fileobj = StringIO.StringIO(raw_message), mode = 'rb') as f:
+                message = f.read()
+
+            this.on_message(websocket_client, message)
+
+    def on_error(this, websocket_client, error):
+        print 'on error'
+        print error
+
+    def send_ws_message(this, message):
+        if this.websocket_client:
+            this.websocket_client.send(message)
+
     def http_request_json(this, url, headers):
         try:
             res = requests.get(url, headers = headers, timeout = this.DEFAULT_TIMEOUT_IN_SECONDS)
@@ -40,7 +63,7 @@ class collector(object):
         if not this.websocket_client:
             this.stop_listen_websocket()
 
-        this.websocket_client = websocket.WebSocketApp(url, on_open = listener.on_open, on_close = listener.on_close, on_message = listener.on_message, on_error = listener.on_error)
+        this.websocket_client = WebSocketApp(url, on_open = listener.on_open, on_close = listener.on_close, on_message = listener.on_raw_message, on_error = listener.on_error)
         this.websocket_client.run_forever()
 
     def stop_listen_websocket(this):
