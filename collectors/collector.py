@@ -1,6 +1,7 @@
 import requests
 import StringIO
 import gzip
+import json
 
 from websocket import WebSocketApp
 
@@ -30,11 +31,12 @@ class collector(object):
             return this.market_settings['api']['ws']
         return None
 
-    def on_open(this, websocket_client):
-        print 'on open'
-
     def on_close(this, websocket_client):
         print 'on close'
+
+    def on_raw_open(this, websocket_client):
+        if this.on_open:
+            this.on_open(websocket_client)
 
     def on_raw_message(this, websocket_client, raw_message):
         if this.on_message:
@@ -46,6 +48,10 @@ class collector(object):
     def on_error(this, websocket_client, error):
         print 'on error'
         print error
+
+    def send_ws_message_json(this, json_obj):
+	message = json.dumps(json_obj)
+	this.send_ws_message(message)
 
     def send_ws_message(this, message):
         if this.websocket_client:
@@ -69,6 +75,9 @@ class collector(object):
     def stop_listen_websocket(this):
         if this.websocket_client:
             this.websocket_client.close()
+
+    def save_tick(this, market_name, symbol_name, tick):
+        this.db_adapter.save_tick(market_name, symbol_name, tick)
 
     def bulk_save_ticks(this, market_name, symbol_name, ticks):
         sql = "select max(time), market, symbol from market_ticks where market = '%s' and symbol = '%s' group by market, symbol" % (market_name, symbol_name)

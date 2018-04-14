@@ -8,6 +8,7 @@ from .utility import *
 class collector_huobi(collector):
     DEFAULT_PERIOD = "1min"
     DEFAULT_SIZE = 200
+    DEFAULT_DELAY = 3
 
     def __init__(this, settings, market_settings):
         super(collector_huobi, this).__init__(settings, market_settings)
@@ -34,6 +35,11 @@ class collector_huobi(collector):
 
         return ticks
 
+    def on_open(this, websocket_client):
+        this.logger.info('huobi websocket connection established')
+
+        this.subscription_delay = this.DEFAULT_DELAY
+
     def on_message(this, websocket_client, message):
         this.logger.info('receive message from huobi websocket: %s', message)
 
@@ -41,6 +47,18 @@ class collector_huobi(collector):
 
         if message_json.has_key('ping'):
             this.send_ws_message(json.dumps({ 'pong': message_json['ping'] }))
+
+            if this.subscription_delay > 0:
+                this.subscription_delay -= 1
+            elif this.subscription_delay == 0:
+		subscription_msg = {
+		    "sub": "market.btcusdt.kline.1min",
+		    "id": "id1"
+		}
+                this.send_ws_message_json(subscription_msg)
+        elif message_json.has_key('tick'):
+            ticks = this.translate([ message_json['tick'] ])
+            this.save_tick('huobi', 'btcusdt', ticks[0])
 
     def collect_ws(this):
         this.start_listen_websocket(this.WS_URL, this)

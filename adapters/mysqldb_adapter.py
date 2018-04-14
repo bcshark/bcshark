@@ -20,6 +20,9 @@ class mysqldb_adapter(database_adapter):
             this.client.close()
             this.client = None
 
+    def save_tick(this, market_name, symbol_name, tick):
+        this.bulk_save_ticks(market_name, symbol_name, [ tick ])
+
     def bulk_save_ticks(this, market_name, symbol_name, ticks):
         cursor = this.client.cursor()
 
