@@ -49,7 +49,11 @@ class influxdb_adapter(database_adapter):
         return points
 
     def save_tick(this, market_name, symbol_name, tick):
-        this.bulk_save_ticks(market_name, symbol_name, [ tick ])
+        measurement_name = 'huobi_ticks'
+
+        points = this.generate_points_by_ticks(measurement_name, market_name, symbol_name, [ tick ])
+
+        this.client.write_points(points)
 
     def bulk_save_ticks(this, market_name, symbol_name, ticks):
         #measurement_name = 'ticks_%s' % market_name

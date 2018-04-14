@@ -3,6 +3,7 @@ CREATE DATABASE IF NOT EXISTS market_index DEFAULT CHARSET utf8 COLLATE utf8_gen
 CREATE TABLE `market_ticks` (
 	  `id` int(11) NOT NULL AUTO_INCREMENT,
 	  `time` bigint(18) DEFAULT NULL,
+	  `timestamp` bigint(18) DEFAULT NULL,
 	  `open` decimal(18,9) DEFAULT NULL,
 	  `close` decimal(18,9) DEFAULT NULL,
 	  `high` decimal(18,9) DEFAULT NULL,

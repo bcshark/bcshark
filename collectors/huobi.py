@@ -1,5 +1,7 @@
 import requests
 import json
+import StringIO
+import gzip
 
 from model.market_tick import  market_tick
 from .collector import collector
@@ -16,11 +18,13 @@ class collector_huobi(collector):
         this.period = this.DEFAULT_PERIOD
         this.symbols_huobi = this.symbols['default']
 
-    def translate(this, objs):
+    def translate(this, ts, objs):
         ticks = []
         for obj in objs:
             tick = market_tick()
+            #FIXME: change this back to id
             tick.time = obj['id']
+            #tick.time = ts
             tick.timezone_offset = this.timezone_offset
             tick.open = obj['open']
             tick.close = obj['close']
@@ -40,9 +44,11 @@ class collector_huobi(collector):
 
         this.subscription_delay = this.DEFAULT_DELAY
 
-    def on_message(this, websocket_client, message):
-        this.logger.info('receive message from huobi websocket: %s', message)
+    def on_message(this, websocket_client, raw_message):
+        with gzip.GzipFile(fileobj = StringIO.StringIO(raw_message), mode = 'rb') as f:
+            message = f.read()
 
+        this.logger.info('receive message from huobi websocket: %s', message)
         message_json = json.loads(message)
 
         if message_json.has_key('ping'):
@@ -57,7 +63,7 @@ class collector_huobi(collector):
 		}
                 this.send_ws_message_json(subscription_msg)
         elif message_json.has_key('tick'):
-            ticks = this.translate([ message_json['tick'] ])
+            ticks = this.translate(message_json['ts'], [ message_json['tick'] ])
             this.save_tick('huobi', 'btcusdt', ticks[0])
 
     def collect_ws(this):
@@ -75,7 +81,7 @@ class collector_huobi(collector):
                 this.logger.error('cannot get response from huobi (%s)' % symbol)
                 continue
 
-            ticks = this.translate(data['data'])
+            ticks = this.translate(data['ts'], data['data'])
             this.bulk_save_ticks('huobi', symbol, ticks)
 
             this.logger.info('get response from huobi')

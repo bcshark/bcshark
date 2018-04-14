@@ -40,6 +40,14 @@ class market_tick(object):
         this._volume = value
 
     @property
+    def timestamp(this):
+        return this._timestamp
+
+    @timestamp.setter
+    def timestamp(this, value):
+        this._timestamp = value
+
+    @property
     def time(this):
         return this._time
 

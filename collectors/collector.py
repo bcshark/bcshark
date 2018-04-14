@@ -1,6 +1,4 @@
 import requests
-import StringIO
-import gzip
 import json
 
 from websocket import WebSocketApp
@@ -40,10 +38,7 @@ class collector(object):
 
     def on_raw_message(this, websocket_client, raw_message):
         if this.on_message:
-            with gzip.GzipFile(fileobj = StringIO.StringIO(raw_message), mode = 'rb') as f:
-                message = f.read()
-
-            this.on_message(websocket_client, message)
+            this.on_message(websocket_client, raw_message)
 
     def on_error(this, websocket_client, error):
         print 'on error'
