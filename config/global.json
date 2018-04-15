@@ -55,6 +55,11 @@
 			"api": { 
 				"rest": "https://api.gdax.com/" 
 			} 
+		},
+		"bitfinex": {
+			"api": {
+				"ws": "wss://api.bitfinex.com/ws/2"
+			}
 		}
 	}
 }
