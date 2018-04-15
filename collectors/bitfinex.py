@@ -42,36 +42,37 @@ class collector_bitfinex(collector):
         this.subscription_delay = this.DEFAULT_DELAY
 
     def on_message(this, websocket_client, raw_message):
-        message_json = raw_message
 
-        this.logger.info('receive message from bitfinex websocket: %s', message_json)
-
-        if message_json.has_key('platform'):
-            status = message_json["platform"]["status"]
-            if status == "1":
-                this.logger.info('bitfinex ws connected!')
-                subscription_msg = {
-                    "event": "subscribe",
-                    "channel": "candles",
-                    "key": "trade:1m:tBTCUSD"
-                }
-                this.send_ws_message_json(subscription_msg)
-        elif message_json.has_key('event'):
-            event = message_json["event"]
-            if event == "subscribed":
-                this.chanId = message_json["chanId"]
-                this.logger.info('bitfinex ws channel: %s', message_json["channel"])
-                this.logger.info('bitfinex ws chanId: %s', this.chanId)
-                this.logger.info('bitfinex ws key: %s', message_json["key"])
-        elif isinstance(message_json,list):
+        this.logger.info('receive message from bitfinex websocket: %s', raw_message)
+        message_json = json.loads(raw_message)
+        if isinstance(message_json, dict):
+            if message_json.has_key('platform'):
+                status = message_json['platform']['status']
+                if status == 1:
+                    this.logger.info('bitfinex ws connected!')
+                    subscription_msg = {
+                        "event": "subscribe",
+                        "channel": "candles",
+                        "key": "trade:1m:tBTCUSD"
+                    }
+                    this.send_ws_message_json(subscription_msg)
+            elif message_json.has_key('event'):
+                event = message_json['event']
+                this.logger.info('event=%s',event)
+                if event == "subscribed":
+                    this.chanId = message_json['chanId']
+                    this.logger.info('bitfinex ws channel: %s', message_json['channel'])
+                    this.logger.info('bitfinex ws chanId: %s', this.chanId)
+                    this.logger.info('bitfinex ws key: %s', message_json['key'])
+        elif isinstance(message_json, list):
             if message_json[0] == this.chanId:
                 data = message_json[1]
                 if isinstance(data[0],list):
                     this.logger.info('bitfinex ws ignore history long candles for chanId: %s', this.chanId)
                     return
-                this.logger.info('bitfinex ws get data: %s', data)
-                ticks = this.translate(data[0], data)
-                this.save_tick('bitfinex_ticks', 'bitfinex', 'btcusdt', ticks[0])
+                if data != 'hb':
+                    ticks = this.translate(data[0], data)
+                    this.save_tick('bitfinex_ticks', 'bitfinex', 'btcusdt', ticks[0])
 
     def collect_ws(this):
         this.start_listen_websocket(this.WS_URL, this)
