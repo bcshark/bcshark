@@ -25,7 +25,7 @@ class influxdb_adapter(database_adapter):
         if not filter(lambda db : db['name'] == database_name, this.client.get_list_database()):
             this.client.create_database(database_name) 
 
-    def generate_point_by_dict(this. measurement_name, market_name, symbol_name, dict_obj):
+    def generate_point_by_dict(this, measurement_name, market_name, symbol_name, dict_obj):
         point = {
             'measurement': measurement_name,
             'tags': {

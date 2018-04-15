@@ -42,30 +42,30 @@ class collector_bitstamp(collector):
         ret = dict(obj)
 
         ret['time'] = ts
-        ret['timestamp_offset'] = this.timezone_offset
+        ret['timezone_offset'] = this.timezone_offset
 
         return ret
 
     def on_open(this, websocket_client):
-        this.logger.info('huobi websocket connection established')
+        this.logger.info('bitstamp websocket connection established')
 
     def on_message(this, websocket_client, raw_message):
-        this.logger.info('receive message from huobi websocket: %s', message)
-        message_json = json.loads(message)
+        this.logger.info('receive message from bitstamp websocket: %s', raw_message)
+        message_json = json.loads(raw_message)
 
         event = message_json['event']
-        data = message_json['data']
+        data = json.loads(message_json['data'])
 
         if event == 'pusher:connection_established':
             this.socket_id = data['socket_id']
 
-            subscription_msg = {event: "pusher:subscribe", data: {channel: "live_trades"}}
+            subscription_msg = { "event": "pusher:subscribe", "data": { "channel": "live_trades" } }
             this.send_ws_message_json(subscription_msg)
 
-            subscription_msg = {"event":"pusher:subscribe","data":{"channel":"diff_order_book"}}
+            subscription_msg = { "event": "pusher:subscribe", "data": { "channel": "diff_order_book" } }
             this.send_ws_message_json(subscription_msg)
         elif event == 'trade':
-            trade = this.translate_trade(data['timestamp'], data)
+            trade = this.translate_trade(long(data['timestamp']), data)
             this.save_tick('bitstamp_trades', 'bitstamp', 'btcusdt', trade)
 
     def collect_ws(this):
