@@ -16,7 +16,6 @@ class collector_bitfinex(collector):
         super(collector_bitfinex, this).__init__(settings, market_settings)
 
         this.period = this.DEFAULT_PERIOD
-        this.symbols_bitfinex = this.symbols['bitfinex']
         this.chanId = '';
 
     def translate(this, ts, obj):
