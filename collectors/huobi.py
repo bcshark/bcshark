@@ -64,7 +64,7 @@ class collector_huobi(collector):
                 this.send_ws_message_json(subscription_msg)
         elif message_json.has_key('tick'):
             ticks = this.translate(message_json['ts'], [ message_json['tick'] ])
-            this.save_tick('huobi', 'btcusdt', ticks[0])
+            this.save_tick('huobi_ticks', 'huobi', 'btcusdt', ticks[0])
 
     def collect_ws(this):
         this.start_listen_websocket(this.WS_URL, this)

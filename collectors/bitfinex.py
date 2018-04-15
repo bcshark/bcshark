@@ -71,7 +71,7 @@ class collector_bitfinex(collector):
                     return
                 this.logger.info('bitfinex ws get data: %s', data)
                 ticks = this.translate(data[0], data)
-                this.save_tick('bitfinex', 'btcusdt', ticks[0])
+                this.save_tick('bitfinex_ticks', 'bitfinex', 'btcusdt', ticks[0])
 
     def collect_ws(this):
         this.start_listen_websocket(this.WS_URL, this)

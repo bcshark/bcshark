@@ -71,8 +71,8 @@ class collector(object):
         if this.websocket_client:
             this.websocket_client.close()
 
-    def save_tick(this, market_name, symbol_name, tick):
-        this.db_adapter.save_tick(market_name, symbol_name, tick)
+    def save_tick(this, measurement_name, market_name, symbol_name, tick):
+        this.db_adapter.save_tick(measurement_name, market_name, symbol_name, tick)
 
     def bulk_save_ticks(this, market_name, symbol_name, ticks):
         sql = "select max(time), market, symbol from market_ticks where market = '%s' and symbol = '%s' group by market, symbol" % (market_name, symbol_name)

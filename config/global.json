@@ -22,7 +22,8 @@
 		"okex": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"",			"etc_btc"	],
 		"okcoin": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"",			"etc_btc"	],
 		"poloniex": [ "", 			"EOS_BTC", 	"ETH_BTC",	"USDT_BTC",	"ETC_BTC" 	],
-		"gdax": 	[ "BTC-USD", 	"", 		"",			"",			""			]
+		"gdax": 	[ "BTC-USD", 	"", 		"",			"",			""			],
+		"bitstamp":	[ "btcusdt", 	"", 		"",			"",			""			]
 	},
 	"markets": {
 		"huobi": { 
@@ -59,6 +60,11 @@
 		"bitfinex": {
 			"api": {
 				"ws": "wss://api.bitfinex.com/ws/2"
+			}
+		},
+		"bitstamp": {
+			"api": {
+				"ws": "wss://ws.pusherapp.com/app/0ea60078504a5d9773ab?protocol=6&client=js&version=2.1.2&flash=false"
 			}
 		}
 	}

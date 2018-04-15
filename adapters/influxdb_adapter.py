@@ -25,6 +25,18 @@ class influxdb_adapter(database_adapter):
         if not filter(lambda db : db['name'] == database_name, this.client.get_list_database()):
             this.client.create_database(database_name) 
 
+    def generate_point_by_dict(this. measurement_name, market_name, symbol_name, dict_obj):
+        point = {
+            'measurement': measurement_name,
+            'tags': {
+                'market': market_name,
+                'symbol': symbol_name
+            },
+            'time': get_timestamp_str(dict_obj['time'], dict_obj['timezone_offset']),
+            'fields': dict_obj
+        }
+        return [ point ]
+
     def generate_points_by_ticks(this, measurement_name, market_name, symbol_name, ticks):
         points = [{
             'measurement': measurement_name,
@@ -48,15 +60,12 @@ class influxdb_adapter(database_adapter):
 
         return points
 
-    def save_tick(this, market_name, symbol_name, tick):
-        measurement_name = 'huobi_ticks'
-
-        points = this.generate_points_by_ticks(measurement_name, market_name, symbol_name, [ tick ])
+    def save_tick(this, measurement_name, market_name, symbol_name, tick):
+        points = this.generate_point_by_dict(measurement_name, market_name, symbol_name, tick)
 
         this.client.write_points(points)
 
     def bulk_save_ticks(this, market_name, symbol_name, ticks):
-        #measurement_name = 'ticks_%s' % market_name
         measurement_name = 'market_ticks'
 
         points = this.generate_points_by_ticks(measurement_name, market_name, symbol_name, ticks)
