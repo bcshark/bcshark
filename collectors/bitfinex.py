@@ -21,7 +21,7 @@ class collector_bitfinex(collector):
     def translate(this, ts, obj):
         ticks = []
         tick = market_tick()
-        tick.time = obj[0]
+        tick.time = obj[0]/1000
         tick.timezone_offset = this.timezone_offset
         tick.open = obj[1]
         tick.close = obj[2]
