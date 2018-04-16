@@ -6,6 +6,7 @@ from .okcoin import collector_okcoin
 from .gdax import collector_gdax
 from .bitfinex import collector_bitfinex
 from .bitstamp import collector_bitstamp
+from .bittrex import collector_bittrex
 
 class collector_factory(object):
     def __init__(this, settings):
@@ -39,6 +40,8 @@ class collector_factory(object):
             collector = collector_bitfinex(this.settings, market_settings)
         elif market_name == 'bitstamp':
             collector = collector_bitstamp(this.settings, market_settings)
+        elif market_name == 'bittrex':
+            collector = collector_bittrex(this.settings, market_settings)
 
         return collector
 

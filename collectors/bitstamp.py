@@ -1,7 +1,5 @@
 import requests
 import json
-import StringIO
-import gzip
 import re
 
 from model.market_tick import  market_tick
