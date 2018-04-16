@@ -2,6 +2,7 @@ import requests
 import json
 import StringIO
 import gzip
+import re
 
 from model.market_tick import  market_tick
 from .collector import collector
@@ -10,33 +11,13 @@ from .utility import *
 class collector_bitstamp(collector):
     DEFAULT_PERIOD = "1min"
     DEFAULT_SIZE = 200
+    PATTERN_LIVE_TRADES = "live_trades([_a-zA-Z]*)"
 
     def __init__(this, settings, market_settings):
         super(collector_bitstamp, this).__init__(settings, market_settings)
 
         this.period = this.DEFAULT_PERIOD
-        this.symbols_bitstamp = this.symbols['default']
-
-    def translate(this, ts, objs):
-        ticks = []
-        for obj in objs:
-            tick = market_tick()
-            #FIXME: change this back to id
-            tick.time = obj['id']
-            #tick.time = ts
-            tick.timezone_offset = this.timezone_offset
-            tick.open = obj['open']
-            tick.close = obj['close']
-            tick.low = obj['low']
-            tick.high = obj['high']
-            tick.amount = obj['amount']
-            tick.volume = obj['vol']
-            tick.count = obj['count']
-            tick.period = this.get_generic_period_name(this.period)
-
-            ticks.append(tick)
-
-        return ticks
+        this.symbols_bitstamp = this.symbols['bitstamp']
 
     def translate_trade(this, ts, obj):
         ret = dict(obj)
@@ -59,14 +40,28 @@ class collector_bitstamp(collector):
         if event == 'pusher:connection_established':
             this.socket_id = data['socket_id']
 
-            subscription_msg = { "event": "pusher:subscribe", "data": { "channel": "live_trades" } }
-            this.send_ws_message_json(subscription_msg)
+            for symbol in this.symbols_bitstamp:
+                if symbol == '':
+                    continue
 
-            subscription_msg = { "event": "pusher:subscribe", "data": { "channel": "diff_order_book" } }
-            this.send_ws_message_json(subscription_msg)
+                if symbol == 'btcusd':
+                    channel_name = "live_trades"
+                else:
+                    channel_name = "live_trades_%s" % symbol
+
+                subscription_msg = { "event": "pusher:subscribe", "data": { "channel": channel_name } }
+                this.send_ws_message_json(subscription_msg)
         elif event == 'trade':
+            channel = message_json['channel']
+            match = re.search(this.PATTERN_LIVE_TRADES, channel)
+
+            if match:
+                symbol_name = match.group(1)[1:]
+            else:
+                symbol_name = 'btcusd'
+
             trade = this.translate_trade(long(data['timestamp']), data)
-            this.save_tick('bitstamp_trades', 'bitstamp', 'btcusdt', trade)
+            this.save_tick('bitstamp_trades', 'bitstamp', this.get_generic_symbol_name(symbol_name), trade)
 
     def collect_ws(this):
         this.start_listen_websocket(this.WS_URL, this)
@@ -74,5 +69,11 @@ class collector_bitstamp(collector):
     def collect_rest(this):
         pass
 
-    def get_generic_period_name(this, period_name):
-        return period_name
+    def get_generic_symbol_name(this, symbol_name):
+        symbols_default = this.symbols['default']
+
+        for symbol_index in range(len(this.symbols_bitstamp)):
+            if this.symbols_bitstamp[symbol_index] == symbol_name:
+                return symbols_default[symbol_index]
+
+        return None
