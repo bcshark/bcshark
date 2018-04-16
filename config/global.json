@@ -23,7 +23,7 @@
 		"okcoin": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"",			"etc_btc"	],
 		"poloniex": [ "", 			"EOS_BTC", 	"ETH_BTC",	"USDT_BTC",	"ETC_BTC" 	],
 		"gdax": 	[ "BTC-USD", 	"", 		"",			"",			""			],
-		"bitstamp":	[ "btcusdt", 	"", 		"",			"",			""			]
+		"bitstamp":	[ "btcusd", 	"", 		"ethbtc",	"",			""			]
 	},
 	"markets": {
 		"huobi": { 
