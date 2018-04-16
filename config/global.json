@@ -18,12 +18,13 @@
 		"size": 200
 	},
 	"symbols": {
-		"default":	[ "btcusdt",	"eosbtc", 	"ethbtc",	"usdtbtc",	"etcbtc"	],
-		"okex": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"",			"etc_btc"	],
-		"okcoin": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"",			"etc_btc"	],
-		"poloniex": [ "", 			"EOS_BTC", 	"ETH_BTC",	"USDT_BTC",	"ETC_BTC" 	],
-		"gdax": 	[ "BTC-USD", 	"", 		"",			"",			""			],
-		"bitstamp":	[ "btcusd", 	"", 		"ethbtc",	"",			""			]
+		"default":	[ "btcusdt",	"eosbtc", 	"ethbtc",	"etcbtc"	],
+		"okex": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"etc_btc"	],
+		"okcoin": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"etc_btc"	],
+		"poloniex": [ "USDT_BTC",	"EOS_BTC", 	"ETH_BTC",	"ETC_BTC" 	],
+		"gdax": 	[ "BTC-USD", 	"", 		"",			""			],
+		"bitstamp":	[ "btcusd", 	"", 		"ethbtc",	""			],
+		"bittrex": 	[ "USDT-BTC", 	"", 		"BTC-ETH",	"BTC-ETC"	]
 	},
 	"markets": {
 		"huobi": { 
@@ -65,6 +66,11 @@
 		"bitstamp": {
 			"api": {
 				"ws": "wss://ws.pusherapp.com/app/0ea60078504a5d9773ab?protocol=6&client=js&version=2.1.2&flash=false"
+			}
+		},
+		"bittrex": {
+			"api": {
+				"ws": "https://beta.bittrex.com/signalr"
 			}
 		}
 	}
