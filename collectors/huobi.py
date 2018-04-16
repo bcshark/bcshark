@@ -2,6 +2,7 @@ import requests
 import json
 import StringIO
 import gzip
+import re
 
 from model.market_tick import  market_tick
 from .collector import collector
@@ -10,7 +11,7 @@ from .utility import *
 class collector_huobi(collector):
     DEFAULT_PERIOD = "1min"
     DEFAULT_SIZE = 200
-    DEFAULT_DELAY = 3
+    PATTERN_TICK = "market.([a-zA-Z]+).kline.1min"
 
     def __init__(this, settings, market_settings):
         super(collector_huobi, this).__init__(settings, market_settings)
@@ -22,9 +23,7 @@ class collector_huobi(collector):
         ticks = []
         for obj in objs:
             tick = market_tick()
-            #FIXME: change this back to id
             tick.time = obj['id']
-            #tick.time = ts
             tick.timezone_offset = this.timezone_offset
             tick.open = obj['open']
             tick.close = obj['close']
@@ -39,10 +38,26 @@ class collector_huobi(collector):
 
         return ticks
 
+    def translate_tick(this, ts, obj):
+        tick = {
+            "time": obj['id'],
+            "timezone_offset": this.timezone_offset,
+            "open": obj['open'],
+            "close": obj['close'],
+            "low": obj['low'],
+            "high": obj['high'],
+            "amount": obj['amount'],
+            "volume": obj['vol'],
+            "count": obj['count'],
+            "period": this.get_generic_period_name(this.period)
+        }
+
+        return tick
+
     def on_open(this, websocket_client):
         this.logger.info('huobi websocket connection established')
 
-        this.subscription_delay = this.DEFAULT_DELAY
+        this.is_subscription_sent = False
 
     def on_message(this, websocket_client, raw_message):
         with gzip.GzipFile(fileobj = StringIO.StringIO(raw_message), mode = 'rb') as f:
@@ -54,17 +69,22 @@ class collector_huobi(collector):
         if message_json.has_key('ping'):
             this.send_ws_message(json.dumps({ 'pong': message_json['ping'] }))
 
-            if this.subscription_delay > 0:
-                this.subscription_delay -= 1
-            elif this.subscription_delay == 0:
-		subscription_msg = {
-		    "sub": "market.btcusdt.kline.1min",
-		    "id": "id1"
-		}
-                this.send_ws_message_json(subscription_msg)
+            if not this.is_subscription_sent:
+                for symbol in this.symbols_huobi:
+                    subscription_msg = {
+                        "sub": "market.%s.kline.1min" % symbol,
+                        "id": "id1"
+                    }
+                    this.send_ws_message_json(subscription_msg)
+                this.is_subscription_sent = True
         elif message_json.has_key('tick'):
-            ticks = this.translate(message_json['ts'], [ message_json['tick'] ])
-            this.save_tick('huobi_ticks', 'huobi', 'btcusdt', ticks[0])
+            channel = message_json['ch']
+            match = re.search(this.PATTERN_TICK, channel)
+
+            if match:
+                symbol_name = match.group(1)
+                ticks = [ this.translate_tick(message_json['ts'], message_json['tick']) ]
+                this.save_tick('huobi_ticks', 'huobi', symbol_name, ticks[0])
 
     def collect_ws(this):
         this.start_listen_websocket(this.WS_URL, this)
