@@ -6,7 +6,7 @@ from websocket import WebSocketApp
 from .utility import *
 
 class collector(object):
-    DEFAULT_TIMEOUT_IN_SECONDS = 1;
+    DEFAULT_TIMEOUT_IN_SECONDS = 10;
 
     def __init__(this, settings, market_settings):
         this.settings = settings
@@ -52,12 +52,13 @@ class collector(object):
         if this.websocket_client:
             this.websocket_client.send(message)
 
-    def http_request_json(this, url, headers):
+    def http_request_json(this, url, headers, cookies = None):
         try:
-            res = requests.get(url, headers = headers, timeout = this.DEFAULT_TIMEOUT_IN_SECONDS)
+            res = requests.get(url, headers = headers, cookies = cookies, timeout = this.DEFAULT_TIMEOUT_IN_SECONDS, allow_redirects = True)
 
             return res.json()
         except Exception, e:
+            print e
             return None
 
     def start_listen_websocket(this, url, listener):

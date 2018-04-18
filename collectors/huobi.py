@@ -71,6 +71,9 @@ class collector_huobi(collector):
 
             if not this.is_subscription_sent:
                 for symbol in this.symbols_huobi:
+                    if symbol == '':
+                        continue
+
                     subscription_msg = {
                         "sub": "market.%s.kline.1min" % symbol,
                         "id": "id1"

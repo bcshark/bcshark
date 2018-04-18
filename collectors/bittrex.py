@@ -1,25 +1,22 @@
-import requests
 import json
-import StringIO
-import gzip
+import requests
 import re
 
+from zlib import decompress, MAX_WBITS
+from base64 import b64decode
+from requests import Session
+from signalr import Connection
 from model.market_tick import  market_tick
 from .collector import collector
 from .utility import *
 
 class collector_bittrex(collector):
-    DEFAULT_PERIOD = "1min"
-    DEFAULT_SIZE = 200
-    PATTERN_LIVE_TRADES = "live_trades([_a-zA-Z]*)"
-
     def __init__(this, settings, market_settings):
         super(collector_bittrex, this).__init__(settings, market_settings)
 
-        this.period = this.DEFAULT_PERIOD
         this.symbols_bittrex = this.symbols['bittrex']
 
-    def translate_trade(this, ts, obj):
+    def translate_tick(this, ts, obj):
         ret = dict(obj)
 
         ret['time'] = ts
@@ -30,41 +27,31 @@ class collector_bittrex(collector):
     def on_open(this, websocket_client):
         this.logger.info('bittrex websocket connection established')
 
-    def on_message(this, websocket_client, raw_message):
-        this.logger.info('receive message from bittrex websocket: %s', raw_message)
+    def on_message(this, raw_message):
+	try:
+	    raw_message = decompress(b64decode(raw_message), -MAX_WBITS)
+	except SyntaxError:
+	    raw_message = decompress(b64decode(raw_message))
+
+        #this.logger.info('receive message from bittrex websocket: %s', raw_message)
+        this.logger.info('receive message from bittrex websocket: (hide)')
         message_json = json.loads(raw_message)
 
-        event = message_json['event']
-        data = json.loads(message_json['data'])
-
-        if event == 'pusher:connection_established':
-            this.socket_id = data['socket_id']
-
-            for symbol in this.symbols_bittrex:
-                if symbol == '':
-                    continue
-
-                if symbol == 'btcusd':
-                    channel_name = "live_trades"
-                else:
-                    channel_name = "live_trades_%s" % symbol
-
-                subscription_msg = { "event": "pusher:subscribe", "data": { "channel": channel_name } }
-                this.send_ws_message_json(subscription_msg)
-        elif event == 'trade':
-            channel = message_json['channel']
-            match = re.search(this.PATTERN_LIVE_TRADES, channel)
-
-            if match:
-                symbol_name = match.group(1)[1:]
-            else:
-                symbol_name = 'btcusd'
-
-            trade = this.translate_trade(long(data['timestamp']), data)
-            this.save_tick('bittrex_trades', 'bittrex', this.get_generic_symbol_name(symbol_name), trade)
+        for tick in message_json['D']:
+            if tick['M'] in this.symbols_bittrex:
+                symbol_name = tick['M']
+                this.save_tick('bittrex_ticks', 'bittrex', this.get_generic_symbol_name(symbol_name), this.translate_tick(time.time(), tick))
 
     def collect_ws(this):
-        this.start_listen_websocket(this.WS_URL, this)
+	with Session() as session:
+            connection = Connection(this.WS_URL, session = session)
+            hub = connection.register_hub('c2')
+            connection.start()
+
+            hub.client.on('uS', this.on_message)
+            hub.server.invoke('SubscribeToSummaryDeltas')
+
+            connection.wait()
 
     def collect_rest(this):
         pass

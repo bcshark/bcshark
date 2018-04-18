@@ -70,7 +70,7 @@
 		},
 		"bittrex": {
 			"api": {
-				"ws": "wss://socket.bittrex.com/signalr/"
+				"ws": "https://beta.bittrex.com/signalr"
 			}
 		}
 	}
