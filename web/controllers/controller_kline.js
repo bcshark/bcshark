@@ -15,6 +15,7 @@ var KlineController = ['$scope', '$http', '$interval', function($scope, $http, $
 	$scope.symbols = [
 		{ title : 'BTC - USDT', name : 'btcusdt' },
 		{ title : 'ETH - BTC', name : 'ethbtc' },
+		{ title : 'ETC - BTC', name : 'etcbtc' },
 		{ title : 'EOS - BTC', name : 'eosbtc' }
 	];
 	$scope.markets = [
@@ -23,7 +24,10 @@ var KlineController = ['$scope', '$http', '$interval', function($scope, $http, $
 		{ title : 'OKEX', name : 'okex' },
 		{ title : 'Poloniex', name : 'poloniex' },
 		{ title : 'OkCoin', name : 'okcoin' },
-		{ title : 'GDAX', name : 'gdax' }
+		{ title : 'GDAX', name : 'gdax' },
+		{ title : 'Bitfinex', name : 'bitfinex' },
+		{ title : 'Bitstamp', name : 'bitstamp' },
+		{ title : 'Bittrex', name : 'bittrex' }
 	];
 	$scope.selectedSymbol = 'btcusdt';
 	$scope.selectedMarket = $scope.markets[0]
