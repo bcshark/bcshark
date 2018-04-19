@@ -20,6 +20,7 @@
 		</nav>
 	</div>
 	<div class="fix-content">
+		<div uib-alert ng-repeat="alert in alerts" ng-class="'alert-' + (alert.type || 'warning')" dismiss-on-timeout="3000" close="closeAlert($index)">{{alert.msg}}</div>
 		<div class="btn-group market-dropdown" uib-dropdown is-open="market_dropdown.isopen">
 			<button id="market-dropdown" type="button" class="btn btn-default"  uib-dropdown-toggle ng-disabled="disabled">
 				Market: {{ selectedMarket.title }}<span class="caret" style="margin-left: 5px;"></span>

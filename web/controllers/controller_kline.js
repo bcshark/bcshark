@@ -31,6 +31,7 @@ var KlineController = ['$scope', '$http', '$interval', function($scope, $http, $
 	];
 	$scope.selectedSymbol = 'btcusdt';
 	$scope.selectedMarket = $scope.markets[0]
+	$scope.alerts = [];
 
 	$scope.switchSymbol = function(symbol) {
 		$scope.selectedSymbol = symbol;
@@ -86,13 +87,22 @@ var KlineController = ['$scope', '$http', '$interval', function($scope, $http, $
 		return result;
 	}
 
+	function showAlert(message) {
+		$scope.alerts = [];
+		$scope.alerts.push({ type: 'danger', msg: message });
+	}
+	
+	$scope.closeAlert = function(index) {
+		$scope.alerts.splice(index, 1);
+	};
+
 	var isInitialized = false;
 
 	function getMarketTicks() {
 		//$scope.promise = $http.get('http://192.168.56.101:5000/api/kline/' + $scope.selectedMarket.name + '/' + $scope.selectedSymbol)
 		$http.get('http://192.168.56.101:5000/api/kline/' + $scope.selectedMarket.name + '/' + $scope.selectedSymbol)
-			.then(function(res) {
-				data0 = splitData(res.data);
+			.then(function(resp) {
+				data0 = splitData(resp.data);
 
 				if (isInitialized) {
 					option = {
@@ -296,6 +306,10 @@ var KlineController = ['$scope', '$http', '$interval', function($scope, $http, $
 
 					myChart.setOption(option);
 					isInitialized = true;
+				}
+			}, function(resp) {
+				if (!resp.data) {
+					showAlert('Data is not provided by selected market.');
 				}
 			}
 		);
