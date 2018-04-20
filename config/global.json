@@ -25,7 +25,8 @@
 		"poloniex": [ "USDT_BTC",	"EOS_BTC", 	"ETH_BTC",	"ETC_BTC" 	],
 		"gdax": 	[ "BTC-USD", 	"", 		"",			""			],
 		"bitstamp":	[ "btcusd", 	"", 		"ethbtc",	""			],
-		"bittrex": 	[ "USDT-BTC", 	"", 		"BTC-ETH",	"BTC-ETC"	]
+		"bittrex": 	[ "USDT-BTC", 	"", 		"BTC-ETH",	"BTC-ETC"	],
+		"coinmarketcap": 	[ "BTC"	]
 	},
 	"markets": {
 		"huobi": { 
@@ -90,6 +91,13 @@
 			"order": 8,
 			"api": {
 				"ws": "https://beta.bittrex.com/signalr"
+			}
+		},
+		"coinmarketcap": {
+			"title": "coinmarketcap",
+			"order": 9,
+			"api": {
+				"rest": "https://api.coinmarketcap.com/v1/ticker/?limit=20"
 			}
 		}
 	}

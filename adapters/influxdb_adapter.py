@@ -69,9 +69,9 @@ class influxdb_adapter(database_adapter):
             'time': get_timestamp_str(k20_rank.time, k20_rank.timezone_offset),
             'fields': {
                 'time': k20_rank.time + k20_rank.timezone_offset,
-                'id': float(k20_rank.id),
-                'name': float(k20_rank.name),
-                'rank': float(k20_rank.rank),
+                'id': k20_rank.id,
+                'name': k20_rank.name,
+                'rank': int(k20_rank.rank),
                 'price_usd': float(k20_rank.price_usd),
                 'price_btc': float(k20_rank.price_btc),
                 'volume_usd_24h': float(k20_rank.volume_usd_24h),

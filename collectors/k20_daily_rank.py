@@ -24,7 +24,7 @@ class collector_k20_daily_rank(collector):
             rank.rank = obj["rank"]
             rank.price_usd = obj["price_usd"]
             rank.price_btc = obj["price_btc"]
-            rank.volume_usd_24h = obj["volume_usd_24h"]
+            rank.volume_usd_24h = obj["24h_volume_usd"]
             rank.market_cap_usd = obj["market_cap_usd"]
             rank.available_supply = obj["available_supply"]
             rank.total_supply = obj["total_supply"]
@@ -48,7 +48,7 @@ class collector_k20_daily_rank(collector):
             return
 
         k20_ranks = this.translate(data)
-        this.bulk_save_k20_daily_rank('k20', k20_ranks)
+        this.bulk_save_k20_daily_rank(k20_ranks)
 
         this.logger.info('get response from k20 daily rank')
 
