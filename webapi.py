@@ -26,6 +26,17 @@ logger.addHandler(file_logger_handler)
 app = Flask(__name__)
 CORS(app)
 
+@app.route('/api/markets', methods=['GET'])
+def api_markets():
+    support_markets = [{ "name": key, "title": setting['title'], "order": setting['order'] } for key, setting in settings['markets'].items()]
+    return json.dumps(sorted(support_markets, lambda x, y: x['order'] - y['order']))
+
+@app.route('/api/symbols', methods=['GET'])
+def api_symbols():
+    setting = settings['symbols']
+    support_symbols = [{ "name": setting['default'][index], "title": setting['title'][index] } for index in range(0, len(setting['default']))]
+    return json.dumps(support_symbols)
+
 @app.route('/api/kline/<market>/<symbol>', methods=['GET'])
 def api_kline(market, symbol):
     client = settings['db_adapter']

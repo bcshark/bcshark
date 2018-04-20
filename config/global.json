@@ -19,6 +19,7 @@
 	},
 	"symbols": {
 		"default":	[ "btcusdt",	"eosbtc", 	"ethbtc",	"etcbtc"	],
+		"title":	[ "BTC-USDT",	"EOS-BTC", 	"ETH-BTC",	"ETC-BTC"	],
 		"okex": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"etc_btc"	],
 		"okcoin": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"etc_btc"	],
 		"poloniex": [ "USDT_BTC",	"EOS_BTC", 	"ETH_BTC",	"ETC_BTC" 	],
@@ -28,47 +29,65 @@
 	},
 	"markets": {
 		"huobi": { 
+			"title": "Huobi",
+			"order": 0,
 			"api": { 
 				"rest": "https://api.huobi.pro/market/history/", 
 				"ws": "wss://api.huobipro.com/ws"
 			}
 		},
 		"binance": { 
+			"title": "Binance",
+			"order": 1,
 			"api": { 
 				"rest": "https://api.binance.com/api/v1/" 
 			} 
 		},
 		"okex": { 
+			"title": "OKEX",
+			"order": 2,
 			"api": { 
 				"rest": "https://www.okex.com/api/v1/" 
 			} 
 		},
 		"poloniex": { 
+			"title": "Poloniex",
+			"order": 3,
 			"api": { 
 				"rest": "https://poloniex.com/" 
 			} 
 		},
 		"okcoin": { 
+			"title": "OkCoin",
+			"order": 4,
 			"api": { 
 				"rest": "https://www.okcoin.com/api/v1/" 
 			} 
 		},
 		"gdax": { 
+			"title": "GDAX",
+			"order": 5,
 			"api": { 
 				"rest": "https://api.gdax.com/" 
 			} 
 		},
 		"bitfinex": {
+			"title": "Bitfinex",
+			"order": 6,
 			"api": {
 				"ws": "wss://api.bitfinex.com/ws/2"
 			}
 		},
 		"bitstamp": {
+			"title": "Bitstamp",
+			"order": 7,
 			"api": {
 				"ws": "wss://ws.pusherapp.com/app/0ea60078504a5d9773ab?protocol=6&client=js&version=2.1.2&flash=false"
 			}
 		},
 		"bittrex": {
+			"title": "Bittrex",
+			"order": 8,
 			"api": {
 				"ws": "https://beta.bittrex.com/signalr"
 			}

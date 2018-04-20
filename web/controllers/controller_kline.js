@@ -6,32 +6,20 @@ var KlineController = ['$scope', '$http', '$interval', function($scope, $http, $
 	var downColor = '#00da3c';
 	var downBorderColor = '#008F28';
 	var nextTickPromise = null;
+	var isInitialized = false;
 
 	$scope.isNavCollapsed = true;
 	$scope.market_dropdown = {
 		isopen : false,
 		isdisabled : false
 	};
-	$scope.symbols = [
-		{ title : 'BTC - USDT', name : 'btcusdt' },
-		{ title : 'ETH - BTC', name : 'ethbtc' },
-		{ title : 'ETC - BTC', name : 'etcbtc' },
-		{ title : 'EOS - BTC', name : 'eosbtc' }
-	];
-	$scope.markets = [
-		{ title : 'Huobi', name : 'huobi' },
-		{ title : 'Binance', name : 'binance' },
-		{ title : 'OKEX', name : 'okex' },
-		{ title : 'Poloniex', name : 'poloniex' },
-		{ title : 'OkCoin', name : 'okcoin' },
-		{ title : 'GDAX', name : 'gdax' },
-		{ title : 'Bitfinex', name : 'bitfinex' },
-		{ title : 'Bitstamp', name : 'bitstamp' },
-		{ title : 'Bittrex', name : 'bittrex' }
-	];
-	$scope.selectedSymbol = 'btcusdt';
-	$scope.selectedMarket = $scope.markets[0]
+	$scope.symbols = [];
+	$scope.markets = [];
+	$scope.selectedSymbol = null;
+	$scope.selectedMarket = null;
 	$scope.alerts = [];
+	$scope.isMarketsLoadded = false;
+	$scope.isSymbolsLoadded = false;
 
 	$scope.switchSymbol = function(symbol) {
 		$scope.selectedSymbol = symbol;
@@ -96,7 +84,27 @@ var KlineController = ['$scope', '$http', '$interval', function($scope, $http, $
 		$scope.alerts.splice(index, 1);
 	};
 
-	var isInitialized = false;
+	function getMarkets() {
+		$http.get('http://192.168.56.101:5000/api/markets')
+			.then(function(resp) {
+				if (resp && resp.data) {
+					$scope.markets = resp.data;
+					$scope.selectedMarket = $scope.markets[0]
+					$scope.isMarketsLoadded = true;
+				}
+			});
+	}
+
+	function getSymbols() {
+		$http.get('http://192.168.56.101:5000/api/symbols')
+			.then(function(resp) {
+				if (resp && resp.data) {
+					$scope.symbols = resp.data;
+					$scope.selectedSymbol = $scope.symbols[0].name;
+					$scope.isSymbolsLoadded = true;
+				}
+			});
+	}
 
 	function getMarketTicks() {
 		//$scope.promise = $http.get('http://192.168.56.101:5000/api/kline/' + $scope.selectedMarket.name + '/' + $scope.selectedSymbol)
@@ -299,6 +307,15 @@ var KlineController = ['$scope', '$http', '$interval', function($scope, $http, $
 		);
 	}
 
-	nextTickPromise = $interval(getMarketTicks, 20000, -1);
-	getMarketTicks();
+	getMarkets();
+	getSymbols();
+
+	$scope.$watch(function() {
+		return $scope.isMarketsLoadded && $scope.isSymbolsLoadded;
+	}, function(newValue, oldValue, scope) {
+		if (newValue) {
+			nextTickPromise = $interval(getMarketTicks, 20000, -1);
+			getMarketTicks();
+		}
+	});
 }];
