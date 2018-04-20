@@ -1,3 +1,5 @@
+"use strict";
+
 var KlineController = ['$scope', '$http', '$interval', function($scope, $http, $interval) {
 	var myChart = echarts.init(document.getElementById('kline-chart'));
 
@@ -25,12 +27,12 @@ var KlineController = ['$scope', '$http', '$interval', function($scope, $http, $
 		$scope.selectedSymbol = symbol;
 		$scope.isNavCollapsed = true;
 		getMarketTicks();
-	}
+	};
 
 	$scope.switchMarket = function(market) {
 		$scope.selectedMarket = market;
 		getMarketTicks();
-	}
+	};
 
 	/*
 	// 数据意义：开盘(open)，收盘(close)，最低(lowest)，最高(highest)
@@ -48,10 +50,11 @@ var KlineController = ['$scope', '$http', '$interval', function($scope, $http, $
 
 	function splitData(rawData) {
 		var categoryData = [];
-		var values = []
+		var values = [];
+
 		for (var i = 0; i < rawData.length; i++) {
 			categoryData.push(rawData[i].splice(0, 1)[0]);
-			values.push(rawData[i])
+			values.push(rawData[i]);
 		}
 		return {
 			categoryData: categoryData,
