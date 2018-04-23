@@ -113,7 +113,8 @@ var KlineController = ['$scope', '$http', '$interval', function($scope, $http, $
 		//$scope.promise = $http.get('http://192.168.56.101:5000/api/kline/' + $scope.selectedMarket.name + '/' + $scope.selectedSymbol)
 		$http.get('http://192.168.56.101:5000/api/kline/' + $scope.selectedMarket.name + '/' + $scope.selectedSymbol)
 			.then(function(resp) {
-				data0 = splitData(resp.data);
+				var data0 = splitData(resp.data);
+				var option = null;
 
 				if (isInitialized) {
 					option = {

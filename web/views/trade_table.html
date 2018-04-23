@@ -1,0 +1,42 @@
+<div cg-busy="{ promise: promise }">
+    <div class="fix-title-bar">
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" ng-click="isNavCollapsed = !isNavCollapsed">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">
+					<i class="fas fa-chart-line" style="padding-right: 10px;"></i>{{ page.title }}
+				</a>
+            </div>
+            <div class="collapse navbar-collapse" uib-collapse="isNavCollapsed">
+                <ul class="nav navbar-nav" style="text-align: left;">
+                    <li ng-repeat="symbol in symbols"><a class="navbar-item" ng-click="switchSymbol(symbol.name)"><i class="fas fa-square" style="padding-right: 10px;"></i>{{ symbol.title }}</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+    <div class="fix-content">
+        <div uib-alert ng-repeat="alert in alerts" ng-class="'alert-' + (alert.type || 'warning')" dismiss-on-timeout="3000" close="closeAlert($index)">{{alert.msg}}</div>
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <td ng-repeat="period_column in trade_period_columns">{{ period_column.title }}</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="period_column in trade_period_columns">
+                    <td ng-repeat="period_row in trade_period_rows">{{ get_trade_period_row_value(period_row, period_column) }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <uib-accordion close-others="oneAtATime">
+            <div uib-accordion-group class="panel-default" heading="近5日资金净流入" is-open="page.isTradeInPanelOpened">
+                <div id="trade-in-chart" style="margin-left: auto; margin-right: auto; width: 98%; height: 480px;"></div>
+            </div>
+        </uib-accordion>
+    </div>
+</div>
