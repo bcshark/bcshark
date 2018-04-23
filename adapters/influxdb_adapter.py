@@ -60,6 +60,34 @@ class influxdb_adapter(database_adapter):
 
         return points
 
+    def generate_points_by_k20_rank(this, measurement_name, k20_ranks):
+        points = [{
+            'measurement': measurement_name,
+            'tags': {
+                'symbol': k20_rank.symbol
+            },
+            'time': get_timestamp_str(k20_rank.time, k20_rank.timezone_offset),
+            'fields': {
+                'time': k20_rank.time + k20_rank.timezone_offset,
+                'id': k20_rank.id,
+                'name': k20_rank.name,
+                'rank': int(k20_rank.rank),
+                'price_usd': float(k20_rank.price_usd),
+                'price_btc': float(k20_rank.price_btc),
+                'volume_usd_24h': float(k20_rank.volume_usd_24h),
+                'market_cap_usd': float(k20_rank.market_cap_usd),
+                'available_supply': float(k20_rank.available_supply),
+                'total_supply': float(k20_rank.total_supply),
+                'max_supply': float(k20_rank.max_supply),
+                'percent_change_1h': float(k20_rank.percent_change_1h),
+                'percent_change_24h': float(k20_rank.percent_change_24h),
+                'percent_change_7d': float(k20_rank.percent_change_7d),
+                'period': k20_rank.period
+            }
+        } for k20_rank in k20_ranks]
+
+        return points
+
     def save_tick(this, measurement_name, market_name, symbol_name, tick):
         points = this.generate_point_by_dict(measurement_name, market_name, symbol_name, tick)
 
@@ -75,3 +103,7 @@ class influxdb_adapter(database_adapter):
     def query(this, sql):
         result_set = this.client.query(sql)
         return result_set.raw
+
+    def bulk_save_k20_daily_rank(this, k20_ranks):
+        points = this.generate_points_by_k20_rank("k20_daily_rank", k20_ranks)
+        this.client.write_points(points)

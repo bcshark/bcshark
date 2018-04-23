@@ -86,3 +86,5 @@ class collector(object):
 
         this.db_adapter.bulk_save_ticks(market_name, symbol_name, ticks)
 
+    def bulk_save_k20_daily_rank(this, k20_ranks):
+        this.db_adapter.bulk_save_k20_daily_rank(k20_ranks)
