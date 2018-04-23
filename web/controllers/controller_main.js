@@ -1,5 +1,9 @@
-angular.module('MarketIndex', ['ngRoute', 'cgBusy', 'ui.bootstrap'])
+angular.module('MarketIndex', ['ngRoute', 'ngResource', 'cgBusy', 'ui.bootstrap'])
 
+.service('ConfigService', ConfigService)
+.service('MarketService', MarketService)
+.service('SymbolService', SymbolService)
+.service('KlineService', KlineService)
 .controller('MainController', function($scope, $route, $routeParams, $location) {
 	$scope.$route = $route;
 	$scope.$location = $location;

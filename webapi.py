@@ -8,7 +8,7 @@ from adapters.influxdb_adapter import influxdb_adapter
 from adapters.mysqldb_adapter import mysqldb_adapter
 from adapters.utility import *
 
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
 
 from services.kline_service import kline_service
@@ -37,8 +37,11 @@ def api_symbols():
     support_symbols = [{ "name": setting['default'][index], "title": setting['title'][index] } for index in range(0, len(setting['default']))]
     return json.dumps(support_symbols)
 
-@app.route('/api/kline/<market>/<symbol>', methods=['GET'])
-def api_kline(market, symbol):
+@app.route('/api/kline', methods=['GET'])
+def api_kline():
+    market = request.args.get('m', '')
+    symbol = request.args.get('s', '')
+
     client = settings['db_adapter']
     support_markets = settings['markets'].keys()
     support_symbols = settings['symbols']['default']

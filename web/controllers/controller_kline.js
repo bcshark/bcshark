@@ -1,6 +1,6 @@
 "use strict";
 
-var KlineController = ['$scope', '$http', '$interval', function($scope, $http, $interval) {
+var KlineController = ['$scope', '$http', '$interval', 'MarketService', 'SymbolService', 'KlineService', function($scope, $http, $interval, marketService, symbolService, klineService) {
 	var myChart = echarts.init(document.getElementById('kline-chart'));
 
 	var upColor = '#ec0000';
@@ -53,8 +53,8 @@ var KlineController = ['$scope', '$http', '$interval', function($scope, $http, $
 		var values = [];
 
 		for (var i = 0; i < rawData.length; i++) {
-			categoryData.push(rawData[i].splice(0, 1)[0]);
-			values.push(rawData[i]);
+			categoryData.push(rawData[i]['0']);
+			values.push([rawData[i]['1'], rawData[i]['2'], rawData[i]['3'], rawData[i]['4']]);
 		}
 		return {
 			categoryData: categoryData,
@@ -88,32 +88,28 @@ var KlineController = ['$scope', '$http', '$interval', function($scope, $http, $
 	};
 
 	function getMarkets() {
-		$http.get('http://192.168.56.101:5000/api/markets')
-			.then(function(resp) {
-				if (resp && resp.data) {
-					$scope.markets = resp.data;
-					$scope.selectedMarket = $scope.markets[0]
-					$scope.isMarketsLoadded = true;
-				}
-			});
+		marketService.all(function(resp) {
+			$scope.markets = resp;
+			$scope.selectedMarket = $scope.markets[0]
+			$scope.isMarketsLoadded = true;
+		});
 	}
 
 	function getSymbols() {
-		$http.get('http://192.168.56.101:5000/api/symbols')
-			.then(function(resp) {
-				if (resp && resp.data) {
-					$scope.symbols = resp.data;
-					$scope.selectedSymbol = $scope.symbols[0].name;
-					$scope.isSymbolsLoadded = true;
-				}
-			});
+		symbolService.all(function(resp) {
+			$scope.symbols = resp;
+			$scope.selectedSymbol = $scope.symbols[0].name;
+			$scope.isSymbolsLoadded = true;
+		});
 	}
 
 	function getMarketTicks() {
 		//$scope.promise = $http.get('http://192.168.56.101:5000/api/kline/' + $scope.selectedMarket.name + '/' + $scope.selectedSymbol)
-		$http.get('http://192.168.56.101:5000/api/kline/' + $scope.selectedMarket.name + '/' + $scope.selectedSymbol)
-			.then(function(resp) {
-				var data0 = splitData(resp.data);
+		klineService.market_index_kline($scope.selectedMarket.name, $scope.selectedSymbol,
+			function(resp) {
+				console.log(resp);
+
+				var data0 = splitData(resp);
 				var option = null;
 
 				if (isInitialized) {
