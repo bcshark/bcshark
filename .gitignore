@@ -3,3 +3,5 @@ logs/
 
 *.pyc
 *.code-workspace
+*.sublime-project
+*.sublime-workspace
