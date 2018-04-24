@@ -126,3 +126,11 @@ class k20_rank(object):
     @symbol.setter
     def symbol(this, value):
         this._symbol = value
+
+    @property
+    def cap_ratio(this):
+        return this._cap_ratio
+
+    @cap_ratio.setter
+    def cap_ratio(this, value):
+        this._cap_ratio = value

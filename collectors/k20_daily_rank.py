@@ -15,6 +15,8 @@ class collector_k20_daily_rank(collector):
         k20_ranks = []
 
         for obj in objs:
+            if obj["symbol"] == 'USDT':
+                continue
             rank = k20_rank()
             rank.timezone_offset = this.timezone_offset
             rank.time = obj["last_updated"]
@@ -28,7 +30,10 @@ class collector_k20_daily_rank(collector):
             rank.market_cap_usd = obj["market_cap_usd"]
             rank.available_supply = obj["available_supply"]
             rank.total_supply = obj["total_supply"]
-            rank.max_supply = obj["max_supply"]
+            if obj["max_supply"] == None:
+                rank.max_supply = 0
+            else:
+                rank.max_supply = obj["max_supply"]
             rank.percent_change_1h = obj["percent_change_1h"]
             rank.percent_change_24h = obj["percent_change_24h"]
             rank.percent_change_7d = obj["percent_change_7d"]
@@ -40,7 +45,7 @@ class collector_k20_daily_rank(collector):
 
     def collect_rest(this):
 
-        url = "https://api.coinmarketcap.com/v1/ticker/?limit=20"
+        url = "https://api.coinmarketcap.com/v1/ticker/?limit=2"
         data = this.http_request_json(url, None)
 
         if not data or not isinstance(data, list):

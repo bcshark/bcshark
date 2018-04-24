@@ -88,3 +88,19 @@ class collector(object):
 
     def bulk_save_k20_daily_rank(this, k20_ranks):
         this.db_adapter.bulk_save_k20_daily_rank(k20_ranks)
+
+    def query_k20_daily_rank(this):
+        sql = "select max(time), symbol, market_cap_usd from k20_daily_rank group by symbol"
+        result = this.db_adapter.query(sql)
+        return result
+
+    def query_latest_price(this, symbol_name, startSecond):
+        #sql = "select max(time), market, symbol, high, low, open, close from market_ticks where symbol = '%s' and time >= '%s' and time <= '%s' group by market, symbol" % (symbol_name, startSecond, startSecond+60000000000)
+        sql = "select max(time), market, symbol, high, low, open, close from market_ticks where symbol = '%s' group by market, symbol" % (symbol_name)
+        result = this.db_adapter.query(sql)
+        return result
+
+    def save_k20_index(this, k20_index):
+        this.db_adapter.save_k20_index(k20_index)
+
+

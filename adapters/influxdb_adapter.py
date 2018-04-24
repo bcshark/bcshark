@@ -66,9 +66,9 @@ class influxdb_adapter(database_adapter):
             'tags': {
                 'symbol': k20_rank.symbol
             },
-            'time': get_timestamp_str(k20_rank.time, k20_rank.timezone_offset),
+            'time': get_timestamp_str(long(k20_rank.time), k20_rank.timezone_offset),
             'fields': {
-                'time': k20_rank.time + k20_rank.timezone_offset,
+                'time': long(k20_rank.time) + long(k20_rank.timezone_offset),
                 'id': k20_rank.id,
                 'name': k20_rank.name,
                 'rank': int(k20_rank.rank),
@@ -88,6 +88,34 @@ class influxdb_adapter(database_adapter):
 
         return points
 
+    def generate_points_by_k20_index(this, measurement_name, k20_index):
+
+        print('index.timezone_offset:', k20_index['timezone_offset'])
+        print('index.high:', float(k20_index['high']))
+        print('index.low:', float(k20_index['low']))
+        print('index.open:', float(k20_index['open']))
+        print('index.close:', float(k20_index['close']))
+        print('index.time:', get_timestamp_str(long(k20_index['time']), k20_index['timezone_offset']))
+        print('index.time:', long(k20_index['time']) + k20_index['timezone_offset'])
+        print('index.period:', k20_index['period'])
+
+        point = {
+            'measurement': measurement_name,
+            'tags': {
+                'time': long(k20_index['time']) + k20_index['timezone_offset']
+            },
+            'time': get_timestamp_str(long(k20_index['time']), k20_index['timezone_offset']),
+            'fields': {
+                'time': long(k20_index['time']) + k20_index['timezone_offset'],
+                'high': float(k20_index['high']),
+                'low': float(k20_index['low']),
+                'open': float(k20_index['open']),
+                'close': float(k20_index['close']),
+                'period': k20_index['period']
+            }
+        }
+        return [ point ]
+
     def save_tick(this, measurement_name, market_name, symbol_name, tick):
         points = this.generate_point_by_dict(measurement_name, market_name, symbol_name, tick)
 
@@ -106,4 +134,8 @@ class influxdb_adapter(database_adapter):
 
     def bulk_save_k20_daily_rank(this, k20_ranks):
         points = this.generate_points_by_k20_rank("k20_daily_rank", k20_ranks)
+        this.client.write_points(points)
+
+    def save_k20_index(this, k20_index):
+        points = this.generate_points_by_k20_index("k20_index", k20_index)
         this.client.write_points(points)
