@@ -5,7 +5,7 @@ DEFAULT_TIMEOUT_IN_SECONDS = 60
 DEFAULT_OUTPUT_FILE = 'binance.matches.txt'
 DEFAULT_WATCH_SYMBOLS = ['BTC', 'USDT', 'USD']
 
-check_symbol_list = ['EOS', 'IPFS', 'ADA', 'ZILLIQA', 'ONT', 'ELF', 'AE', 'KNC', 'AGI', 'MANA', 'POWR', 'ENG', 'THETA', 'IOST', 'BLZ', 'ELA', 'BRD', 'ICX', 'DDD', 'ZRX', 'CVC', 'WAN', 'AION', 'DRGN', 'RDN', 'MOBIUS', 'RUFF', 'GNX', 'LRC', 'SNT', 'VEN', 'NANO', 'WTC', 'GNT', 'LOOM']
+check_symbol_list = ['EOS', 'FIL', 'ADA', 'ZIL', 'ONT', 'ELF', 'AE', 'KNC', 'AGI', 'MANA', 'POWR', 'ENG', 'THETA', 'IOST', 'BLZ', 'ELA', 'BRD', 'ICX', 'DDD', 'ZRX', 'CVC', 'WAN', 'AION', 'DRGN', 'RDN', 'MOBI', 'RUFF', 'GNX', 'LRC', 'SNT', 'VEN', 'NANO', 'WTC', 'GNT', 'LOOM']
 
 def http_request_json(url, headers = None, cookies = None):
     try:
