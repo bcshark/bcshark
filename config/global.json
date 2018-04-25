@@ -20,6 +20,7 @@
 	"symbols": {
 		"default":	[ "btcusdt",	"eosbtc", 	"ethbtc",	"etcbtc"	],
 		"title":	[ "BTC-USDT",	"EOS-BTC", 	"ETH-BTC",	"ETC-BTC"	],
+		"bitfinex":	[ "tBTCUSD",	"tEOSBTC", 	"tETHBTC",	"tETCBTC"	],
 		"okex": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"etc_btc"	],
 		"okcoin": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"etc_btc"	],
 		"poloniex": [ "USDT_BTC",	"EOS_BTC", 	"ETH_BTC",	"ETC_BTC" 	],
