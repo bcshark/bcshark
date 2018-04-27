@@ -34,7 +34,7 @@ def api_markets():
 @app.route('/api/symbols', methods=['GET'])
 def api_symbols():
     setting = settings['symbols']
-    support_symbols = [{ "name": setting['default'][index], "title": setting['title'][index] } for index in range(0, len(setting['default']))]
+    support_symbols = [{ "name": setting['default'][index], "title": setting['_title'][index] } for index in range(0, len(setting['default']))]
     return json.dumps(support_symbols)
 
 @app.route('/api/kline', methods=['GET'])

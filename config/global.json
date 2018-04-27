@@ -17,7 +17,7 @@
 	"cache": {
 		"enabled": true,
 		"shared_memory": {
-			"path": "data_files/cache/",
+			"abspath": "/home/phoenix/data-files/cache",
 			"symbols": [ "btcusdt" ]
 		}
 	},

@@ -13,12 +13,16 @@ class collector_bitfinex(collector):
 	DEFAULT_SIZE = 200
 	PATTERN_KEY = 'trade:1m:(t[A-Z]+)'
 
+	@property
+	def market_name(this):
+		return "bitfinex"
+
 	def __init__(this, settings, market_settings):
 		super(collector_bitfinex, this).__init__(settings, market_settings)
 
 		this.period = this.DEFAULT_PERIOD
 		this.subscribed_channels = {}
-		this.symbols_bitfinex = this.symbols['bitfinex']
+		this.symbols_bitfinex = this.symbols[this.market_name]
 
 	def translate(this, obj):
 		tick = {
@@ -73,24 +77,15 @@ class collector_bitfinex(collector):
 				symbol_name = this.subscribed_channels[channel_id]
 				if isinstance(data[0], list):
 					this.logger.info('bitfinex ws ignore history long candles for symbol: %s', symbol_name)
-				elif data != 'hb':
+				elif isinstance(data, list):
 					tick = this.translate(data)
-					this.save_tick('bitfinex_ticks', 'bitfinex', this.get_generic_symbol_name(symbol_name), tick)
+					this.save_tick('bitfinex_ticks', this.market_name, this.get_generic_symbol_name(this.symbols_bitfinex, symbol_name), tick)
 
 	def collect_ws(this):
 		this.start_listen_websocket(this.WS_URL, this)
 
 	def collect_rest(this):
 		this.logger.info('bitfinex rest api by pass!')
-
-	def get_generic_symbol_name(this, symbol_name):
-		symbols_default = this.symbols['default']
-
-		for symbol_index in range(len(this.symbols_bitfinex)):
-			if this.symbols_bitfinex[symbol_index] == symbol_name:
-				return symbols_default[symbol_index]
-
-		return None
 
 	def get_generic_period_name(this, period_name):
 		return period_name
