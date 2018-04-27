@@ -15,6 +15,7 @@ class collector(object):
 		this.market_settings = market_settings
 		this.logger = settings['logger']
 		this.db_adapter = settings['db_adapter']
+		this.cache_manager = settings['cache_manager']
 		this.symbols = settings['symbols']
 		this.symbols_default = this.symbols["default"]
 		this.timezone_offset = settings['timezone_offset']
@@ -75,13 +76,6 @@ class collector(object):
 		if this.websocket_client:
 			this.websocket_client.close()
 
-	def get_generic_symbol_name(this, market_symbol_names, symbol_name):
-		for symbol_index in range(len(market_symbol_names)):
-			if market_symbol_names[symbol_index] == symbol_name:
-				return this.symbols_default[symbol_index]
-
-		return None
-
 	def save_tick(this, measurement_name, market_name, symbol_name, tick):
 		if symbol_name == this.symbols_default[0]:
 			this.update_cache(market_name, symbol_name, tick)
@@ -91,49 +85,8 @@ class collector(object):
 		if not symbol_name == this.symbols_default[0]:
 			tick = this.calculate_usd_prices(market_name, tick)
 
-			if tick:
-				this.db_adapter.save_tick(measurement_name, market_name, symbol_name + '.usd', tick)
-	
-	def calculate_usd_prices(this, market_name, tick):
-		if (not isinstance(tick, market_tick)) and (not isinstance(tick, dict)):
-			return None
-
-		cache_manager = this.settings['cache_manager']
-		cached_prices = cache_manager.load_market_symbol_tick(market_name, this.symbols_default[0])
-
-		if cached_prices:
-			if isinstance(tick, market_tick):
-				tick.open = tick.open * cached_prices[1]
-				tick.close = tick.close * cached_prices[2]
-				tick.high = tick.high * cached_prices[3]
-				tick.low = tick.low * cached_prices[4]
-
-				return tick
-			elif isinstance(tick, dict):
-				tick['open'] = tick['open'] * cached_prices[1]
-				tick['close'] = tick['close'] * cached_prices[2]
-				tick['high'] = tick['high'] * cached_prices[3]
-				tick['low'] = tick['low'] * cached_prices[4]
-
-				return tick
-			else:
-				return None
-
-		return None
-
-	def update_cache(this, market_name, symbol_name, tick):
-		cache_manager = this.settings['cache_manager']
-
-		if cache_manager:
-			tick_to_save = None
-
-			if isinstance(tick, market_tick):
-				tick_to_save = (tick.time, tick.open, tick.close, tick.high, tick.low)
-			elif isinstance(tick, dict):
-				tick_to_save = (tick['time'], tick['open'], tick['close'], tick['high'], tick['low'])
-
-			cache_manager.save_market_symbol_tick(market_name, symbol_name, tick_to_save)
-			#print cache_manager.load_market_symbol_tick(market_name, symbol_name)
+		if tick:
+			this.db_adapter.save_tick(measurement_name, market_name, symbol_name + '.usd', tick)
 
 	def bulk_save_ticks(this, market_name, symbol_name, ticks):
 		sql = "select max(time), market, symbol from market_ticks where market = '%s' and symbol = '%s' group by market, symbol" % (market_name, symbol_name)
@@ -141,10 +94,12 @@ class collector(object):
 
 		if ret and ret.has_key('series'):
 			ret = ret['series'][0]['values'][0][1]
-
 			ticks = filter(lambda x: x.time + x.timezone_offset > ret, ticks)
 
 		this.db_adapter.bulk_save_ticks(market_name, symbol_name, ticks)
+
+	def save_k20_index(this, k20_index):
+		this.db_adapter.save_k20_index(k20_index)
 
 	def bulk_save_k20_daily_rank(this, k20_ranks):
 		this.db_adapter.bulk_save_k20_daily_rank(k20_ranks)
@@ -160,7 +115,46 @@ class collector(object):
 		result = this.db_adapter.query(sql)
 		return result
 
-	def save_k20_index(this, k20_index):
-		this.db_adapter.save_k20_index(k20_index)
+	def get_generic_symbol_name(this, market_symbol_names, symbol_name):
+		for symbol_index in range(len(market_symbol_names)):
+			if market_symbol_names[symbol_index] == symbol_name:
+				return this.symbols_default[symbol_index]
+
+		return None
+	
+	def calculate_usd_prices(this, market_name, tick):
+		if (not isinstance(tick, market_tick)) and (not isinstance(tick, dict)):
+			return None
+
+		if this.cache_manager:
+			cached_prices = this.cache_manager.load_market_symbol_tick(market_name, this.symbols_default[0])
+
+			if cached_prices:
+				if isinstance(tick, market_tick):
+					tick.open = tick.open * cached_prices[1]
+					tick.close = tick.close * cached_prices[2]
+					tick.high = tick.high * cached_prices[3]
+					tick.low = tick.low * cached_prices[4]
+					return tick
+				elif isinstance(tick, dict):
+					tick['open'] = tick['open'] * cached_prices[1]
+					tick['close'] = tick['close'] * cached_prices[2]
+					tick['high'] = tick['high'] * cached_prices[3]
+					tick['low'] = tick['low'] * cached_prices[4]
+					return tick
+
+		return None
+
+	def update_cache(this, market_name, symbol_name, tick):
+		if this.cache_manager:
+			tick_to_save = None
+
+			if isinstance(tick, market_tick):
+				tick_to_save = (tick.time, tick.open, tick.close, tick.high, tick.low)
+			elif isinstance(tick, dict):
+				tick_to_save = (tick['time'], tick['open'], tick['close'], tick['high'], tick['low'])
+
+			this.cache_manager.save_market_symbol_tick(market_name, symbol_name, tick_to_save)
+			#print cache_manager.load_market_symbol_tick(market_name, symbol_name)
 
 

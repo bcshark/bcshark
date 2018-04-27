@@ -48,8 +48,6 @@ class cache_manager(object):
 					f.write(struct.pack(this.DATA_FORMAT, 0, 0, 0, 0, 0))
 
 			file_obj = open(market_file_path, "r+b")
-			file_obj.seek(0)
-			print file_obj.fileno()
 			mmap_obj = mmap.mmap(file_obj.fileno(), this.DATA_LENGTH, mmap.MAP_SHARED)
 
 			this.mapping_collection[market_name] = (mmap_obj, file_obj)
@@ -62,7 +60,6 @@ class cache_manager(object):
 		mmap_obj, file_obj = this.get_mapping(market_name, symbol_name)
 
 		if mmap_obj:
-			mmap_obj.seek(0)
 			mmap_obj.write(struct.pack(this.DATA_FORMAT, tick[0], tick[1], tick[2], tick[3], tick[4]))
 
 	def load_market_symbol_tick(this, market_name, symbol_name):
@@ -72,7 +69,6 @@ class cache_manager(object):
 		mmap_obj, file_obj = this.get_mapping(market_name, symbol_name)
 
 		if mmap_obj:
-			mmap_obj.seek(0)
 			data_obj = struct.unpack(this.DATA_FORMAT, mmap_obj.read(this.DATA_LENGTH))
 			return data_obj
 
