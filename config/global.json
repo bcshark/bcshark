@@ -14,12 +14,19 @@
 		"password": "76f4dd9b",
 		"database": "market_index"
 	},
+	"cache": {
+		"enabled": true,
+		"shared_memory": {
+			"path": "data_files/cache/",
+			"symbols": [ "btcusdt" ]
+		}
+	},
 	"kline": {
 		"size": 200
 	},
 	"symbols": {
 		"default":	[ "btcusdt",	"eosbtc", 	"ethbtc",	"etcbtc"	],
-		"title":	[ "BTC-USDT",	"EOS-BTC", 	"ETH-BTC",	"ETC-BTC"	],
+		"_title":	[ "BTC-USDT",	"EOS-BTC", 	"ETH-BTC",	"ETC-BTC"	],
 		"bitfinex":	[ "tBTCUSD",	"tEOSBTC", 	"tETHBTC",	"tETCBTC"	],
 		"okex": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"etc_btc"	],
 		"okcoin": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"etc_btc"	],
