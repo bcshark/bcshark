@@ -25,17 +25,56 @@ class influxdb_adapter(database_adapter):
         if not filter(lambda db : db['name'] == database_name, this.client.get_list_database()):
             this.client.create_database(database_name) 
 
-    def generate_point_by_dict(this, measurement_name, market_name, symbol_name, dict_obj):
+    def generate_point_by_trade(this, measurement_name, market_name, symbol_name, trade):
+        fields = None
+
+        if isinstance(trade, dict):
+            fields = trade
+
         point = {
             'measurement': measurement_name,
             'tags': {
                 'market': market_name,
                 'symbol': symbol_name
             },
-            'time': get_timestamp_str(dict_obj['time'], dict_obj['timezone_offset']),
-            'fields': dict_obj
+            'time': get_timestamp_str(fields['time'], fields['timezone_offset']),
+            'fields': fields
         }
         return [ point ]
+
+
+    def generate_point_by_tick(this, measurement_name, market_name, symbol_name, tick):
+        fields = None
+
+        if isinstance(tick, dict):
+            fields = tick
+        elif isinstance(tick, object):
+            fields = {
+                'time': tick.time + tick.timezone_offset,
+                'timezone_offset': tick.timezone_offset,
+                'open': float(tick.open),
+                'close': float(tick.close),
+                'low': float(tick.low),
+                'high': float(tick.high),
+                'amount': float(tick.amount),
+                'volume': float(tick.volume),
+                'count': float(tick.count),
+                'period': tick.period
+            }
+           
+        if fields:
+            point = {
+                'measurement': measurement_name,
+                'tags': {
+                    'market': market_name,
+                    'symbol': symbol_name
+                },
+                'time': get_timestamp_str(fields['time'], fields['timezone_offset']),
+                'fields': fields
+            }
+            return [ point ]
+
+        return []
 
     def generate_points_by_ticks(this, measurement_name, market_name, symbol_name, ticks):
         points = [{
@@ -116,8 +155,13 @@ class influxdb_adapter(database_adapter):
         }
         return [ point ]
 
+    def save_trade(this, measurement_name, market_name, symbol_name, trade):
+        points = this.generate_point_by_trade(measurement_name, market_name, symbol_name, trade)
+
+        this.client.write_points(points)
+
     def save_tick(this, measurement_name, market_name, symbol_name, tick):
-        points = this.generate_point_by_dict(measurement_name, market_name, symbol_name, tick)
+        points = this.generate_point_by_tick(measurement_name, market_name, symbol_name, tick)
 
         this.client.write_points(points)
 

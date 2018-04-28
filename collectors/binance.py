@@ -8,50 +8,47 @@ class collector_binance(collector):
     DEFAULT_PERIOD = "1m"
     DEFAULT_SIZE = 200
 
+    @property
+    def market_name(this):
+        return "binance"
+
     def __init__(this, settings, market_settings):
         super(collector_binance, this).__init__(settings, market_settings)
 
         this.period = this.DEFAULT_PERIOD
-        this.symbols_binance = this.symbols['default']
 
-    def translate(this, objs):
-        ticks = []
-        for obj in objs:
-            tick = market_tick()
-            tick.time = obj[6] / 1000
-            tick.timezone_offset = this.timezone_offset
-            tick.open = obj[1]
-            tick.close = obj[4]
-            tick.low = obj[3]
-            tick.high = obj[2]
-            tick.amount = 0
-            tick.volume = obj[5]
-            tick.count = 0
-            tick.period = this.get_generic_period_name(this.period)
+    def translate(this, obj):
+        tick = market_tick()
 
-            ticks.append(tick)
+        tick.time = obj[6] / 1000
+        tick.timezone_offset = this.timezone_offset
+        tick.open = obj[1]
+        tick.close = obj[4]
+        tick.low = obj[3]
+        tick.high = obj[2]
+        tick.amount = 0
+        tick.volume = obj[5]
+        tick.count = 0
+        tick.period = this.get_generic_period_name(this.period)
 
-        return ticks
+        return tick
 
     def collect_ws(this):
         pass
 
     def collect_rest(this):
-        timestamp = current_timestamp_str() 
-
-        for symbol in this.symbols_binance:
+        for symbol in this.symbols_market:
             url = "klines?symbol=%s&interval=%s&limit=%d" % (symbol.upper(), this.DEFAULT_PERIOD, this.DEFAULT_SIZE)
             url = this.REST_URL + url
-            data = this.http_request_json(url, None)
-        
-            if not data or not isinstance(data, list):
-                this.logger.error('cannot get response from binance (%s)' % symbol)
+            ticks = this.http_request_json(url, None)
+
+            if not ticks or not isinstance(ticks, list):
+                this.logger.error('cannot get ticks from binance (%s)' % symbol)
                 continue
 
-            ticks = this.translate(data)
-            this.bulk_save_ticks('binance', symbol, ticks)
+            this.bulk_save_ticks(this.get_generic_symbol_name(symbol), [ this.translate(tick) for tick in ticks ])
 
-            this.logger.info('get response from binance')
+            this.logger.info('get ticks from binance')
 
     def get_generic_period_name(this, period_name):
         if period_name == '1m':

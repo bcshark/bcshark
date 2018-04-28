@@ -18,24 +18,24 @@ def http_request_json(url, headers = None, cookies = None):
         return None
 
 if __name__ == '__main__':
-	support_symbols = http_request_json('https://api.bitfinex.com/v2/tickers?symbols=ALL&_=%d' % (time.time() * 1000))
+    support_symbols = http_request_json('https://api.bitfinex.com/v2/tickers?symbols=ALL&_=%d' % (time.time() * 1000))
 
-	with open(DEFAULT_OUTPUT_FILE, 'wr') as out_file:
-		for index in range(0, len(check_symbol_list)):
-			symbol = check_symbol_list[index]
-			ret = []
+    with open(DEFAULT_OUTPUT_FILE, 'wr') as out_file:
+        for index in range(0, len(check_symbol_list)):
+            symbol = check_symbol_list[index]
+            ret = []
 
-			matches = filter(lambda x: x[0] == 't%sUSD' % symbol, support_symbols)
-			if matches:
-				ret.append('USD')
+            matches = filter(lambda x: x[0] == 't%sUSD' % symbol, support_symbols)
+            if matches:
+                ret.append('USD')
 
-			matches = filter(lambda x: x[0] == 't%sBTC' % symbol, support_symbols)
-			if matches:
-				ret.append('BTC')
+            matches = filter(lambda x: x[0] == 't%sBTC' % symbol, support_symbols)
+            if matches:
+                ret.append('BTC')
 
-			if ret:
-				out_file.write('%s\t%s\n' % (symbol, '/'.join(ret)))
-			else:
-				out_file.write('%s\t%s\n' % (symbol, 'NA'))
+            if ret:
+                out_file.write('%s    %s\n' % (symbol, '/'.join(ret)))
+            else:
+                out_file.write('%s    %s\n' % (symbol, 'NA'))
 
 

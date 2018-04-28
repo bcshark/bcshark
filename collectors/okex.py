@@ -9,6 +9,10 @@ class collector_okex(collector):
     DEFAULT_SIZE = 200
     DEFAULT_TYPE = "this_week"
 
+    @property
+    def market_name(this):
+        return "okex"
+
     def __init__(this, settings, market_settings):
         super(collector_okex, this).__init__(settings, market_settings)
         this.period = this.DEFAULT_PERIOD

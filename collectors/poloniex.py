@@ -7,6 +7,10 @@ from .utility import *
 class collector_poloniex(collector):
     DEFAULT_PERIOD = "300"
 
+    @property
+    def market_name(this):
+        return "poloniex"
+
     def __init__(this, settings, market_settings):
         super(collector_poloniex, this).__init__(settings, market_settings)
 

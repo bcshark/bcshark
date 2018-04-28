@@ -237,6 +237,3 @@ class collector_k20_index_calc(collector):
                     print('total: ', total)
             return total/(len(ticks) - 2)
 
-
-
-

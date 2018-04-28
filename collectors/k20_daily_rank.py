@@ -8,6 +8,10 @@ from .utility import *
 class collector_k20_daily_rank(collector):
     DEFAULT_PERIOD = "1day"
 
+    @property
+    def market_name(this):
+        return "k20_daily_rank"
+
     def __init__(this, settings, market_settings):
         super(collector_k20_daily_rank, this).__init__(settings, market_settings)
 

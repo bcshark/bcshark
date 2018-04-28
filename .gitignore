@@ -2,6 +2,7 @@ logs/
 .vscode
 
 *.pyc
+*.swp
 *.code-workspace
 *.sublime-project
 *.sublime-workspace

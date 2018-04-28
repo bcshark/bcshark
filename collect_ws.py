@@ -5,6 +5,7 @@ import signal
 import time
 import sys
 import os
+import getopt
 
 from lib.config import ConfigurationManager
 from lib.cache import cache_manager_factory
@@ -25,43 +26,55 @@ file_logger_handler.setLevel(logging.DEBUG)
 logger.addHandler(file_logger_handler)
 
 def close_and_exit(signum, frame):
-	global threads
-	global settings
+    global threads
+    global settings
 
-	logger.info('waiting for exit...3')
-	for thread in threads:
-		thread.join(TIMEOUT_COLLECT_IN_SECONDS)
+    logger.info('waiting for exit...3')
+    for thread in threads:
+        thread.join(TIMEOUT_COLLECT_IN_SECONDS)
 
-	logger.info('waiting for exit...2')
-	settings['db_adapter'].close()
-	settings['cache_manager'].dispose()
+    logger.info('waiting for exit...2')
+    settings['db_adapter'].close()
+    settings['cache_manager'].dispose()
 
-	logger.info('waiting for exit...1')
-	exit()
+    logger.info('waiting for exit...1')
+    exit()
 
 if __name__ == '__main__':
-	global factory
-	global threads
-	global settings
+    global factory
+    global threads
+    global settings
 
-	settings = ConfigurationManager(os.path.normpath(os.path.join(sys.path[0], 'config/global.json')))
-	settings['logger'] = logger
-	settings['db_adapter'] = influxdb_adapter(settings['influxdb'])
-	#settings['db_adapter'] = mysqldb_adapter(settings['mysqldb'])
-	settings['cache_manager'] = cache_manager_factory.create(settings['cache'])
+    selected_markets = []
 
-	factory = collector_factory(settings)
-	threads = []
-	signal.signal(signal.SIGINT, close_and_exit)
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "m:", [ "markets=" ])
 
-	settings['db_adapter'].open()
+        for opt, arg in opts:
+            if opt in ("-m", "--markets"):
+                selected_markets = arg.split(',')
+    except getopt.GetoptError:
+        selected_markets = []
 
-	collectors = factory.get_all_ws_collectors()
-	for collector in collectors:
-		threads.append(threading.Thread(target=collector.collect_ws))
-	
-	for thread in threads:
-		thread.setDaemon(True) 
-		thread.start()
+    settings = ConfigurationManager(os.path.normpath(os.path.join(sys.path[0], 'config/global.json')))
+    settings['logger'] = logger
+    settings['db_adapter'] = influxdb_adapter(settings['influxdb'])
+    #settings['db_adapter'] = mysqldb_adapter(settings['mysqldb'])
+    settings['cache_manager'] = cache_manager_factory.create(settings['cache'])
 
-	signal.pause()
+    factory = collector_factory(settings)
+    threads = []
+    signal.signal(signal.SIGINT, close_and_exit)
+
+    settings['db_adapter'].open()
+
+    collectors = factory.get_all_ws_collectors()
+    for collector in collectors:
+        if not selected_markets or collector.market_name in selected_markets:
+            threads.append(threading.Thread(target=collector.collect_ws))
+    
+    for thread in threads:
+        thread.setDaemon(True) 
+        thread.start()
+
+    signal.pause()

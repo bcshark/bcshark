@@ -13,6 +13,10 @@ class collector_huobi(collector):
     DEFAULT_SIZE = 200
     PATTERN_TICK = "market.([a-zA-Z]+).kline.1min"
 
+    @property
+    def market_name(this):
+        return "huobi"
+
     def __init__(this, settings, market_settings):
         super(collector_huobi, this).__init__(settings, market_settings)
 

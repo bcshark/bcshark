@@ -8,6 +8,10 @@ class collector_okcoin(collector):
     DEFAULT_PERIOD = "1min"
     DEFAULT_SIZE = 200
 
+    @property
+    def market_name(this):
+        return "okcoin"
+
     def __init__(this, settings, market_settings):
         super(collector_okcoin, this).__init__(settings, market_settings)
         this.period = this.DEFAULT_PERIOD

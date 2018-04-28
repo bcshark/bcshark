@@ -11,11 +11,14 @@ class collector_bitstamp(collector):
     DEFAULT_SIZE = 200
     PATTERN_LIVE_TRADES = "live_trades([_a-zA-Z]*)"
 
+    @property
+    def market_name(this):
+        return "bitstamp"
+
     def __init__(this, settings, market_settings):
         super(collector_bitstamp, this).__init__(settings, market_settings)
 
         this.period = this.DEFAULT_PERIOD
-        this.symbols_bitstamp = this.symbols['bitstamp']
 
     def translate_trade(this, ts, obj):
         ret = dict(obj)
@@ -38,7 +41,7 @@ class collector_bitstamp(collector):
         if event == 'pusher:connection_established':
             this.socket_id = data['socket_id']
 
-            for symbol in this.symbols_bitstamp:
+            for symbol in this.symbols_market:
                 if symbol == '':
                     continue
 
@@ -59,19 +62,7 @@ class collector_bitstamp(collector):
                 symbol_name = 'btcusd'
 
             trade = this.translate_trade(long(data['timestamp']), data)
-            this.save_tick('bitstamp_trades', 'bitstamp', this.get_generic_symbol_name(symbol_name), trade)
+            this.save_trade(this.get_generic_symbol_name(symbol_name), trade)
 
     def collect_ws(this):
         this.start_listen_websocket(this.WS_URL, this)
-
-    def collect_rest(this):
-        pass
-
-    def get_generic_symbol_name(this, symbol_name):
-        symbols_default = this.symbols['default']
-
-        for symbol_index in range(len(this.symbols_bitstamp)):
-            if this.symbols_bitstamp[symbol_index] == symbol_name:
-                return symbols_default[symbol_index]
-
-        return None

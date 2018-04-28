@@ -9,6 +9,10 @@ class collector_gdax(collector):
     DEFAULT_SIZE = 60
     DEFAULT_PERIOD = "1min"
 
+    @property
+    def market_name(this):
+        return "gdax"
+
     def __init__(this, settings, market_settings):
         super(collector_gdax, this).__init__(settings, market_settings)
         this.period = this.DEFAULT_PERIOD

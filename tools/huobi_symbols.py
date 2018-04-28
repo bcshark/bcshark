@@ -17,17 +17,17 @@ def http_request_json(url, headers = None, cookies = None):
         return None
 
 if __name__ == '__main__':
-	json_obj = http_request_json('https://api.huobi.pro/v1/common/symbols')
-	support_symbols = json_obj['data']
+    json_obj = http_request_json('https://api.huobi.pro/v1/common/symbols')
+    support_symbols = json_obj['data']
 
-	with open(DEFAULT_OUTPUT_FILE, 'wr') as out_file:
-		for index in range(0, len(check_symbol_list)):
-			symbol = check_symbol_list[index]
-			matches = filter(lambda x: x['base-currency'] == symbol.lower() and x['quote-currency'] in DEFAULT_WATCH_SYMBOLS, support_symbols)
-			ret = '/'.join([match['quote-currency'].upper() for match in matches])
-			if not ret:
-				ret = 'NA'
+    with open(DEFAULT_OUTPUT_FILE, 'wr') as out_file:
+        for index in range(0, len(check_symbol_list)):
+            symbol = check_symbol_list[index]
+            matches = filter(lambda x: x['base-currency'] == symbol.lower() and x['quote-currency'] in DEFAULT_WATCH_SYMBOLS, support_symbols)
+            ret = '/'.join([match['quote-currency'].upper() for match in matches])
+            if not ret:
+                ret = 'NA'
 
-			out_file.write('%s\t%s\n' % (symbol, ret))
+            out_file.write('%s    %s\n' % (symbol, ret))
 
 
