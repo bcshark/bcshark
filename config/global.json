@@ -27,6 +27,8 @@
 	"symbols": {
 		"default":	[ "btcusdt",	"eosbtc", 	"ethbtc",	"etcbtc"	],
 		"_title":	[ "BTC-USDT",	"EOS-BTC", 	"ETH-BTC",	"ETC-BTC"	],
+		"huobi":	[ "btcusdt",	"eosbtc", 	"ethbtc",	"etcbtc"	],
+		"binance":	[ "btcusdt",	"eosbtc", 	"ethbtc",	"etcbtc"	],
 		"bitfinex":	[ "tBTCUSD",	"tEOSBTC", 	"tETHBTC",	"tETCBTC"	],
 		"okex": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"etc_btc"	],
 		"okcoin": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"etc_btc"	],
