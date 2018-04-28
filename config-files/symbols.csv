@@ -1,0 +1,12 @@
+default,btcusdt,eosbtc,ethbtc,etcbtc,ethusd
+_title,BTC-USDT,EOS-BTC,ETH-BTC,ETC-BTC,
+huobi,btcusdt,eosbtc,ethbtc,etcbtc,
+binance,btcusdt,eosbtc,ethbtc,etcbtc,
+bitfinex,tBTCUSD,tEOSBTC,tETHBTC,tETCBTC,
+okex,btc_usd,eos_btc,eth_btc,etc_btc,
+okcoin,btc_usd,,,,eth_usd
+poloniex,USDT_BTC,,USDT_ETH,USDT_ETC,
+gdax,BTC-USD,,ETH-BTC,,
+bitstamp,btcusd,,ethbtc,,
+bittrex,USDT-BTC,,BTC-ETH,BTC-ETC,
+coinmarketcap,BTC,,,,

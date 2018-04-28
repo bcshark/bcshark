@@ -4,6 +4,7 @@ import logging
 import logging.handlers
 import threading
 import getopt
+import csv
 
 from lib.config import ConfigurationManager
 from lib.cache import cache_manager_factory
@@ -22,6 +23,16 @@ file_logger_handler.suffix = "%Y-%m-%d_%H-%M-%S.log"
 file_logger_handler.setFormatter(formatter)
 file_logger_handler.setLevel(logging.DEBUG)
 logger.addHandler(file_logger_handler)
+
+def get_symbols_from_csv(file_path):
+    symbols_dict = {}
+
+    with open(os.path.normpath(os.path.join(sys.path[0], file_path)), 'rb') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        for row in spamreader:
+            symbols_dict[row[0]] = row[1:]
+
+    return symbols_dict
 
 if __name__ == '__main__':
     global factory
@@ -42,6 +53,7 @@ if __name__ == '__main__':
     settings['db_adapter'] = influxdb_adapter(settings['influxdb'])
     #settings['db_adapter'] = mysqldb_adapter(settings['mysqldb'])
     settings['cache_manager'] = cache_manager_factory.create(settings['cache'])
+    settings['symbols'] = get_symbols_from_csv(settings['symbols']['path'])
 
     factory = collector_factory(settings)
     threads = []
