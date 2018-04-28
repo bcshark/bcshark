@@ -1,5 +1,5 @@
 default,btcusdt,eosbtc,ethbtc,etcbtc,ethusd
-_title,BTC-USDT,EOS-BTC,ETH-BTC,ETC-BTC,
+_title,BTC-USDT,EOS-BTC,ETH-BTC,ETC-BTC,ETH-USD
 huobi,btcusdt,eosbtc,ethbtc,etcbtc,
 binance,btcusdt,eosbtc,ethbtc,etcbtc,
 bitfinex,tBTCUSD,tEOSBTC,tETHBTC,tETCBTC,
