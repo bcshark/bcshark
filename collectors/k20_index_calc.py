@@ -20,13 +20,22 @@ class collector_k20_index_calc(collector):
 
         for obj in objs['series']:
 
+            if len(objs["value"]) < 1:
+                print('K20 - Error! DB query result of Rank is 0: ', objs["values"])
+                continue
+
             rank = k20_rank()
             rank.symbol = obj["values"][0][2]
-            rank.time = obj["values"][0][1]
-            rank.market_cap_usd = obj["values"][0][3]
+            rank.time = long(obj["values"][0][1])
+            rank.market_cap_usd = float(obj["values"][0][3])
+
+            if rank.market_cap_usd <= 0:
+                print('K20 - Error! Rank market cap is incorrect! ', rank.symbol, rank.market_cap_usd)
+                continue
             k20_ranks.append(rank)
 
             print('generated rank: ', rank.time, rank.symbol, rank.market_cap_usd)
+        print('length of generated rank: ', len(k20_ranks))
 
         return k20_ranks
 
@@ -37,17 +46,27 @@ class collector_k20_index_calc(collector):
 
         for obj in objs['series']:
 
+            if len(objs["value"]) < 1:
+                print('K20 - Error! DB query result of Tick is 0: ', objs["values"])
+                continue
+
             tick = market_tick()
             tick.market = obj["values"][0][2]
             tick.symbol = obj["values"][0][3]
-            tick.time = obj["values"][0][1]
-            tick.high = obj["values"][0][4]
-            tick.low = obj["values"][0][5]
-            tick.open = obj["values"][0][6]
-            tick.close = obj["values"][0][7]
+            tick.time = long(obj["values"][0][1])
+            tick.high = float(obj["values"][0][4])
+            tick.low = float(obj["values"][0][5])
+            tick.open = float(obj["values"][0][6])
+            tick.close = float(obj["values"][0][7])
+
+            if tick.market == '' or tick.symbol == '':
+                print('K20 - Error! Tick market/symbol is incorrect! ', tick.market, tick.symbol)
+                continue
+
             ticks.append(tick)
 
             print('generated tick: ', tick.time, tick.market, tick.symbol, tick.high, tick.low, tick.open, tick.close)
+        print('length of generated rick: ', len(ticks))
 
         return ticks
 
@@ -60,67 +79,32 @@ class collector_k20_index_calc(collector):
         #print('-------', rank_result['series'][0]['values'])
         ranks = this.translate_ranks(rank_result)
         ranks = this.fillRatio(ranks)
-        for rank in ranks:
-            print('rank ratio:', rank.symbol, rank.cap_ratio)
 
         start_second = this.getStartSecondPreviousMinute()
 
         total_high_weight = total_low_weight = total_open_weight = total_close_weight = 0
-        btc_usd_price_high = btc_usd_price_low = btc_usd_price_open = btc_usd_price_close = 0
 
         for rank in ranks:
 
-            if rank.symbol == 'BTC':
-                tick_symbol = this.getSymbol(rank.symbol)
-                print('returned tick symbol: ', tick_symbol)
-                tick_result = this.query_latest_price(tick_symbol, start_second)
-                #print('market_ticks return result:', tick_result)
-                #print('market_ticks return value0:', tick_result['series'][0]['values'])
-                ticks = this.translate_ticks(tick_result)
-                avg_high = this.calculateSymbolAvgPrice(ticks, '_high')
-                total_high_weight = avg_high * rank.cap_ratio
-                avg_low = this.calculateSymbolAvgPrice(ticks, '_low')
-                total_low_weight = avg_low * rank.cap_ratio
-                avg_open = this.calculateSymbolAvgPrice(ticks, '_open')
-                total_open_weight = avg_open * rank.cap_ratio
-                avg_close = this.calculateSymbolAvgPrice(ticks, '_close')
-                total_close_weight = avg_close * rank.cap_ratio
-
-                btc_usd_price_high = avg_high
-                btc_usd_price_low = avg_low
-                btc_usd_price_open = avg_open
-                btc_usd_price_close = avg_close
-
-                print('(Basic) BTC usd price high:', avg_high)
-                print('(Basic) BTC usd price low:', avg_low)
-                print('(Basic) BTC usd price open:', avg_open)
-                print('(Basic) BTC usd price close:', avg_close)
-
-                break
-
-        for rank in ranks:
-
-            if rank.symbol != 'BTC':
-
-                tick_symbol = this.getSymbol(rank.symbol)
-                print('returned tick symbol: ', tick_symbol)
-                tick_result = this.query_latest_price(tick_symbol, start_second)
-                #print('market_ticks return result:', tick_result)
-                ticks = this.translate_ticks(tick_result)
-                avg_high = this.calculateSymbolAvgPrice(ticks, '_high')
-                total_high_weight = total_high_weight + avg_high * btc_usd_price_high * rank.cap_ratio
-                avg_low = this.calculateSymbolAvgPrice(ticks, '_low')
-                total_low_weight = total_low_weight + avg_low * btc_usd_price_low * rank.cap_ratio
-                avg_open = this.calculateSymbolAvgPrice(ticks, '_open')
-                total_open_weight = total_open_weight + avg_open * btc_usd_price_open * rank.cap_ratio
-                avg_close = this.calculateSymbolAvgPrice(ticks, '_close')
-                total_close_weight = total_close_weight + avg_close * btc_usd_price_close * rank.cap_ratio
+            tick_symbol = this.getSymbol(rank.symbol)
+            print('Rank symbol related Tick symbol: ', tick_symbol)
+            tick_result = this.query_latest_price(tick_symbol, start_second)
+            #print('market_ticks return result:', tick_result)
+            ticks = this.translate_ticks(tick_result)
+            avg_high = this.calculateSymbolAvgPrice(ticks, 'high')
+            total_high_weight = total_high_weight + avg_high * rank.cap_ratio
+            avg_low = this.calculateSymbolAvgPrice(ticks, 'low')
+            total_low_weight = total_low_weight + avg_low * rank.cap_ratio
+            avg_open = this.calculateSymbolAvgPrice(ticks, 'open')
+            total_open_weight = total_open_weight + avg_open * rank.cap_ratio
+            avg_close = this.calculateSymbolAvgPrice(ticks, 'close')
+            total_close_weight = total_close_weight + avg_close * rank.cap_ratio
 
         index.timezone_offset = -28800
-        index.high = total_high_weight / 20
-        index.low = total_low_weight / 20
-        index.open = total_open_weight / 20
-        index.close = total_close_weight / 20
+        index.high = total_high_weight / len(ranks)
+        index.low = total_low_weight / len(ranks)
+        index.open = total_open_weight / len(ranks)
+        index.close = total_close_weight / len(ranks)
         index.time = start_second
         index.period = '1min'
 
@@ -146,49 +130,11 @@ class collector_k20_index_calc(collector):
 
         this.logger.info('K20 index calc done !')
 
-    def getSymbol(this, rank_symbol):
-        print('rank symbol mapping to tick symbol: ', rank_symbol)
-        if "BTC" == rank_symbol:
-            return "btcusdt"
-        if "ETH" == rank_symbol:
-            return "ethbtc"
-        if "XRP" == rank_symbol:
-            return "xrpbtc"
-        if "BCH" == rank_symbol:
-            return "bchbtc"
-        if "EOS" == rank_symbol:
-            return "eosbtc"
-        if "LTC" == rank_symbol:
-            return "ltcbtc"
-        if "ADA" == rank_symbol:
-            return "adabtc"
-        if "XLM" == rank_symbol:
-            return "xlmbtc"
-        if "MIOTA" == rank_symbol:
-            return "miotabtc"
-        if "NEO" == rank_symbol:
-            return "neobtc"
-        if "XMR" == rank_symbol:
-            return "xmrbtc"
-        if "DASH" == rank_symbol:
-            return "dashbtc"
-        if "XEM" == rank_symbol:
-            return "xembtc"
-        if "TRX" == rank_symbol:
-            return "trxbtc"
-        if "VEN" == rank_symbol:
-            return "venbtc"
-        if "ETC" == rank_symbol:
-            return "etcbtc"
-        if "QTUM" == rank_symbol:
-            return "qtumbtc"
-        if "OMG" == rank_symbol:
-            return "omgbtc"
-        if "BNB" == rank_symbol:
-            return "bnbbtc"
-
     def getStartSecondPreviousMinute(this):
-        return 1524458040;
+        time_second = int(time.time())
+        time_second = time_second - time_second % 100 - 60
+        print('start second generated: ', time_second)
+        return time_second;
 
     def fillRatio(this, ranks):
         total_cap = 0
@@ -196,9 +142,10 @@ class collector_k20_index_calc(collector):
             total_cap = total_cap + rank.market_cap_usd
         for rank in ranks:
             rank.cap_ratio = rank.market_cap_usd / total_cap
+            print('rank symbol: ', rank.symbol, ' Cap Ratio:', rank.cap_ratio)
         return ranks
 
-    def calculateSymbolAvgPrice(this, ticks, price_field):
+    def calculateSymbolAvgPriceExcludeHighLow(this, ticks, price_field):
 
         print('input price field for avg cal: ', price_field)
         print('ticks length: ', len(ticks), ticks[0].__dict__)
@@ -237,3 +184,66 @@ class collector_k20_index_calc(collector):
                     print('total: ', total)
             return total/(len(ticks) - 2)
 
+    def calculateSymbolAvgPrice(this, ticks, price_field):
+
+        if len(ticks) == 0:
+            this.logger.error('K20 calc Error! No price record found for such symbol! ')
+            return 0
+        else:
+            this.logger.info('Total size of ticks is:', len(ticks))
+
+            sum_price = 0
+            for tick in ticks:
+                if price_field == 'high':
+                    sum_price = sum_price + tick.high
+                if price_field == 'low':
+                    sum_price = sum_price + tick.low
+                if price_field == 'open':
+                    sum_price = sum_price + tick.open
+                if price_field == 'close':
+                    sum_price = sum_price + tick.close
+
+            avg_price = sum_price/(len(ticks))
+            print('Calculated Avg Price Is: ', avg_price)
+            return avg_price
+
+    def getSymbol(this, rank_symbol):
+        print('rank symbol mapping to tick symbol: ', rank_symbol)
+        if "BTC" == rank_symbol:
+            return "btcusdt"
+        if "ETH" == rank_symbol:
+            return "ethusdt"
+        if "XRP" == rank_symbol:
+            return "xrpusdt"
+        if "BCH" == rank_symbol:
+            return "bchusdt"
+        if "EOS" == rank_symbol:
+            return "eosusdt"
+        if "LTC" == rank_symbol:
+            return "ltcusdt"
+        if "ADA" == rank_symbol:
+            return "adausdt"
+        if "XLM" == rank_symbol:
+            return "xlmusdt"
+        if "MIOTA" == rank_symbol:
+            return "miotausdt"
+        if "NEO" == rank_symbol:
+            return "neousdt"
+        if "XMR" == rank_symbol:
+            return "xmrusdt"
+        if "DASH" == rank_symbol:
+            return "dashusdt"
+        if "XEM" == rank_symbol:
+            return "xemusdt"
+        if "TRX" == rank_symbol:
+            return "trxusdt"
+        if "VEN" == rank_symbol:
+            return "venusdt"
+        if "ETC" == rank_symbol:
+            return "etcusdt"
+        if "QTUM" == rank_symbol:
+            return "qtumusdt"
+        if "OMG" == rank_symbol:
+            return "omgusdt"
+        if "BNB" == rank_symbol:
+            return "bnbusdt"

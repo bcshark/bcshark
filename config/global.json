@@ -32,7 +32,7 @@
 		"bitfinex":	[ "tBTCUSD",	"tEOSBTC", 	"tETHBTC",	"tETCBTC",	""		  ],
 		"okex": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"etc_btc",	""		  ],
 		"okcoin": 	[ "btc_usd",	"", 		"",			"",			"eth_usd" ],
-		"poloniex": [ "USDT_BTC",	"EOS_BTC", 	"ETH_BTC",	"ETC_BTC" ,	""		  ],
+		"poloniex": [ "USDT_BTC",	"", 	"USDT_ETH",	"USDT_ETC" ,	""		  ],
 		"gdax": 	[ "BTC-USD", 	"", 		"ETH-BTC",	"",			""		  ],
 		"bitstamp":	[ "btcusd", 	"", 		"ethbtc",	"",			""		  ],
 		"bittrex": 	[ "USDT-BTC", 	"", 		"BTC-ETH",	"BTC-ETC",	""		  ],
