@@ -16,7 +16,6 @@ class collector_gdax(collector):
     def __init__(this, settings, market_settings):
         super(collector_gdax, this).__init__(settings, market_settings)
         this.period = this.DEFAULT_PERIOD
-        this.symbols_gdax = this.symbols['gdax']
 
     def translate(this, objs):
         ticks = []
@@ -39,14 +38,10 @@ class collector_gdax(collector):
         return ticks
 
     def collect_rest(this):
-        symbol_index = -1
-
-        start = (datetime.datetime.utcnow()-datetime.timedelta(minutes=1)).strftime('%Y-%m-%dT%H:%MZ')
+        start = (datetime.datetime.utcnow() - datetime.timedelta(minutes = 1)).strftime('%Y-%m-%dT%H:%MZ')
         end = (datetime.datetime.utcnow()).strftime('%Y-%m-%dT%H:%MZ')
 
-        for symbol in this.symbols_gdax:
-            symbol_index += 1
-
+        for symbol in this.symbols_market:
             if symbol == "":
                 continue
 
@@ -59,12 +54,6 @@ class collector_gdax(collector):
                 continue
 
             ticks = this.translate(data)
-            this.bulk_save_ticks('gdax', this.get_generic_symbol_name(symbol_index), ticks)
+            this.bulk_save_ticks(this.get_generic_symbol_name(symbol), ticks)
 
             this.logger.info('get response from gdax')
-
-    def get_generic_symbol_name(this, symbol_index):
-        symbols_default = this.symbols['default']
-
-        return symbols_default[symbol_index]
-

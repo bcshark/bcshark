@@ -21,40 +21,20 @@ class collector_huobi(collector):
         super(collector_huobi, this).__init__(settings, market_settings)
 
         this.period = this.DEFAULT_PERIOD
-        this.symbols_huobi = this.symbols['default']
 
-    def translate(this, ts, objs):
-        ticks = []
-        for obj in objs:
-            tick = market_tick()
-            tick.time = obj['id']
-            tick.timezone_offset = this.timezone_offset
-            tick.open = obj['open']
-            tick.close = obj['close']
-            tick.low = obj['low']
-            tick.high = obj['high']
-            tick.amount = obj['amount']
-            tick.volume = obj['vol']
-            tick.count = obj['count']
-            tick.period = this.get_generic_period_name(this.period)
+    def translate(this, ts, obj):
+        tick = market_tick()
 
-            ticks.append(tick)
-
-        return ticks
-
-    def translate_tick(this, ts, obj):
-        tick = {
-            "time": obj['id'],
-            "timezone_offset": this.timezone_offset,
-            "open": obj['open'],
-            "close": obj['close'],
-            "low": obj['low'],
-            "high": obj['high'],
-            "amount": obj['amount'],
-            "volume": obj['vol'],
-            "count": obj['count'],
-            "period": this.get_generic_period_name(this.period)
-        }
+        tick.time = long(obj['id'])
+        tick.timezone_offset = this.timezone_offset
+        tick.open = float(obj['open'])
+        tick.close = float(obj['close'])
+        tick.low = float(obj['low'])
+        tick.high = float(obj['high'])
+        tick.amount = float(obj['amount'])
+        tick.volume = float(obj['vol'])
+        tick.count = float(obj['count'])
+        tick.period = this.get_generic_period_name(this.period)
 
         return tick
 
@@ -74,7 +54,7 @@ class collector_huobi(collector):
             this.send_ws_message(json.dumps({ 'pong': message_json['ping'] }))
 
             if not this.is_subscription_sent:
-                for symbol in this.symbols_huobi:
+                for symbol in this.symbols_market:
                     if symbol == '':
                         continue
 
@@ -90,8 +70,7 @@ class collector_huobi(collector):
 
             if match:
                 symbol_name = match.group(1)
-                ticks = [ this.translate_tick(message_json['ts'], message_json['tick']) ]
-                this.save_tick('huobi_ticks', 'huobi', symbol_name, ticks[0])
+                this.save_tick(this.get_generic_period_name(symbol_name), this.translate(message_json['ts'], message_json['tick']))
 
     def collect_ws(this):
         this.start_listen_websocket(this.WS_URL, this)
@@ -99,17 +78,19 @@ class collector_huobi(collector):
     def collect_rest(this):
         timestamp = current_timestamp_str() 
 
-        for symbol in this.symbols_huobi:
+        for symbol in this.symbols_market:
+            if symbol == '':
+                continue
+
             url = "kline?Timestamp=%s&peroid=%s&size=%s&symbol=%s" % (timestamp, this.DEFAULT_PERIOD, this.DEFAULT_SIZE, symbol)
             url = this.REST_URL + url
-            data = this.http_request_json(url, None)
+            ticks = this.http_request_json(url, None)
         
-            if not data or not data.has_key('data'):
+            if not ticks or not ticks.has_key('data'):
                 this.logger.error('cannot get response from huobi (%s)' % symbol)
                 continue
 
-            ticks = this.translate(data['ts'], data['data'])
-            this.bulk_save_ticks('huobi', symbol, ticks)
+            this.bulk_save_ticks(this.get_generic_period_name(symbol), [ this.translate(ticks['ts'], tick) for tick in ticks['data'] ])
 
             this.logger.info('get response from huobi')
 

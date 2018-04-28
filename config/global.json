@@ -33,7 +33,7 @@
 		"okex": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"etc_btc"	],
 		"okcoin": 	[ "btc_usd",	"eos_btc", 	"eth_btc",	"etc_btc"	],
 		"poloniex": [ "USDT_BTC",	"EOS_BTC", 	"ETH_BTC",	"ETC_BTC" 	],
-		"gdax": 	[ "BTC-USD", 	"", 		"",			""			],
+		"gdax": 	[ "BTC-USD", 	"", 		"ETH-BTC",	""			],
 		"bitstamp":	[ "btcusd", 	"", 		"ethbtc",	""			],
 		"bittrex": 	[ "USDT-BTC", 	"", 		"BTC-ETH",	"BTC-ETC"	],
 		"coinmarketcap": 	[ "BTC"	]

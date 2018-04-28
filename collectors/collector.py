@@ -73,6 +73,8 @@ class collector(object):
             this.websocket_client.send(message)
 
     def http_request_json(this, url, headers, cookies = None):
+        this.logger.info('Requesting \033[0;32;40m%s\033[0m rest interface, url: \033[0;32;40m%s\033[0m' % (this.market_name, url))
+
         try:
             res = requests.get(url, headers = headers, cookies = cookies, timeout = this.DEFAULT_TIMEOUT_IN_SECONDS, allow_redirects = True)
 
@@ -85,7 +87,7 @@ class collector(object):
         if not this.websocket_client:
             this.stop_listen_websocket()
 
-        this.logger.info('Connecting to \033[0;32;40m%s\033[0m websocket interface, url: \033[0;32;40m%s\033[0m' % (this.market_name, this.WS_URL))
+        this.logger.info('Connecting to \033[0;32;40m%s\033[0m websocket interface, url: \033[0;32;40m%s\033[0m' % (this.market_name, url))
         this.websocket_client = WebSocketApp(url, on_open = listener.on_raw_open, on_close = listener.on_raw_close, on_message = listener.on_raw_message, on_error = listener.on_raw_error)
         this.websocket_client.run_forever()
 

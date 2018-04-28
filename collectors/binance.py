@@ -20,15 +20,15 @@ class collector_binance(collector):
     def translate(this, obj):
         tick = market_tick()
 
-        tick.time = obj[6] / 1000
+        tick.time = long(obj[6] / 1000)
         tick.timezone_offset = this.timezone_offset
-        tick.open = obj[1]
-        tick.close = obj[4]
-        tick.low = obj[3]
-        tick.high = obj[2]
-        tick.amount = 0
-        tick.volume = obj[5]
-        tick.count = 0
+        tick.open = float(obj[1])
+        tick.close = float(obj[4])
+        tick.low = float(obj[3])
+        tick.high = float(obj[2])
+        tick.amount = 0.0
+        tick.volume = float(obj[5])
+        tick.count = float(0)
         tick.period = this.get_generic_period_name(this.period)
 
         return tick
@@ -38,6 +38,9 @@ class collector_binance(collector):
 
     def collect_rest(this):
         for symbol in this.symbols_market:
+            if symbol == "":
+                continue
+
             url = "klines?symbol=%s&interval=%s&limit=%d" % (symbol.upper(), this.DEFAULT_PERIOD, this.DEFAULT_SIZE)
             url = this.REST_URL + url
             ticks = this.http_request_json(url, None)

@@ -53,6 +53,9 @@ class collector_bitfinex(collector):
 
                 if status == 1:
                     for symbol in this.symbols_market:
+                        if symbol == '':
+                            continue
+
                         subscription_msg = {
                             "event": "subscribe",
                             "channel": "candles",
