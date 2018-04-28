@@ -19,27 +19,25 @@ class collector_poloniex(collector):
 
     def translate(this, obj):
         tick = market_tick()
-        print('---', obj)
-        tick.time = obj["date"]
+
+        tick.time = long(obj["date"])
         tick.timezone_offset = this.timezone_offset
-        tick.open = obj["open"]
-        tick.high = obj["high"]
-        tick.low = obj["low"]
-        tick.close = obj["close"]
-        tick.volume = obj["volume"]
-        tick.amount = 0
-        tick.count = 0
+        tick.open = float(obj["open"])
+        tick.high = float(obj["high"])
+        tick.low = float(obj["low"])
+        tick.close = float(obj["close"])
+        tick.volume = float(obj["volume"])
+        tick.amount = 0.0
+        tick.count = 0.0
         tick.period = this.get_generic_period_name()
 
         return tick
 
     def collect_rest(this):
-
         time_second = int(time.time())
         time_second = time_second - time_second % 60 - 300 ## possible to miss data each 5 mins ?
 
         for symbol in this.symbols_market:
-
             if symbol == "":
                 continue
 
@@ -50,10 +48,10 @@ class collector_poloniex(collector):
             if not ticks or not isinstance(ticks, list):
                 this.logger.error('cannot get response from poloniex (%s)' % symbol)
                 continue
+
             # this.bulk_save_ticks('poloniex', this.get_generic_symbol_name(symbol_index), ticks)
             this.bulk_save_ticks(this.get_generic_symbol_name(symbol), [ this.translate(tick) for tick in ticks ])
             this.logger.info('get response from poloniex')
 
     def get_generic_period_name(this):
-
         return "5min"

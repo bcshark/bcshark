@@ -22,15 +22,15 @@ class collector_gdax(collector):
 
         for obj in objs:
             tick = market_tick()
+            tick.time = long(objs[0][0])
             tick.timezone_offset = this.timezone_offset
-            tick.time = objs[0][0]
-            tick.open = objs[0][3]
-            tick.high = objs[0][2]
-            tick.low = objs[0][1]
-            tick.close = objs[0][4]
-            tick.volume = objs[0][5]
-            tick.amount = 0
-            tick.count = 0
+            tick.open = float(objs[0][3])
+            tick.high = float(objs[0][2])
+            tick.low = float(objs[0][1])
+            tick.close = float(objs[0][4])
+            tick.volume = float(objs[0][5])
+            tick.amount = 0.0
+            tick.count = 0.0
             tick.period = this.period
 
             ticks.append(tick)

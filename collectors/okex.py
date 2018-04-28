@@ -19,23 +19,21 @@ class collector_okex(collector):
 
     def translate(this, obj):
         tick = market_tick()
+        tick.time = long(obj[0] / 1000)
         tick.timezone_offset = this.timezone_offset
-        tick.time = obj[0] / 1000
-        tick.open = obj[1]
-        tick.high = obj[2]
-        tick.low = obj[3]
-        tick.close = obj[4]
-        tick.volume = obj[5]
-        tick.amount = 0
-        tick.count = 0
+        tick.open = float(obj[1])
+        tick.high = float(obj[2])
+        tick.low = float(obj[3])
+        tick.close = float(obj[4])
+        tick.volume = float(obj[5])
+        tick.amount = 0.0
+        tick.count = 0.0
         tick.period = this.get_generic_period_name()
 
         return tick
 
     def collect_rest(this):
-
         for symbol in this.symbols_market:
-
             if symbol == "":
                 continue
 
@@ -53,5 +51,4 @@ class collector_okex(collector):
             this.logger.info('get response from okex')
 
     def get_generic_period_name(this):
-
         return this.DEFAULT_PERIOD
