@@ -15,55 +15,43 @@ class collector_okcoin(collector):
     def __init__(this, settings, market_settings):
         super(collector_okcoin, this).__init__(settings, market_settings)
         this.period = this.DEFAULT_PERIOD
-        this.symbols_okcoin = this.symbols['okcoin']
 
-    def translate(this, objs):
-        ticks = []
-        for obj in objs:
-            tick = market_tick()
-            tick.timezone_offset = this.timezone_offset
-            tick.time = obj[0] / 1000
-            tick.open = obj[1]
-            tick.high = obj[2]
-            tick.low = obj[3]
-            tick.close = obj[4]
-            tick.volume = obj[5]
-            tick.amount = 0
-            tick.count = 0
-            tick.period = this.get_generic_period_name(this.period)
+    def translate(this, obj):
+        tick = market_tick()
 
-            ticks.append(tick)
+        tick.time = long(obj[0] / 1000)
+        tick.timezone_offset = this.timezone_offset
+        tick.open = float(obj[1])
+        tick.high = float(obj[2])
+        tick.low = float(obj[3])
+        tick.close = float(obj[4])
+        tick.volume = float(obj[5])
+        tick.amount = 0.0
+        tick.count = 0.0
+        tick.period = this.get_generic_period_name(this.period)
 
-        return ticks
+        return tick
 
     def collect_rest(this):
         symbol_index = -1
 
         time_second = int(time.time())
         time_second = time_second - time_second % 60 - 300 ## possible to miss data each 5 mins ?
-        for symbol in this.symbols_okcoin:
-            symbol_index += 1
-
-            if symbol == "":
+        for symbol in this.symbols_market:
+            if symbol == '':
                 continue
 
             url = "kline.do?symbol=%s&type=%s&size=%d&since=%d" % (symbol, this.DEFAULT_PERIOD, this.DEFAULT_SIZE, time_second)
             url = this.REST_URL + url
-            data = this.http_request_json(url, None)
+            ticks = this.http_request_json(url, None)
 
-            if not data or not isinstance(data, list):
+            if not ticks or not isinstance(ticks, list):
                 this.logger.error('cannot get response from okcoin (%s)' % symbol)
                 continue
 
-            ticks = this.translate(data)
-            this.bulk_save_ticks('okcoin', this.get_generic_symbol_name(symbol_index), ticks)
+            this.bulk_save_ticks(this.get_generic_symbol_name(symbol), [ this.translate(tick) for tick in ticks ])
 
             this.logger.info('get response from okcoin')
-
-    def get_generic_symbol_name(this, symbol_index):
-        symbols_default = this.symbols['default']
-
-        return symbols_default[symbol_index]
 
     def get_generic_period_name(this, period_name):
         return this.DEFAULT_PERIOD

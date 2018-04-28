@@ -95,6 +95,9 @@ class collector(object):
         if this.websocket_client:
             this.websocket_client.close()
 
+    def is_usd_price(this, symbol_name):
+        return symbol_name == this.symbols_default[0] or symbol_name.endswith('usd') or symbol_name.endswith('usdt')
+
     def save_trade(this, symbol_name, trade):
         this.db_adapter.save_trade(this.table_market_trades, this.market_name, symbol_name, trade)
 
@@ -105,7 +108,7 @@ class collector(object):
         this.db_adapter.save_tick(this.table_market_ticks, this.market_name, symbol_name, tick)
 
         # calculate usd prices except btc-usd pair
-        if not symbol_name == this.symbols_default[0]:
+        if not this.is_usd_price(symbol_name):
             tick = this.calculate_usd_prices(tick)
 
         if tick:
