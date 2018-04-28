@@ -110,7 +110,7 @@ class collector(object):
             this.db_adapter.save_tick(this.table_market_ticks_usd, this.market_name, symbol_name, tick)
 
     def bulk_save_ticks(this, symbol_name, ticks):
-        sql = "select max(time), market, symbol from market_ticks where market = '%s' and symbol = '%s' group by market, symbol" % (this.market_name, symbol_name)
+        sql = "select max(time), market, symbol from %s where market = '%s' and symbol = '%s' group by market, symbol" % (this.table_market_ticks, this.market_name, symbol_name)
         ret = this.db_adapter.query(sql)
 
         if ret and ret.has_key('series'):
