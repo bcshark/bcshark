@@ -10,7 +10,7 @@ from .utility import *
 
 class collector_huobi(collector):
     DEFAULT_PERIOD = "1min"
-    DEFAULT_SIZE = 200
+    DEFAULT_SIZE = 1
     PATTERN_TICK = "market.([a-zA-Z]+).kline.1min"
 
     @property

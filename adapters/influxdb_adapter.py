@@ -142,7 +142,7 @@ class influxdb_adapter(database_adapter):
             'measurement': measurement_name,
             'tags': {
                 'symbol': 'k20',
-                'time': long(k20_index['time']) + k20_index['timezone_offset']
+                #'time': get_timestamp_str(long(k20_index['time']), k20_index['timezone_offset'])
             },
             'time': get_timestamp_str(long(k20_index['time']), k20_index['timezone_offset']),
             'fields': {

@@ -124,7 +124,7 @@ class collector(object):
 
         for tick in ticks:
             this.save_tick(symbol_name, tick)
-        #this.db_adapter.bulk_save_ticks(this.market_name, symbol_name, ticks)
+        this.db_adapter.bulk_save_ticks(this.market_name, symbol_name, ticks)
 
     def save_k20_index(this, k20_index):
         this.db_adapter.save_k20_index(k20_index)

@@ -124,10 +124,10 @@ class collector_k20_index_calc(collector):
             print('K20 - Error: NONE symbol weight exist! program exit')
             return
         index.timezone_offset = -28800
-        index.high = total_high_weight / cal_length
-        index.low = total_low_weight / cal_length
-        index.open = total_open_weight / cal_length
-        index.close = total_close_weight / cal_length
+        index.high = (total_high_weight / cal_length) * 100
+        index.low = (total_low_weight / cal_length) * 100
+        index.open = (total_open_weight / cal_length) * 100
+        index.close = (total_close_weight / cal_length) * 100
         index.time = start_second
         index.period = '1min'
 
@@ -155,7 +155,7 @@ class collector_k20_index_calc(collector):
 
     def getStartSecondPreviousMinute(this):
         time_second = int(time.time())
-        time_second = time_second - time_second % 100 - 60
+        time_second = time_second - (time_second % 100) - 60
         print('start second generated: ', time_second)
         return time_second;
 
