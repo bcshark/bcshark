@@ -21,15 +21,14 @@ class collector_okex(collector):
         tick = market_tick()
         tick.time = long(obj[0] / 1000)
         tick.timezone_offset = this.timezone_offset
-        tick.open = float(obj[1])
-        tick.high = float(obj[2])
-        tick.low = float(obj[3])
-        tick.close = float(obj[4])
+        tick.open = reciprocal(obj[1])
+        tick.high = reciprocal(obj[2])
+        tick.low = reciprocal(obj[3])
+        tick.close = reciprocal(obj[4])
         tick.volume = float(obj[5])
         tick.amount = 0.0
         tick.count = 0.0
         tick.period = this.get_generic_period_name()
-
         return tick
 
     def collect_rest(this):

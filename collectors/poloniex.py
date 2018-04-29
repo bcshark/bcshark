@@ -15,22 +15,20 @@ class collector_poloniex(collector):
         super(collector_poloniex, this).__init__(settings, market_settings)
 
         this.period = this.DEFAULT_PERIOD
-        this.symbols_poloniex = this.symbols['poloniex']
 
     def translate(this, obj):
         tick = market_tick()
 
         tick.time = long(obj["date"])
         tick.timezone_offset = this.timezone_offset
-        tick.open = float(obj["open"])
-        tick.high = float(obj["high"])
-        tick.low = float(obj["low"])
-        tick.close = float(obj["close"])
+        tick.open = reciprocal(obj["open"])
+        tick.high = reciprocal(obj["high"])
+        tick.low = reciprocal(obj["low"])
+        tick.close = reciprocal(obj["close"])
         tick.volume = float(obj["volume"])
         tick.amount = 0.0
         tick.count = 0.0
         tick.period = this.get_generic_period_name()
-
         return tick
 
     def collect_rest(this):
