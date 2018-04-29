@@ -4,6 +4,7 @@ import threading
 
 from lib.config import ConfigurationManager
 from collectors.collector_factory import collector_factory
+from collectors.k20_index_calc import collector_k20_index_calc
 from adapters.influxdb_adapter import influxdb_adapter
 from adapters.mysqldb_adapter import mysqldb_adapter
 

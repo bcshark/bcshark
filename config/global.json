@@ -92,11 +92,24 @@
 				"ws": "https://beta.bittrex.com/signalr"
 			}
 		},
-		"coinmarketcap": {
-			"title": "coinmarketcap",
+		"gateio": {
+			"title": "gateio",
 			"order": 9,
 			"api": {
+			}
+		},
+		"k20_daily_rank": {
+			"title": "k20_daily_rank",
+			"order": 10,
+			"api": {
 				"rest": "https://api.coinmarketcap.com/v1/ticker/?limit=20"
+			}
+		},
+		"k20_index_calc": {
+			"title": "k20_index_calc",
+			"order": 11,
+			"api": {
+				"rest": ""
 			}
 		}
 	}

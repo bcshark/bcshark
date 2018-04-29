@@ -6,7 +6,7 @@ from .collector import collector
 from .utility import *
 
 class collector_k20_daily_rank(collector):
-    DEFAULT_PERIOD = "1day"
+    DEFAULT_PERIOD = "1min"
 
     @property
     def market_name(this):
@@ -49,8 +49,7 @@ class collector_k20_daily_rank(collector):
 
     def collect_rest(this):
 
-        url = "https://api.coinmarketcap.com/v1/ticker/?limit=2"
-        data = this.http_request_json(url, None)
+        data = this.http_request_json(this.REST_URL, None)
 
         if not data or not isinstance(data, list):
             this.logger.error('cannot get response from k20 daily rank')

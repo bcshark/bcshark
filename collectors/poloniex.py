@@ -22,11 +22,11 @@ class collector_poloniex(collector):
 
         tick.time = long(obj["date"])
         tick.timezone_offset = this.timezone_offset
-        tick.open = float(obj["open"])
-        tick.high = float(obj["high"])
-        tick.low = float(obj["low"])
-        tick.close = float(obj["close"])
-        tick.volume = float(obj["volume"])
+        tick.open = float(format(obj["open"], '.12f'))
+        tick.high = float(format(obj["high"], '.12f'))
+        tick.low = float(format(obj["low"], '.12f'))
+        tick.close = float(format(obj["close"], '.12f'))
+        tick.volume = float(format(obj["volume"], '.12f'))
         tick.amount = 0.0
         tick.count = 0.0
         tick.period = this.get_generic_period_name()
