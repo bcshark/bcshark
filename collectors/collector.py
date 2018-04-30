@@ -137,9 +137,8 @@ class collector(object):
         result = this.db_adapter.query(sql)
         return result
 
-    def query_latest_price(this, symbol_name, startSecond):
-        #sql = "select max(time), market, symbol, high, low, open, close from market_ticks where symbol = '%s' and time >= '%s' and time <= '%s' group by market, symbol" % (symbol_name, startSecond, startSecond+60000000000)
-        sql = "select max(time), market, symbol, high, low, open, close from market_ticks where symbol = '%s' group by market, symbol" % (symbol_name)
+    def query_latest_price(this, symbol_name_usdt, symbol_name_btc, startSecond):
+        sql = "select max(time), market, symbol, high, low, open, close from market_ticks where symbol = '%s' or symbol = '%s' and time >= %s and time <= %s group by market, symbol" % (symbol_name_usdt, symbol_name_btc, startSecond*1000000000, startSecond*1000000000+60000000000)
         result = this.db_adapter.query(sql)
         return result
 

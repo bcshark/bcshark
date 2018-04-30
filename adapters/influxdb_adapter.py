@@ -129,14 +129,8 @@ class influxdb_adapter(database_adapter):
 
     def generate_points_by_k20_index(this, measurement_name, k20_index):
 
-        print('index.timezone_offset:', k20_index['timezone_offset'])
-        print('index.high:', float(k20_index['high']))
-        print('index.low:', float(k20_index['low']))
-        print('index.open:', float(k20_index['open']))
-        print('index.close:', float(k20_index['close']))
-        print('index.time:', get_timestamp_str(long(k20_index['time']), k20_index['timezone_offset']))
-        print('index.time:', long(k20_index['time']) + k20_index['timezone_offset'])
-        print('index.period:', k20_index['period'])
+        #print('k20 calc - index.time: %s', get_timestamp_str(long(k20_index['time']), k20_index['timezone_offset']))
+        #print('k20 calc - index.time: %s', long(k20_index['time']) + k20_index['timezone_offset'])
 
         point = {
             'measurement': measurement_name,

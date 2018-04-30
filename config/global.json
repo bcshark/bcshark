@@ -102,7 +102,7 @@
 			"title": "k20_daily_rank",
 			"order": 10,
 			"api": {
-				"rest": "https://api.coinmarketcap.com/v1/ticker/?limit=20"
+				"rest": "https://api.coinmarketcap.com/v1/ticker/?limit=10"
 			}
 		},
 		"k20_index_calc": {
