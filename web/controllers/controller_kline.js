@@ -103,8 +103,12 @@ var KlineController = ['$scope', '$http', '$interval', 'MarketService', 'SymbolS
 		});
 	}
 
+	/*
 	function getMarketTicks() {
+		console.log('getMarketTicks');
 		TradingView.onready(function() {
+			console.log('TradingView is ready.');
+
 			var widget = new TradingView.widget({
 				fullscreen: true,
 				symbol: 'AAPL',
@@ -112,7 +116,7 @@ var KlineController = ['$scope', '$http', '$interval', 'MarketService', 'SymbolS
 				container_id: "kline-chart",
 				//	BEWARE: no trailing slash is expected in feed URL
 				datafeed: new Datafeeds.UDFCompatibleDatafeed("https://demo_feed.tradingview.com"),
-				library_path: "charting_library/",
+				library_path: "/public/javascript/charting_library/",
 				locale: "en",
 				//	Regression Trend-related functionality is not implemented yet, so it's hidden for a while
 				drawings_access: { type: 'black', tools: [ { name: "Regression Trend" } ] },
@@ -121,8 +125,8 @@ var KlineController = ['$scope', '$http', '$interval', 'MarketService', 'SymbolS
 			});
 		});
 	}
+	*/
 
-	/*
 	function getMarketTicks() {
 		//$scope.promise = $http.get('http://192.168.56.101:5000/api/kline/' + $scope.selectedMarket.name + '/' + $scope.selectedSymbol)
 		klineService.market_index_kline($scope.selectedMarket.name, $scope.selectedSymbol,
@@ -326,7 +330,6 @@ var KlineController = ['$scope', '$http', '$interval', 'MarketService', 'SymbolS
 			}
 		);
 	}
-	*/
 
 	getMarkets();
 	getSymbols();
