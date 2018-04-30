@@ -1,7 +1,10 @@
+import os
+import sys
 import time
 import logging
 import logging.handlers
 import json
+import csv
 
 from lib.config import ConfigurationManager
 from adapters.influxdb_adapter import influxdb_adapter
@@ -17,7 +20,7 @@ formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
 
-file_logger_handler = logging.handlers.TimedRotatingFileHandler('logs/webapi.log', when = 'D', interval = 1, backupCount = 10)
+file_logger_handler = logging.handlers.TimedRotatingFileHandler(os.path.normpath(os.path.join(sys.path[0], 'logs/webapi.log')), when = 'D', interval = 1, backupCount = 10)
 file_logger_handler.suffix = "%Y-%m-%d_%H-%M-%S.log"
 file_logger_handler.setFormatter(formatter)
 file_logger_handler.setLevel(logging.DEBUG)
@@ -25,6 +28,16 @@ logger.addHandler(file_logger_handler)
 
 app = Flask(__name__)
 CORS(app)
+
+def get_symbols_from_csv(file_path):
+    symbols_dict = {}
+
+    with open(os.path.normpath(os.path.join(sys.path[0], file_path)), 'rb') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        for row in spamreader:
+            symbols_dict[row[0]] = row[1:]
+
+    return symbols_dict
 
 @app.route('/api/markets', methods=['GET'])
 def api_markets():
@@ -89,5 +102,6 @@ if __name__ == '__main__':
     settings['logger'] = logger
     settings['db_adapter'] = influxdb_adapter(settings['influxdb'])
     #settings['db_adapter'] = mysqldb_adapter(settings['mysqldb'])
+    settings['symbols'] = get_symbols_from_csv(settings['symbols']['path'])
 
     app.run(debug = True, threaded = True, host = '0.0.0.0', port = 5000)
