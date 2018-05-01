@@ -127,7 +127,7 @@ class collector_k20_index_calc(collector):
         if cal_length == 0:
             this.logger.error('K20 calc Error - validated symbol weight is 0 ! program exit')
             return
-        index.timezone_offset = -28800
+        index.timezone_offset = this.timezone_offset
         index.high = (total_high_weight / cal_length) * 100
         index.low = (total_low_weight / cal_length) * 100
         index.open = (total_open_weight / cal_length) * 100
@@ -159,7 +159,7 @@ class collector_k20_index_calc(collector):
 
     def getStartSecondPreviousMinute(this):
         time_second = int(time.time())
-        time_second = time_second - (time_second % 60) - 60 -28800
+        time_second = time_second - (time_second % 60) - 60 + this.timezone_offset
         this.logger.debug('k20 calc - start second generated: %s', time_second)
         return time_second;
 
