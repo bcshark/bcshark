@@ -7,8 +7,8 @@ from .gdax import collector_gdax
 from .bitfinex import collector_bitfinex
 from .bitstamp import collector_bitstamp
 from .bittrex import collector_bittrex
-from .k20_daily_rank import collector_k20_daily_rank
-from .k20_index_calc import collector_k20_index_calc
+from .k10_daily_rank import collector_k10_daily_rank
+from .k10_index_calc import collector_k10_index_calc
 
 class collector_factory(object):
     def __init__(this, settings):
@@ -44,10 +44,10 @@ class collector_factory(object):
             collector = collector_bitstamp(this.settings, market_settings)
         elif market_name == 'bittrex':
             collector = collector_bittrex(this.settings, market_settings)
-        elif market_name == 'k20_daily_rank':
-            collector = collector_k20_daily_rank(this.settings, market_settings)
-        elif market_name == 'k20_index_calc':
-            collector = collector_k20_index_calc(this.settings, market_settings)
+        elif market_name == 'k10_daily_rank':
+            collector = collector_k10_daily_rank(this.settings, market_settings)
+        elif market_name == 'k10_index_calc':
+            collector = collector_k10_index_calc(this.settings, market_settings)
 
         return collector
 

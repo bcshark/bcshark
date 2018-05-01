@@ -127,14 +127,14 @@ class collector(object):
             this.save_tick(symbol_name, tick)
         #this.db_adapter.bulk_save_ticks(this.market_name, symbol_name, ticks)
 
-    def save_k20_index(this, k20_index):
-        this.db_adapter.save_k20_index(k20_index)
+    def save_k10_index(this, k10_index):
+        this.db_adapter.save_k10_index(k10_index)
 
-    def bulk_save_k20_daily_rank(this, k20_ranks):
-        this.db_adapter.bulk_save_k20_daily_rank(k20_ranks)
+    def bulk_save_k10_daily_rank(this, k10_ranks):
+        this.db_adapter.bulk_save_k10_daily_rank(k10_ranks)
 
-    def query_k20_daily_rank(this):
-        sql = "select max(time), symbol, market_cap_usd from k20_daily_rank where rank < 11 group by symbol"
+    def query_k10_daily_rank(this):
+        sql = "select max(time), symbol, market_cap_usd from k10_daily_rank where rank < 11 group by symbol"
         result = this.db_adapter.query(sql)
         return result
 
