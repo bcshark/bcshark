@@ -105,9 +105,9 @@ class influxdb_adapter(database_adapter):
             'tags': {
                 'symbol': k20_rank.symbol
             },
-            'time': get_timestamp_str(long(k20_rank.time), k20_rank.timezone_offset),
+            'time': get_timestamp_str(long(k20_rank.time)+k20_rank.timezone_offset, k20_rank.timezone_offset),
             'fields': {
-                'time': long(k20_rank.time) + long(k20_rank.timezone_offset),
+                'time': long(k20_rank.time) + k20_rank.timezone_offset + k20_rank.timezone_offset,
                 'id': k20_rank.id,
                 'name': k20_rank.name,
                 'rank': int(k20_rank.rank),
@@ -129,18 +129,14 @@ class influxdb_adapter(database_adapter):
 
     def generate_points_by_k20_index(this, measurement_name, k20_index):
 
-        #print('k20 calc - index.time: %s', get_timestamp_str(long(k20_index['time']), k20_index['timezone_offset']))
-        #print('k20 calc - index.time: %s', long(k20_index['time']) + k20_index['timezone_offset'])
-
         point = {
             'measurement': measurement_name,
             'tags': {
                 'symbol': 'k20',
-                #'time': get_timestamp_str(long(k20_index['time']), k20_index['timezone_offset'])
             },
             'time': get_timestamp_str(long(k20_index['time']), k20_index['timezone_offset']),
             'fields': {
-                #'time': long(k20_index['time']) + k20_index['timezone_offset'],
+                'time': long(k20_index['time']) + k20_index['timezone_offset'],
                 'high': float(k20_index['high']),
                 'low': float(k20_index['low']),
                 'open': float(k20_index['open']),

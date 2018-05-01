@@ -159,7 +159,7 @@ class collector_k20_index_calc(collector):
 
     def getStartSecondPreviousMinute(this):
         time_second = int(time.time())
-        time_second = time_second - (time_second % 60) - 60
+        time_second = time_second - (time_second % 60) - 60 -28800
         this.logger.debug('k20 calc - start second generated: %s', time_second)
         return time_second;
 
