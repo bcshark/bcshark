@@ -1,36 +1,3 @@
 <div cg-busy="{ promise: promise }">
-	<div class="fix-title-bar">
-		<nav class="navbar navbar-default" role="navigation">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle" ng-click="isNavCollapsed = !isNavCollapsed">
-					<span class="sr-only">Toggle navigation</span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" href="#">
-					<i class="fas fa-chart-line" style="padding-right: 10px;"></i>Market Index K-Line
-				</a>
-			</div>
-			<div class="collapse navbar-collapse" uib-collapse="isNavCollapsed">
-				<div class="nav navbar-nav row" style="text-align: left;">
-					<div ng-repeat="symbol in symbols" class="col-xs-4"><a class="navbar-item" ng-click="switchSymbol(symbol.name)"><i class="fas fa-square" style="padding-right: 10px;"></i>{{ symbol.title }}</a></div>
-				</div>
-			</div>
-		</nav>
-	</div>
-	<div class="fix-content">
-		<div uib-alert ng-repeat="alert in alerts" ng-class="'alert-' + (alert.type || 'warning')" dismiss-on-timeout="3000" close="closeAlert($index)">{{alert.msg}}</div>
-		<div class="btn-group market-dropdown" uib-dropdown is-open="market_dropdown.isopen">
-			<button id="market-dropdown" type="button" class="btn btn-default"  uib-dropdown-toggle ng-disabled="disabled">
-				Market: {{ selectedMarket.title }}<span class="caret" style="margin-left: 5px;"></span>
-			</button>
-			<ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="market-dropdown">
-				<li role="menuitem" ng-repeat="market in markets"><a ng-click="switchMarket(market)">{{ market.title }}</a></li>
-				<li class="divider"></li>
-				<li role="menuitem"><a href="#">Aggregate</a></li>
-			</ul>
-		</div>	
-		<div id="kline-chart" style="margin-left: auto; margin-right: auto; width: 98%; height: 480px;"></div>
-	</div>
+	<div id="kline-chart"></div>
 </div>
