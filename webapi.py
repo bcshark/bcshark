@@ -39,6 +39,104 @@ def get_symbols_from_csv(file_path):
 
     return symbols_dict
 
+@app.route('/tv/history', methods=['GET'])
+def tv_history():
+    ret = {"s":"no_data","nextTime":1522108800} 
+    return json.dumps(ret)
+
+@app.route('/tv/symbols', methods=['GET'])
+def tv_symbols():
+    ret = {
+        "name": "AAPL",
+        "exchange-traded": "NasdaqNM",
+        "exchange-listed": "NasdaqNM",
+        "timezone": "America/New_York",
+        "minmov": 1,
+        "minmov2": 0,
+        "pointvalue": 1,
+        "session": "0930-1630",
+        "has_intraday": False,
+        "has_no_volume": False,
+        "description": "Apple Inc.",
+        "type": "stock",
+        "supported_resolutions": ["D", "2D", "3D", "W", "3W", "M", "6M"],
+        "pricescale": 100,
+        "ticker": "AAPL"
+    }
+
+    return json.dumps(ret)
+
+@app.route('/tv/1.1/study_templates', methods=['GET'])
+def tv_study_templates():
+    ret = {
+        "status": "ok",
+        "data": [
+            {
+                "name": "Best"
+            },
+            {
+                "name": "Fav 1"
+            }]
+    }
+
+    return json.dumps(ret)
+
+@app.route('/tv/time', methods=['GET'])
+def tv_time():
+    return str(int(time.time()))
+
+@app.route('/tv/config', methods=['GET'])
+def tv_config():
+    ret = {
+        "supports_search": True,
+        "supports_group_request": False,
+        "supports_marks": True,
+        "supports_timescale_marks": True,
+        "supports_time": True,
+        "exchanges": [
+        {
+            "value": "",
+            "name": "All Exchanges",
+            "desc": ""
+        },
+        {
+            "value": "NasdaqNM",
+            "name": "NasdaqNM",
+            "desc": "NasdaqNM"
+        },
+        {
+            "value": "NYSE",
+            "name": "NYSE",
+            "desc": "NYSE"
+        },
+        {
+            "value": "NCM",
+            "name": "NCM",
+            "desc": "NCM"
+        },
+        {
+            "value": "NGM",
+            "name": "NGM",
+            "desc": "NGM"
+        }],
+        "symbols_types": [
+        {
+            "name": "All types",
+            "value": ""
+        },
+        {
+            "name": "Stock",
+            "value": "stock"
+        },
+        {
+            "name": "Index",
+            "value": "index"
+        }],
+        "supported_resolutions": ["D", "2D", "3D", "W", "3W", "M", "6M"]
+    }
+
+    return json.dumps(ret)
+
 @app.route('/api/markets', methods=['GET'])
 def api_markets():
     support_markets = [{ "name": key, "title": setting['title'], "order": setting['order'] } for key, setting in settings['markets'].items()]

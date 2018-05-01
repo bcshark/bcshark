@@ -6,9 +6,16 @@
 	height: 40px;
 	text-align: center;
 	line-height: 40px;
-	font-size: 16px;
 	color: #fff;
 	z-index: 100;
+}
+
+.fix-title-bar .navbar-header {
+	font-size: 16px;
+}
+
+.fix-title-bar .navbar-nav {
+	font-size: 12px;
 }
 
 .fix-content {

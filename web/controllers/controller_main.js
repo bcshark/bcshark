@@ -17,6 +17,9 @@ angular.module('MarketIndex', ['ngRoute', 'ngResource', 'cgBusy', 'ui.bootstrap'
 		}).when('/kline', {
 			templateUrl: 'views/kline.html',
 			controller: KlineController,
+		}).when('/tvkline', {
+			templateUrl: 'views/tvkline.html',
+			controller: TvKlineController,
 		}).when('/trade-table', {
 			templateUrl: 'views/trade_table.html',
 			controller: TradeTableController,

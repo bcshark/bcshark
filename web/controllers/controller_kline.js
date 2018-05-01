@@ -1,6 +1,6 @@
 "use strict";
 
-var KlineController = ['$scope', '$http', '$interval', 'MarketService', 'SymbolService', 'KlineService', function($scope, $http, $interval, marketService, symbolService, klineService) {
+var KlineController = ['$scope', '$http', '$interval', '$window', 'MarketService', 'SymbolService', 'KlineService', function($scope, $http, $interval, $window, marketService, symbolService, klineService) {
 	var myChart = echarts.init(document.getElementById('kline-chart'));
 
 	var upColor = '#ec0000';
@@ -103,29 +103,12 @@ var KlineController = ['$scope', '$http', '$interval', 'MarketService', 'SymbolS
 		});
 	}
 
-	/*
-	function getMarketTicks() {
-		console.log('getMarketTicks');
-		TradingView.onready(function() {
-			console.log('TradingView is ready.');
-
-			var widget = new TradingView.widget({
-				fullscreen: true,
-				symbol: 'AAPL',
-				interval: 'D',
-				container_id: "kline-chart",
-				//	BEWARE: no trailing slash is expected in feed URL
-				datafeed: new Datafeeds.UDFCompatibleDatafeed("https://demo_feed.tradingview.com"),
-				library_path: "/public/javascript/charting_library/",
-				locale: "en",
-				//	Regression Trend-related functionality is not implemented yet, so it's hidden for a while
-				drawings_access: { type: 'black', tools: [ { name: "Regression Trend" } ] },
-				disabled_features: ["use_localstorage_for_settings"],
-				preset: "mobile"
-			});
-		});
+	function getParameterByName(name) {
+		name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+		var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+				results = regex.exec(location.search);
+		return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 	}
-	*/
 
 	function getMarketTicks() {
 		//$scope.promise = $http.get('http://192.168.56.101:5000/api/kline/' + $scope.selectedMarket.name + '/' + $scope.selectedSymbol)

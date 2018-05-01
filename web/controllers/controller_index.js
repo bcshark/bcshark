@@ -2,6 +2,10 @@
 
 var IndexController = ['$scope', '$http', '$interval', '$location', 
 	function($scope, $http, $interval, $location) {
+		$scope.openTvKline = function() {
+	        $location.path('/tvkline');
+		};
+
 		$scope.openKline = function() {
 	        $location.path('/kline');
 		};
