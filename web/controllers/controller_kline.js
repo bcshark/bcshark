@@ -34,6 +34,11 @@ var KlineController = ['$scope', '$http', '$interval', '$window', 'MarketService
 		getMarketTicks();
 	};
 
+	$scope.showMarketIndex = function() {
+		$scope.selectedMarket = { name: "market_index" , title: "Aggregate"};
+		getMarketTicks();
+	}
+
 	/*
 	// 数据意义：开盘(open)，收盘(close)，最低(lowest)，最高(highest)
 	var data0 = splitData([

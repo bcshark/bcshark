@@ -28,7 +28,7 @@
 			<ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="market-dropdown">
 				<li role="menuitem" ng-repeat="market in markets"><a ng-click="switchMarket(market)">{{ market.title }}</a></li>
 				<li class="divider"></li>
-				<li role="menuitem"><a href="#">Aggregate</a></li>
+				<li role="menuitem"><a ng-click="showMarketIndex()">Aggregate</a></li>
 			</ul>
 		</div>	
 		<div id="kline-chart" style="margin-left: auto; margin-right: auto; width: 98%; height: 480px;"></div>

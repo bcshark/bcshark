@@ -47,10 +47,10 @@ def tv_history():
 @app.route('/tv/symbols', methods=['GET'])
 def tv_symbols():
     ret = {
-        "name": "AAPL",
+        "name": "BTC",
         "exchange-traded": "NasdaqNM",
         "exchange-listed": "NasdaqNM",
-        "timezone": "America/New_York",
+        "timezone": "China/Shanghai",
         "minmov": 1,
         "minmov2": 0,
         "pointvalue": 1,
@@ -157,41 +157,46 @@ def api_kline():
     support_markets = settings['markets'].keys()
     support_symbols = settings['symbols']['default']
 
-    if not market in support_markets or not symbol in support_symbols:
+    if (not market == 'market_index') and (not market in support_markets or not symbol in support_symbols):
         return 'not supported'
 
-    client.open()
-    service = kline_service(client, settings)
-    kline =  service.get_kline_by_market_symbol(market, symbol, settings['kline']['size'])
-    client.close()
+    try:
+        client.open()
+        service = kline_service(client, settings)
+        kline =  service.get_kline_by_market_symbol(market, symbol, settings['kline']['size'])
+    finally:
+        client.close()
 
-    columns = kline['series'][0]['columns']
-    for i in range(0, len(columns)):
-        if columns[i] == 'time':
-            time_index = i
-        elif columns[i] == 'open':
-            open_index = i
-        elif columns[i] == 'close':
-            close_index = i
-        elif columns[i] == 'low':
-            low_index = i
-        elif columns[i] == 'high':
-            high_index = i
+    if kline:
+        columns = kline['series'][0]['columns']
+        for i in range(0, len(columns)):
+            if columns[i] == 'time':
+                time_index = i
+            elif columns[i] == 'open':
+                open_index = i
+            elif columns[i] == 'close':
+                close_index = i
+            elif columns[i] == 'low':
+                low_index = i
+            elif columns[i] == 'high':
+                high_index = i
 
-    timezone_offset = settings['timezone_offset']
+        timezone_offset = settings['timezone_offset']
 
-    ticks = kline['series'][0]['values']
-    ticks.sort(lambda x, y: cmp(x[time_index], y[time_index]))
+        ticks = kline['series'][0]['values']
+        ticks.sort(lambda x, y: cmp(x[time_index], y[time_index]))
 
-    kline = [[
-        get_timestamp_str(tick[time_index], 0),
-        float(tick[open_index]),
-        float(tick[close_index]),
-        float(tick[low_index]),
-        float(tick[high_index])
-    ] for tick in ticks]
+        kline = [[
+            get_timestamp_str(tick[time_index], 0),
+            float(tick[open_index]),
+            float(tick[close_index]),
+            float(tick[low_index]),
+            float(tick[high_index])
+        ] for tick in ticks]
 
-    return json.dumps(kline)
+        return json.dumps(kline)
+    else:
+        return None
 
 if __name__ == '__main__':
     global settings

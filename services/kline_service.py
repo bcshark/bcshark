@@ -8,7 +8,10 @@ class kline_service(object):
         return result_set.raw
 
     def get_kline_by_market_symbol(this, market, symbol, size):
-        sql = "select time, open, close, low, high from market_ticks where market = '%s' and symbol = '%s' order by time desc limit %d" % (market, symbol, size)
+        if market == 'market_index':
+            sql = "select time, open, close, low, high from k10_index order by time desc limit %d" % size
+        else:
+            sql = "select time, open, close, low, high from market_ticks where market = '%s' and symbol = '%s' order by time desc limit %d" % (market, symbol, size)
         rows = this.client.query(sql)
 
         return rows 
