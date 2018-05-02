@@ -163,8 +163,8 @@ class influxdb_adapter(database_adapter):
 
         this.client.write_points(points)
 
-    def query(this, sql):
-        result_set = this.client.query(sql)
+    def query(this, sql, epoch = None):
+        result_set = this.client.query(sql, epoch = epoch)
         return result_set.raw
 
     def bulk_save_k10_daily_rank(this, k10_ranks):

@@ -41,15 +41,66 @@ def get_symbols_from_csv(file_path):
 
 @app.route('/tv/history', methods=['GET'])
 def tv_history():
-    ret = {"s":"no_data","nextTime":1522108800} 
-    return json.dumps(ret)
+    symbol = request.args.get('symbol', '')
+    resolution = request.args.get('resolution', '')
+    from_time = request.args.get('from', '')
+    to_time = request.args.get('to', '')
+
+    client = settings['db_adapter']
+    support_markets = settings['markets'].keys()
+    support_symbols = settings['symbols']['default']
+
+    if not symbol == 'Index':
+        return 'not supported'
+
+    try:
+        client.open()
+        service = kline_service(client, settings)
+        kline =  service.get_tvkline_by_market_symbol(symbol, long(from_time), long(to_time), settings['kline']['size'])
+    finally:
+        client.close()
+
+    if kline:
+        columns = kline['series'][0]['columns']
+        for i in range(0, len(columns)):
+            if columns[i] == 'time':
+                time_index = i
+            elif columns[i] == 'open':
+                open_index = i
+            elif columns[i] == 'close':
+                close_index = i
+            elif columns[i] == 'low':
+                low_index = i
+            elif columns[i] == 'high':
+                high_index = i
+
+        timezone_offset = settings['timezone_offset']
+
+        ticks = kline['series'][0]['values']
+        ticks.sort(lambda x, y: cmp(x[time_index], y[time_index]))
+
+        print ticks[0][time_index]
+
+        kline = {
+            "s": "ok",
+            "t": [tick[time_index] for tick in ticks],
+            "o": [tick[open_index] for tick in ticks],
+            "c": [tick[close_index] for tick in ticks],
+            "h": [tick[high_index] for tick in ticks],
+            "l": [tick[low_index] for tick in ticks],
+        }
+    else:
+        #kline = { "s": "no_data", "nextTime": long(time.time() + 60) }
+        kline = { "s": "no_data" }
+
+    return json.dumps(kline)
 
 @app.route('/tv/symbols', methods=['GET'])
 def tv_symbols():
     ret = {
-        "name": "BTC",
-        "exchange-traded": "NasdaqNM",
-        "exchange-listed": "NasdaqNM",
+        "name": "Index",
+        "exchange-traded": "Market",
+        "exchange-listed": "Market",
         "timezone": "China/Shanghai",
         "minmov": 1,
         "minmov2": 0,
@@ -57,11 +108,11 @@ def tv_symbols():
         "session": "0930-1630",
         "has_intraday": False,
         "has_no_volume": False,
-        "description": "Apple Inc.",
+        "description": "Market Index",
         "type": "stock",
         "supported_resolutions": ["D", "2D", "3D", "W", "3W", "M", "6M"],
         "pricescale": 100,
-        "ticker": "AAPL"
+        "ticker": "Index"
     }
 
     return json.dumps(ret)
@@ -71,12 +122,9 @@ def tv_study_templates():
     ret = {
         "status": "ok",
         "data": [
-            {
-                "name": "Best"
-            },
-            {
-                "name": "Fav 1"
-            }]
+            { "name": "Best" },
+            { "name": "Fav 1" }
+        ]
     }
 
     return json.dumps(ret)
@@ -94,44 +142,40 @@ def tv_config():
         "supports_timescale_marks": True,
         "supports_time": True,
         "exchanges": [
-        {
-            "value": "",
-            "name": "All Exchanges",
-            "desc": ""
-        },
-        {
-            "value": "NasdaqNM",
-            "name": "NasdaqNM",
-            "desc": "NasdaqNM"
-        },
-        {
-            "value": "NYSE",
-            "name": "NYSE",
-            "desc": "NYSE"
-        },
-        {
-            "value": "NCM",
-            "name": "NCM",
-            "desc": "NCM"
-        },
-        {
-            "value": "NGM",
-            "name": "NGM",
-            "desc": "NGM"
-        }],
+            {
+                "value": "",
+                "name": "All Exchanges",
+                "desc": ""
+            }, {
+                "value": "NasdaqNM",
+                "name": "NasdaqNM",
+                "desc": "NasdaqNM"
+            }, {
+                "value": "NYSE",
+                "name": "NYSE",
+                "desc": "NYSE"
+            }, {
+                "value": "NCM",
+                "name": "NCM",
+                "desc": "NCM"
+            }, {
+                "value": "NGM",
+                "name": "NGM",
+                "desc": "NGM"
+            }
+        ],
         "symbols_types": [
-        {
-            "name": "All types",
-            "value": ""
-        },
-        {
-            "name": "Stock",
-            "value": "stock"
-        },
-        {
-            "name": "Index",
-            "value": "index"
-        }],
+            {
+                "name": "All types",
+                "value": ""
+            }, {
+                "name": "Stock",
+                "value": "stock"
+            }, {
+                "name": "Index",
+                "value": "index"
+            }
+        ],
         "supported_resolutions": ["D", "2D", "3D", "W", "3W", "M", "6M"]
     }
 
