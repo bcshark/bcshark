@@ -96,6 +96,7 @@
 			"title": "gateio",
 			"order": 9,
 			"api": {
+				"rest": "http://data.gateio.io/api2/1/"
 			}
 		},
 		"k10_daily_rank": {
