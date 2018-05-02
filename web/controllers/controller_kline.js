@@ -1,6 +1,6 @@
 "use strict";
 
-var KlineController = ['$scope', '$http', '$interval', '$window', 'MarketService', 'SymbolService', 'KlineService', function($scope, $http, $interval, $window, marketService, symbolService, klineService) {
+var KlineController = ['$scope', '$http', '$interval', '$location', '$window', 'MarketService', 'SymbolService', 'KlineService', function($scope, $http, $interval, $location, $window, marketService, symbolService, klineService) {
 	var myChart = echarts.init(document.getElementById('kline-chart'));
 
 	var upColor = '#ec0000';
@@ -25,7 +25,6 @@ var KlineController = ['$scope', '$http', '$interval', '$window', 'MarketService
 
 	$scope.switchSymbol = function(symbol) {
 		$scope.selectedSymbol = symbol;
-		$scope.isNavCollapsed = true;
 		getMarketTicks();
 	};
 
@@ -38,6 +37,18 @@ var KlineController = ['$scope', '$http', '$interval', '$window', 'MarketService
 		$scope.selectedMarket = { name: "market_index" , title: "Aggregate"};
 		getMarketTicks();
 	}
+
+	$scope.showTradeView = function() {
+		$location.path('/tvkline');
+	};
+
+	$scope.showMarketIndexView = function() {
+		$location.path('/kline');
+	};
+
+	$scope.showTradeTable = function() {
+		$location.path('/trade-table');
+	};
 
 	/*
 	// 数据意义：开盘(open)，收盘(close)，最低(lowest)，最高(highest)
@@ -103,7 +114,7 @@ var KlineController = ['$scope', '$http', '$interval', '$window', 'MarketService
 	function getSymbols() {
 		symbolService.all(function(resp) {
 			$scope.symbols = resp;
-			$scope.selectedSymbol = $scope.symbols[0].name;
+			$scope.selectedSymbol = $scope.symbols[0];
 			$scope.isSymbolsLoadded = true;
 		});
 	}
@@ -117,7 +128,7 @@ var KlineController = ['$scope', '$http', '$interval', '$window', 'MarketService
 
 	function getMarketTicks() {
 		//$scope.promise = $http.get('http://192.168.56.101:5000/api/kline/' + $scope.selectedMarket.name + '/' + $scope.selectedSymbol)
-		klineService.market_index_kline($scope.selectedMarket.name, $scope.selectedSymbol,
+		klineService.market_index_kline($scope.selectedMarket.name, $scope.selectedSymbol.name,
 			function(resp) {
 				console.log(resp);
 
@@ -140,7 +151,7 @@ var KlineController = ['$scope', '$http', '$interval', '$window', 'MarketService
 				} else {
 					option = {
 						title: {
-							text: $scope.selectedSymbol,
+							text: $scope.selectedSymbol.name,
 							left: 0
 						},
 						tooltip: {

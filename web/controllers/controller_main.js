@@ -11,16 +11,25 @@ angular.module('MarketIndex', ['ngRoute', 'ngResource', 'cgBusy', 'ui.bootstrap'
 })
 .config(function($routeProvider, $locationProvider) {
 	$routeProvider
+		/*
 		.when('/', {
 			templateUrl: 'views/index.html',
 			controller: IndexController,
-		}).when('/kline', {
+		})
+		*/
+		.when('/', {
 			templateUrl: 'views/kline.html',
 			controller: KlineController,
-		}).when('/tvkline', {
+		})
+		.when('/kline', {
+			templateUrl: 'views/kline.html',
+			controller: KlineController,
+		})
+		.when('/tvkline', {
 			templateUrl: 'views/tvkline.html',
 			controller: TvKlineController,
-		}).when('/trade-table', {
+		})
+		.when('/trade-table', {
 			templateUrl: 'views/trade_table.html',
 			controller: TradeTableController,
 		});

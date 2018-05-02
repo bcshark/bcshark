@@ -16,6 +16,7 @@
 
 .fix-title-bar .navbar-nav {
 	font-size: 12px;
+	text-align: left;
 }
 
 .fix-content {
@@ -27,10 +28,33 @@
 	cursor: pointer;
 }
 
-.market-dropdown {
+.kline-filters {
 	position: relative; 
 	top: 0; 
-	right: 10; 
-	float: right;
+	left: 10; 
+	float: left;
 	z-index: 99;
+}
+
+.symbol-dropdown {
+
+}
+
+.market-dropdown-item {
+	color: #337ab7;
+	font-size: 12px;
+	text-align: left;
+	cursor: pointer;
+}
+.market-dropdown {
+
+}
+
+.symbol-dropdown-item {
+	color: #337ab7;
+	padding-bottom: 5px; 
+	padding-top: 5px;
+	font-size: 12px;
+	text-align: left;
+	cursor: pointer;
 }
