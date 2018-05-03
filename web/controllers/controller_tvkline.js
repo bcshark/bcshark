@@ -123,14 +123,14 @@ var TvKlineController = ['$scope', '$http', '$interval', '$window', 'MarketServi
 				interval: 'D',
 				container_id: "kline-chart",
 				//	BEWARE: no trailing slash is expected in feed URL
-				datafeed: new Datafeeds.UDFCompatibleDatafeed("http://192.168.56.101:5000/tv"),
+				datafeed: new Datafeeds.UDFCompatibleDatafeed("http://18.218.165.228:5000/tv"),
 				library_path: "/public/javascript/charting_library/",
 				locale: getParameterByName('lang') || "en",
 				//	Regression Trend-related functionality is not implemented yet, so it's hidden for a while
 				drawings_access: { type: 'black', tools: [ { name: "Regression Trend" } ] },
 				disabled_features: ["use_localstorage_for_settings"],
 				enabled_features: ["study_templates"],
-				charts_storage_url: 'http://192.168.56.101:5000/tv',
+				charts_storage_url: 'http://18.218.165.228:5000/tv',
 				charts_storage_api_version: "1.1",
 				client_id: 'tradingview.com',
 				user_id: 'public_user_id'
