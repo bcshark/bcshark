@@ -12,7 +12,7 @@ from lib.config import ConfigurationManager
 from lib.cache import cache_manager_factory
 from collectors.collector_factory import collector_factory
 from adapters.influxdb_adapter import influxdb_adapter
-from adapters.mysqldb_adapter import mysqldb_adapter
+#from adapters.mysqldb_adapter import mysqldb_adapter
 
 TIMEOUT_COLLECT_IN_SECONDS = 10
 
