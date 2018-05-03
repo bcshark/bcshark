@@ -39,9 +39,10 @@ class collector_gateio(collector):
 
             url = "candlestick2/%s?group_sec=%s&range_hour=%s" % (symbol, this.DEFAULT_GROUP, this.DEFAULT_PERIOD)
             url = this.REST_URL + url
-            ticks = this.http_request_json(url, None)
+            headers = { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36" }
+            ticks = this.http_request_json(url, headers)
 
-            if not ticks or not isinstance(ticks, list):
+            if not ticks or not isinstance(ticks, dict):
                 this.logger.error('cannot get response from gateio (%s)' % symbol)
                 continue
             this.bulk_save_ticks(this.get_generic_symbol_name(symbol), [ this.translate(tick) for tick in ticks["data"] ])
