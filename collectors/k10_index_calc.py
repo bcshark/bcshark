@@ -18,19 +18,22 @@ class collector_k10_index_calc(collector):
         super(collector_k10_index_calc, this).__init__(settings, market_settings)
 
     def translate_ranks(this, objs):
+        print '-' * 20
+        print objs
+
         k10_ranks = []
 
-        this.logger.debug('k10 calc info - k10_daily_rank query return result length: %s', len(objs['series']))
+        # this.logger.debug('k10 calc info - k10_daily_rank query return result length: %s', len(objs['series']))
 
-        for obj in objs['series']:
-            if len(obj['values']) < 1:
-                this.logger.error('k10 cac Error - k10_daily_rank query return result length 0: %s', objs['values'])
-                continue
+        for obj in objs:
+            # if len(obj['values']) < 1:
+            #     this.logger.error('k10 cac Error - k10_daily_rank query return result length 0: %s', objs['values'])
+            #     continue
 
             rank = k10_rank()
-            rank.symbol = obj['values'][0][2]
-            rank.time = long(obj['values'][0][1])
-            rank.market_cap_usd = float(obj['values'][0][3])
+            rank.symbol = obj[1]
+            rank.time = long(obj[0])
+            rank.market_cap_usd = float(obj[2])
 
             if rank.market_cap_usd <= 0:
                 this.logger.error('k10 calc Error - k10_daily_rank query result market cap is incorrect! %s, %s', rank.symbol, rank.market_cap_usd)
@@ -78,10 +81,10 @@ class collector_k10_index_calc(collector):
         index = k10_index()
         ### this should be limited to latest 5 mins !!!!
         rank_result = this.query_k10_daily_rank()
-        #print('rank query return result:', rank_result)
-        if len(rank_result) == 0:
-            this.logger.error('k10 calc Error - k10_daily_rank table has no data, calculation failed, program exit')
-            return
+        print('rank query return result:', rank_result)
+        # if len(rank_result) == 0:
+        #     this.logger.error('k10 calc Error - k10_daily_rank table has no data, calculation failed, program exit')
+        #     return
         #print('-------', len(rank_result['series']))
         #print('-------', rank_result['series'][0]['values'])
         ranks = this.translate_ranks(rank_result)
@@ -153,7 +156,8 @@ class collector_k10_index_calc(collector):
             "period": index.period
         }
         indexArray = [indexObj]
-        this.save_k10_index(indexArray[0])
+        if index.high != 0:
+            this.save_k10_index(indexArray[0])
 
         this.logger.info('k10 index calc done !')
 
