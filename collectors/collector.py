@@ -120,7 +120,7 @@ class collector(object):
         ret = this.db_adapter.query(sql)
 
         if ret and ret.has_key('series'):
-            latest_timestamp = ret['series'][0]['values'][0][1]
+            latest_timestamp = ret['series'][0]['values'][0][0]
             # print('-----before lambda filter: ', len(ticks), '  --- latest timestamp:', latest_timestamp)
             ticks = filter(lambda x: x.time + x.timezone_offset > latest_timestamp, ticks)
             # print('-----after lambda filter: ', len(ticks))
