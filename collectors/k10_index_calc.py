@@ -53,13 +53,13 @@ class collector_k10_index_calc(collector):
                 continue
 
             tick = market_tick()
-            tick.market = obj['values'][0][2]
-            tick.symbol = obj['values'][0][3]
-            tick.time = long(obj['values'][0][1])
-            tick.high = float(obj['values'][0][4])
-            tick.low = float(obj['values'][0][5])
-            tick.open = float(obj['values'][0][6])
-            tick.close = float(obj['values'][0][7])
+            tick.market = obj['tags']['market']
+            tick.symbol = obj['tags']['symbol']
+            tick.time = long(obj['values'][0][0])
+            tick.high = float(obj['values'][0][1])
+            tick.low = float(obj['values'][0][2])
+            tick.open = float(obj['values'][0][3])
+            tick.close = float(obj['values'][0][4])
 
             if tick.market == '' or tick.symbol == '':
                 this.logger.error('k10 calc Error - market_ticks query result Market/Symbol is incorrect! %s, %s', tick.market, tick.symbol)
