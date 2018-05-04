@@ -18,13 +18,9 @@ class collector_k10_index_calc(collector):
         super(collector_k10_index_calc, this).__init__(settings, market_settings)
 
     def translate_ranks(this, objs):
-        print '-' * 20
-        print objs
-
         k10_ranks = []
 
         # this.logger.debug('k10 calc info - k10_daily_rank query return result length: %s', len(objs['series']))
-
         for obj in objs:
             # if len(obj['values']) < 1:
             #     this.logger.error('k10 cac Error - k10_daily_rank query return result length 0: %s', objs['values'])
@@ -109,7 +105,7 @@ class collector_k10_index_calc(collector):
             tick_result = this.query_latest_price(tick_symbol[0], tick_symbol[1], start_second)
             #print('market_ticks return result:', tick_result)
             #print('market_ticks return result:', tick_result['series'][0]['values'][0][1])
-            if len(tick_result) == 0 or tick_result['series'][0]['values'][0][1] == None:
+            if len(tick_result) == 0 or not tick_result.has_key('series') or tick_result['series'][0]['values'][0][1] == None:
                 this.logger.warn('k10 calc - Warning: market_ticks table has no price for symbol: %s  bypass it!', tick_symbol)
                 cal_length = cal_length - 1
                 continue
