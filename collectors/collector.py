@@ -117,7 +117,7 @@ class collector(object):
 
     def bulk_save_ticks(this, symbol_name, ticks):
         sql = "select time, market, symbol, high, low, open, close from %s where market = '%s' and symbol = '%s' group by market, symbol order by time desc limit 1" % (this.table_market_ticks, this.market_name, symbol_name)
-        ret = this.db_adapter.query(sql)
+        ret = this.db_adapter.query(sql, epoch = 's')
 
         if ret and ret.has_key('series'):
             latest_timestamp = ret['series'][0]['values'][0][0]
