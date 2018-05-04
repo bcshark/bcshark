@@ -79,8 +79,6 @@ def tv_history():
         ticks = kline['series'][0]['values']
         ticks.sort(lambda x, y: cmp(x[time_index], y[time_index]))
 
-        print ticks[0][time_index]
-
         kline = {
             "s": "ok",
             "t": [tick[time_index] for tick in ticks],

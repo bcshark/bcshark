@@ -18,7 +18,6 @@ class collector_gateio(collector):
         this.period = this.DEFAULT_PERIOD
 
     def translate(this, obj):
-        print('---translate obj time: ', obj[0])
         tick = market_tick()
         tick.time = long(obj[0]/1000)
         tick.volume = float(obj[1])
