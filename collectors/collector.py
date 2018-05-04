@@ -121,7 +121,9 @@ class collector(object):
 
         if ret and ret.has_key('series'):
             latest_timestamp = ret['series'][0]['values'][0][1]
+            # print('-----before lambda filter: ', len(ticks), '  --- latest timestamp:', latest_timestamp)
             ticks = filter(lambda x: x.time + x.timezone_offset > latest_timestamp, ticks)
+            # print('-----after lambda filter: ', len(ticks))
 
         for tick in ticks:
             this.save_tick(symbol_name, tick)
@@ -134,13 +136,16 @@ class collector(object):
         this.db_adapter.bulk_save_k10_daily_rank(k10_ranks)
 
     def query_k10_daily_rank(this):
-        sql = "select max(time), symbol, market_cap_usd from k10_daily_rank where rank < 11 group by symbol"
-        result = this.db_adapter.query(sql)
-        return result
+        # sql = "select max(time), symbol, market_cap_usd from k10_daily_rank where rank < 11 group by symbol"
+        sql = "select time, symbol, market_cap_usd, rank from k10_daily_rank order by time desc limit 19"
+        result = this.db_adapter.query(sql, epoch = 's')
+        ranks = result['series'][0]['values']
+        ranks.sort(lambda x, y: cmp(x[3], y[3]))
+        return ranks
 
     def query_latest_price(this, symbol_name_usdt, symbol_name_btc, startSecond):
-        #sql = "select max(time), market, symbol, high, low, open, close from market_ticks where symbol = '%s' or symbol = '%s' and time >= %s and time <= %s group by market, symbol" % (symbol_name_usdt, symbol_name_btc, startSecond*1000000000, startSecond*1000000000+60000000000)
-        sql = "select max(time), market, symbol, high, low, open, close from market_ticks where (symbol = '%s' or symbol = '%s') and time < 1525206240000000000 group by market, symbol" % (symbol_name_usdt, symbol_name_btc)
+        #sql = "select max(time), market, symbol, high, low, open, close from market_ticks where symbol = '%s' or symbol = '%s' and time > %s and time <= %s group by market, symbol" % (symbol_name_usdt, symbol_name_btc, startSecond*1000000000, startSecond*1000000000+60000000000)
+        sql = "select max(time), market, symbol, high, low, open, close from market_ticks where (symbol = '%s' or symbol = '%s') group by market, symbol" % (symbol_name_usdt, symbol_name_btc)
         result = this.db_adapter.query(sql)
         return result
 
