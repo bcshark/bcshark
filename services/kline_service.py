@@ -18,7 +18,7 @@ class kline_service(object):
         if market == 'market_index':
             sql = "select time, open, close, low, high from k10_index order by time desc limit %d" % size
         else:
-            sql = "select time, open, close, low, high from market_ticks where market = '%s' and symbol = '%s' order by time desc limit %d" % (market, symbol, size)
+            sql = "select time, open, close, low, high from %s_ticks where market = '%s' and symbol = '%s' order by time desc limit %d" % (market, market, symbol, size)
         rows = this.client.query(sql)
 
         return rows 

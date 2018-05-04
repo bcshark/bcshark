@@ -70,7 +70,7 @@ class collector_huobi(collector):
 
             if match:
                 symbol_name = match.group(1)
-                this.save_tick(this.get_generic_period_name(symbol_name), this.translate(message_json['ts'], message_json['tick']))
+                this.save_tick(this.get_generic_symbol_name(symbol_name), this.translate(message_json['ts'], message_json['tick']))
 
     def collect_ws(this):
         this.start_listen_websocket(this.WS_URL, this)
@@ -90,7 +90,7 @@ class collector_huobi(collector):
                 this.logger.error('cannot get response from huobi (%s)' % symbol)
                 continue
 
-            this.bulk_save_ticks(this.get_generic_period_name(symbol), [ this.translate(ticks['ts'], tick) for tick in ticks['data'] ])
+            this.bulk_save_ticks(this.get_generic_symbol_name(symbol), [ this.translate(ticks['ts'], tick) for tick in ticks['data'] ])
 
             this.logger.info('get response from huobi')
 
