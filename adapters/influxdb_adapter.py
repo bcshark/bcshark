@@ -40,8 +40,8 @@ class influxdb_adapter(database_adapter):
             'time': get_timestamp_str(fields['time'], fields['timezone_offset']),
             'fields': fields
         }
-        return [ point ]
 
+        return point
 
     def generate_point_by_tick(this, measurement_name, market_name, symbol_name, tick):
         fields = None
@@ -72,32 +72,9 @@ class influxdb_adapter(database_adapter):
                 'time': get_timestamp_str(fields['time'], fields['timezone_offset']),
                 'fields': fields
             }
-            return [ point ]
+            return point
 
-        return []
-
-    def generate_points_by_ticks(this, measurement_name, market_name, symbol_name, ticks):
-        points = [{
-            'measurement': measurement_name,
-            'tags': {
-                'market': market_name,
-                'symbol': symbol_name
-            },
-            'time': get_timestamp_str(tick.time, tick.timezone_offset),
-            'fields': {
-                'time': tick.time + tick.timezone_offset,
-                'open': float(tick.open),
-                'close': float(tick.close),
-                'low': float(tick.low),
-                'high': float(tick.high),
-                'amount': float(tick.amount),
-                'volume': float(tick.volume),
-                'count': float(tick.count),
-                'period': tick.period
-            }
-        } for tick in ticks]
-
-        return points
+        return None
 
     def generate_points_by_k10_rank(this, measurement_name, k10_ranks):
         points = [{
@@ -147,19 +124,19 @@ class influxdb_adapter(database_adapter):
         return [ point ]
 
     def save_trade(this, measurement_name, market_name, symbol_name, trade):
-        points = this.generate_point_by_trade(measurement_name, market_name, symbol_name, trade)
+        points = [ this.generate_point_by_trade(measurement_name, market_name, symbol_name, trade) ]
 
         this.client.write_points(points)
 
     def save_tick(this, measurement_name, market_name, symbol_name, tick):
-        points = this.generate_point_by_tick(measurement_name, market_name, symbol_name, tick)
+        points = [ this.generate_point_by_tick(measurement_name, market_name, symbol_name, tick) ]
 
         this.client.write_points(points)
 
     def bulk_save_ticks(this, market_name, symbol_name, ticks):
         measurement_name = 'market_ticks'
 
-        points = this.generate_points_by_ticks(measurement_name, market_name, symbol_name, ticks)
+        points = [ this.generate_point_by_tick(measurement_name, market_name, symbol_name, tick) for tick in ticks ]
 
         this.client.write_points(points)
 
