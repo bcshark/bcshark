@@ -133,22 +133,38 @@ class collector(object):
         this.db_adapter.save_k10_index(k10_index)
 
     def bulk_save_k10_daily_rank(this, k10_ranks):
-        this.db_adapter.bulk_save_k10_daily_rank(k10_ranks)
+        for rank in k10_ranks:
+            symbol_name = rank.symbol
+            sql = "select time, rank from %s where symbol = '%s' order by time desc limit 1" % (this.market_name, symbol_name)
+            ret = this.db_adapter.query(sql, epoch = 's')
+            if ret and ret.has_key('series'):
+                latest_timestamp = ret['series'][0]['values'][0][0]
+                if long(rank.time) + this.timezone_offset <= long(latest_timestamp):
+                    continue
+            this.db_adapter.save_k10_daily_rank(this.market_name, rank)
 
     def query_k10_daily_rank(this):
-        # sql = "select max(time), symbol, market_cap_usd from k10_daily_rank where rank < 11 group by symbol"
         sql = "select time, symbol, market_cap_usd, rank from k10_daily_rank order by time desc limit 19"
         result = this.db_adapter.query(sql, epoch = 's')
         ranks = result['series'][0]['values']
         ranks.sort(lambda x, y: cmp(x[3], y[3]))
         return ranks
 
-    def query_latest_price(this, symbol_name_usdt, symbol_name_btc, startSecond):
-        #sql = "select max(time), market, symbol, high, low, open, close from market_ticks where symbol = '%s' or symbol = '%s' and time > %s and time <= %s group by market, symbol" % (symbol_name_usdt, symbol_name_btc, startSecond*1000000000, startSecond*1000000000+60000000000)
-        # sql = "select max(time), market, symbol, high, low, open, close from market_ticks where (symbol = '%s' or symbol = '%s') group by market, symbol" % (symbol_name_usdt, symbol_name_btc)
+    def query_previous_min_price(this, symbol_name_usdt, symbol_name_btc, startSecond):
+        sql = "select time, market, symbol, high, low, open, close from market_ticks where (symbol = '%s' or symbol = '%s') and time >= %s and time < %s  group by market, symbol order by time desc limit 1" % (symbol_name_usdt, symbol_name_btc, startSecond*1000000000, startSecond*1000000000+60000000000)
+        result = this.db_adapter.query(sql, epoch = 's')
+        if len(result) == 0 or not result.has_key('series') or result['series'][0]['values'][0][1] == None:
+            this.logger.warn('k10 calc Warning - market_ticks table has no previous minute price for symbol: %s , %s ', symbol_name_usdt, symbol_name_btc)
+            return None
+        return result['series'][0]['values']
+
+    def query_latest_price_exist(this, symbol_name_usdt, symbol_name_btc):
         sql = "select time, market, symbol, high, low, open, close from market_ticks where (symbol = '%s' or symbol = '%s') group by market, symbol order by time desc limit 1" % (symbol_name_usdt, symbol_name_btc)
         result = this.db_adapter.query(sql, epoch = 's')
-        return result
+        if len(result) == 0 or not result.has_key('series') or result['series'][0]['values'][0][1] == None:
+            this.logger.error('k10 calc Error - market_ticks table has no price for symbol: %s , %s ', symbol_name_usdt, symbol_name_btc)
+            return None
+        return result['series']
 
     def get_generic_symbol_name(this, symbol_name):
         for symbol_index in range(len(this.symbols_market)):

@@ -19,39 +19,29 @@ class collector_k10_index_calc(collector):
 
     def translate_ranks(this, objs):
         k10_ranks = []
-
-        # this.logger.debug('k10 calc info - k10_daily_rank query return result length: %s', len(objs['series']))
         for obj in objs:
-            # if len(obj['values']) < 1:
-            #     this.logger.error('k10 cac Error - k10_daily_rank query return result length 0: %s', objs['values'])
-            #     continue
-
+            if int(obj[3]) > 10:
+                continue
             rank = k10_rank()
-            rank.symbol = obj[1]
+            symbol = this.getSymbol(obj[1])
+            this.logger.debug('k10 calc - get mapped Tick symbol: %s', symbol)
+            if symbol == None:
+                this.logger.debug('k10 calc - Warning: New symbol found on top 20, no price collected, bypass it!: %s', obj[1])
+                continue
+            rank.symbol = symbol
             rank.time = long(obj[0])
             rank.market_cap_usd = float(obj[2])
-
+            rank.rank = int(obj[3])
             if rank.market_cap_usd <= 0:
                 this.logger.error('k10 calc Error - k10_daily_rank query result market cap is incorrect! %s, %s', rank.symbol, rank.market_cap_usd)
                 continue
             k10_ranks.append(rank)
-
-            this.logger.debug('k10 calc - rank object generated from DB query: %s, %s, %s', rank.time, rank.symbol, rank.market_cap_usd)
-        this.logger.debug('k10 calc - length of rank object generated from DB query: %s', len(k10_ranks))
-
+            this.logger.debug('k10 calc - rank object generated from DB query: %s, %s, %s, %s', rank.time, rank.symbol, rank.market_cap_usd, rank.rank)
         return k10_ranks
 
     def translate_ticks(this, objs):
         ticks = []
-
-        this.logger.debug('k10 calc - market_ticks query return result length: %s', len(objs['series']))
-
-        for obj in objs['series']:
-
-            if len(obj['values']) < 1:
-                this.logger.error('k10 calc Error - market_ticks query return result length 0: %s', objs["values"])
-                continue
-
+        for obj in objs:
             tick = market_tick()
             tick.market = obj['values'][0][1]
             tick.symbol = obj['values'][0][2]
@@ -60,32 +50,22 @@ class collector_k10_index_calc(collector):
             tick.low = float(obj['values'][0][4])
             tick.open = float(obj['values'][0][5])
             tick.close = float(obj['values'][0][6])
-
-            if tick.market == '' or tick.symbol == '':
-                this.logger.error('k10 calc Error - market_ticks query result Market/Symbol is incorrect! %s, %s', tick.market, tick.symbol)
-                continue
-
             ticks.append(tick)
-
             this.logger.debug('k10 calc - Tick object generated from DB query: %s, %s, %s, %s, %s, %s, %s', tick.time, tick.market, tick.symbol, tick.high, tick.low, tick.open, tick.close)
         this.logger.debug('k10 calc - length of Tick object generated from DB query: %s', len(ticks))
-
         return ticks
 
     def collect_rest(this):
 
         index = k10_index()
-        ### this should be limited to latest 5 mins !!!!
         rank_result = this.query_k10_daily_rank()
         print('rank query return result:', rank_result)
-        # if len(rank_result) == 0:
-        #     this.logger.error('k10 calc Error - k10_daily_rank table has no data, calculation failed, program exit')
-        #     return
-        #print('-------', len(rank_result['series']))
-        #print('-------', rank_result['series'][0]['values'])
         ranks = this.translate_ranks(rank_result)
         if len(ranks) == 0:
-            this.logger.error('k10 calc Error - translate k10 rank object failed for: %s, program exit', rank_result)
+            this.logger.error('k10 calc Error - translate k10 rank object length is 0, program exit %s', rank_result)
+            return
+        if len(ranks) != 10:
+            this.logger.error('k10 calc Error - rank obj generated: %s not match result from DB query: %s, program exit', len(ranks), len(rank_result))
             return
         ranks = this.fillRatio(ranks)
 
@@ -96,24 +76,15 @@ class collector_k10_index_calc(collector):
         total_high_weight = total_low_weight = total_open_weight = total_close_weight = 0
 
         for rank in ranks:
-
-            tick_symbol = this.getSymbol(rank.symbol)
-            this.logger.debug('k10 calc - get mapping Tick symbol: %s', tick_symbol)
-            if tick_symbol == None:
-                this.logger.debug('k10 calc - Warning: New symbol %s  found on top 20, no price collected, bypass it!', rank.symbol)
-                continue
-            tick_result = this.query_latest_price(tick_symbol[0], tick_symbol[1], start_second)
-            #print('market_ticks return result:', tick_result)
-            #print('market_ticks return result:', tick_result['series'][0]['values'][0][1])
-            if len(tick_result) == 0 or not tick_result.has_key('series') or tick_result['series'][0]['values'][0][1] == None:
-                this.logger.warn('k10 calc - Warning: market_ticks table has no price for symbol: %s  bypass it!', tick_symbol)
-                cal_length = cal_length - 1
+            print(rank.symbol[0], rank.symbol[1], start_second)
+            tick_result = this.query_latest_price_exist(rank.symbol[0], rank.symbol[1])
+            if tick_result == None:
+                #remove this rank from array and re-calculate the ratio for all ranks
+                #rank_index = ranks.index(rank)
+                #del ranks[rank_index]
+                #ranks = this.fillRatio(ranks)
                 continue
             ticks = this.translate_ticks(tick_result)
-            if len(ticks) == 0:
-                this.logger.warn('k10 calc - Warning: translate ticks failed for: %s  bypass it', tick_result)
-                cal_length = cal_length - 1
-                continue
             avg_high = this.calculateSymbolAvgPrice(ticks, 'high')
             total_high_weight = total_high_weight + avg_high * rank.cap_ratio
             avg_low = this.calculateSymbolAvgPrice(ticks, 'low')
@@ -152,7 +123,7 @@ class collector_k10_index_calc(collector):
             "period": index.period
         }
         indexArray = [indexObj]
-        if index.high != 0:
+        if index.high != 0 and index.low != 0 and index.open != 0 and index.close != 0:
             this.save_k10_index(indexArray[0])
 
         this.logger.info('k10 index calc done !')
@@ -229,3 +200,4 @@ class collector_k10_index_calc(collector):
             return ['omgusdt', 'omgbtc']
         if "BNB" == rank_symbol:
             return ['bnbusdt', 'bnbbtc']
+        return None
