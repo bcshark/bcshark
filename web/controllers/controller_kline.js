@@ -78,6 +78,14 @@ var KlineController = ['$scope', '$http', '$interval', '$location', '$window', '
 		};
 	}
 
+	function calculateAvg(data0) {
+		var result = [];
+		for (var i = 0, len = data0.length; i < len; i++) {
+			result.push((data0[i][2] + data0[i][3]) / 2);
+		}
+		return result;
+	}
+
 	function calculateMA(data0, dayCount) {
 		var result = [];
 		for (var i = 0, len = data0.values.length; i < len; i++) {
@@ -138,10 +146,7 @@ var KlineController = ['$scope', '$http', '$interval', '$location', '$window', '
 						xAxis: { data: data0.categoryData },
 						series: [ 
 							{ data: data0.values },
-							{ data: calculateMA(data0, 5) },
-							{ data: calculateMA(data0, 10) },
-							{ data: calculateMA(data0, 20) },
-							{ data: calculateMA(data0, 30) } 
+							{ data: calculateAvg(data0.values) }
 						]
 					};
 
@@ -160,7 +165,7 @@ var KlineController = ['$scope', '$http', '$interval', '$location', '$window', '
 						},
 						legend: {
 							bottom: 10,
-							data: ['日K', 'MA5', 'MA10', 'MA20', 'MA30']
+							data: ['日K', 'Index']
 						},
 						grid: {
 							left: 60,
@@ -221,13 +226,6 @@ var KlineController = ['$scope', '$http', '$interval', '$location', '$window', '
 										}
 									},
 									data: [{
-											name: 'XX标点',
-											coord: ['2013/5/31', 2300],
-											value: 2300,
-											itemStyle: {
-												normal: {color: 'rgb(41,60,85)'}
-											}
-										}, {
 											name: 'highest value',
 											type: 'max',
 											valueDim: 'highest'
@@ -235,10 +233,6 @@ var KlineController = ['$scope', '$http', '$interval', '$location', '$window', '
 											name: 'lowest value',
 											type: 'min',
 											valueDim: 'lowest'
-										}, {
-											name: 'average value on close',
-											type: 'average',
-											valueDim: 'close'
 										}
 									],
 									tooltip: {
@@ -246,69 +240,11 @@ var KlineController = ['$scope', '$http', '$interval', '$location', '$window', '
 											return param.name + '<br>' + (param.data.coord || '');
 										}
 									}
-								},
-								markLine: {
-									symbol: ['none', 'none'],
-									data: [
-										[{
-												name: 'from lowest to highest',
-												type: 'min',
-												valueDim: 'lowest',
-												symbol: 'circle',
-												symbolSize: 10,
-												label: {
-													normal: {show: false},
-													emphasis: {show: false}
-												}
-											}, {
-												type: 'max',
-												valueDim: 'highest',
-												symbol: 'circle',
-												symbolSize: 10,
-												label: {
-													normal: {show: false},
-													emphasis: {show: false}
-												}
-											}
-										], {
-											name: 'min line on close',
-											type: 'min',
-											valueDim: 'close'
-										}, {
-											name: 'max line on close',
-											type: 'max',
-											valueDim: 'close'
-										}
-									]
 								}
 							}, {
-								name: 'MA5',
+								name: 'Index',
 								type: 'line',
-								data: calculateMA(data0, 5),
-								smooth: true,
-								lineStyle: {
-									normal: {opacity: 0.5}
-								}
-							}, {
-								name: 'MA10',
-								type: 'line',
-								data: calculateMA(data0, 10),
-								smooth: true,
-								lineStyle: {
-									normal: {opacity: 0.5}
-								}
-							}, {
-								name: 'MA20',
-								type: 'line',
-								data: calculateMA(data0, 20),
-								smooth: true,
-								lineStyle: {
-									normal: {opacity: 0.5}
-								}
-							}, {
-								name: 'MA30',
-								type: 'line',
-								data: calculateMA(data0, 30),
+								data: calculateAvg(data0.values),
 								smooth: true,
 								lineStyle: {
 									normal: {opacity: 0.5}

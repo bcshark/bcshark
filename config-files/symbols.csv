@@ -9,5 +9,5 @@ poloniex,USDT_BTC,,,,,,,,,,,,,,BTC_XEM,,,BTC_OMG,,USDT_ETH,USDT_XRP,USDT_BCH,,US
 gdax,BTC-USD,,,,,,,,,,,,,,,,,,,ETH-USD,,BCH-USD,,LTC-USD,,,,,,,,,,,,,
 bitstamp,btcusd,,,,,,,,,,,,,,,,,,,ethusd,xrpusd,bchusd,,ltcusd,,,,,,,,,,,,,
 bittrex,USDT-BTC,,,,,,,,BTC-XLM,,,,,,BTC-XEM,,BTC-QTUM,,,USDT-ETH,USDT-XRP,,,USDT-LTC,USDT-ADA,,,USDT-NEO,USDT-XMR,USDT-DASH,USDT-TRX,,USDT-ETC,,,USDT-OMG,
-gateio,btc_usdt,,,,,,,,,,,,,,,,,,,eth_usdt,xrp_usdt,bch_usdt,eos_usdt,ltc_usdt,ada_usdt,xlm_usdt,,neo_usdt,xmr_usdt,dash_usdt,trx_usdt,,etc_usdt,ven_usdt,qtum_usdt,omg_usdt,
+gateio,btc_usdt,,,,,,,,,,,,,,,,,,,eth_usdt,xrp_usdt,bch_usdt,eos_usdt,ltc_usdt,ada_usdt,xlm_usdt,iota_usdt,neo_usdt,xmr_usdt,dash_usdt,trx_usdt,,etc_usdt,ven_usdt,qtum_usdt,omg_usdt,
 k10_daily_rank,BTC,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
