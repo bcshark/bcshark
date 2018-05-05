@@ -1,5 +1,5 @@
 { 
-	"timezone_offset": -28800,
+	"timezone_offset": 0,
 	"influxdb": {
 		"host": "127.0.0.1",
 		"port": 8086,
