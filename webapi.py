@@ -99,16 +99,16 @@ def tv_symbols():
         "name": "Index",
         "exchange-traded": "Market",
         "exchange-listed": "Market",
-        "timezone": "China/Shanghai",
+        "timezone": "UTC",
         "minmov": 1,
         "minmov2": 0,
         "pointvalue": 1,
         "session": "0930-1630",
         "has_intraday": False,
-        "has_no_volume": False,
-        "description": "Market Index",
+        "has_no_volume": True,
+        "description": "Index",
         "type": "stock",
-        "supported_resolutions": ["D", "2D", "3D", "W", "3W", "M", "6M"],
+        "supported_resolutions": ["1", "15", "30", "60", "D", "2D", "3D", "W", "3W", "M", "6M"],
         "pricescale": 100,
         "ticker": "Index"
     }
@@ -119,10 +119,7 @@ def tv_symbols():
 def tv_study_templates():
     ret = {
         "status": "ok",
-        "data": [
-            { "name": "Best" },
-            { "name": "Fav 1" }
-        ]
+        "data": [ ]
     }
 
     return json.dumps(ret)
@@ -136,45 +133,23 @@ def tv_config():
     ret = {
         "supports_search": True,
         "supports_group_request": False,
-        "supports_marks": True,
-        "supports_timescale_marks": True,
-        "supports_time": True,
+        "supports_marks": False,
+        "supports_timescale_marks": False,
+        "supports_time": False,
         "exchanges": [
             {
                 "value": "",
                 "name": "All Exchanges",
                 "desc": ""
-            }, {
-                "value": "NasdaqNM",
-                "name": "NasdaqNM",
-                "desc": "NasdaqNM"
-            }, {
-                "value": "NYSE",
-                "name": "NYSE",
-                "desc": "NYSE"
-            }, {
-                "value": "NCM",
-                "name": "NCM",
-                "desc": "NCM"
-            }, {
-                "value": "NGM",
-                "name": "NGM",
-                "desc": "NGM"
             }
         ],
         "symbols_types": [
             {
                 "name": "All types",
                 "value": ""
-            }, {
-                "name": "Stock",
-                "value": "stock"
-            }, {
-                "name": "Index",
-                "value": "index"
             }
         ],
-        "supported_resolutions": ["D", "2D", "3D", "W", "3W", "M", "6M"]
+        "supported_resolutions": ["1", "15", "30", "60", "D", "2D", "3D", "W", "3W", "M", "6M"]
     }
 
     return json.dumps(ret)
