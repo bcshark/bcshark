@@ -59,7 +59,9 @@ class collector_k10_index_calc(collector):
 
         index = k10_index()
         rank_result = this.query_k10_daily_rank()
-        print('rank query return result:', rank_result)
+        if rank_result == None:
+            this.logger.error('k10 calc Error - k10_daily_rank table has no data!')
+            return
         ranks = this.translate_ranks(rank_result)
         if len(ranks) == 0:
             this.logger.error('k10 calc Error - translate k10 rank object length is 0, program exit %s', rank_result)
@@ -77,13 +79,16 @@ class collector_k10_index_calc(collector):
 
         for rank in ranks:
             print(rank.symbol[0], rank.symbol[1], start_second)
-            tick_result = this.query_latest_price_exist(rank.symbol[0], rank.symbol[1])
+            tick_result = this.query_previous_min_price(rank.symbol[0], rank.symbol[1], start_second)
             if tick_result == None:
                 #remove this rank from array and re-calculate the ratio for all ranks
                 #rank_index = ranks.index(rank)
                 #del ranks[rank_index]
                 #ranks = this.fillRatio(ranks)
-                continue
+                tick_result_exist = this.query_latest_price_exist(rank.symbol[0], rank.symbol[1])
+                if tick_result_exist == None:
+                    continue
+                tick_result = tick_result_exist
             ticks = this.translate_ticks(tick_result)
             avg_high = this.calculateSymbolAvgPrice(ticks, 'high')
             total_high_weight = total_high_weight + avg_high * rank.cap_ratio
