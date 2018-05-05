@@ -49,4 +49,4 @@ class collector_gateio(collector):
             this.logger.info('get response from gateio')
 
     def get_generic_period_name(this):
-        return "1hour"
+        return "1min"

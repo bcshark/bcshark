@@ -76,18 +76,17 @@ class influxdb_adapter(database_adapter):
 
         return None
 
-    def generate_points_by_k10_rank(this, measurement_name, k10_ranks):
-        points = [{
+    def generate_points_by_k10_rank(this, measurement_name, k10_rank):
+        point = {
             'measurement': measurement_name,
             'tags': {
                 'symbol': k10_rank.symbol
             },
             'time': get_timestamp_str(long(k10_rank.time)+k10_rank.timezone_offset, k10_rank.timezone_offset),
             'fields': {
-                'time': long(k10_rank.time) + k10_rank.timezone_offset + k10_rank.timezone_offset,
+                #'time': long(k10_rank.time) + k10_rank.timezone_offset + k10_rank.timezone_offset,
                 'id': k10_rank.id,
                 'name': k10_rank.name,
-                'rank': int(k10_rank.rank),
                 'price_usd': float(k10_rank.price_usd),
                 'price_btc': float(k10_rank.price_btc),
                 'volume_usd_24h': float(k10_rank.volume_usd_24h),
@@ -98,11 +97,11 @@ class influxdb_adapter(database_adapter):
                 'percent_change_1h': float(k10_rank.percent_change_1h),
                 'percent_change_24h': float(k10_rank.percent_change_24h),
                 'percent_change_7d': float(k10_rank.percent_change_7d),
+                'rank': int(k10_rank.rank),
                 'period': k10_rank.period
             }
-        } for k10_rank in k10_ranks]
-
-        return points
+        }
+        return [ point ]
 
     def generate_points_by_k10_index(this, measurement_name, k10_index):
 
@@ -144,8 +143,8 @@ class influxdb_adapter(database_adapter):
         result_set = this.client.query(sql, epoch = epoch)
         return result_set.raw
 
-    def bulk_save_k10_daily_rank(this, k10_ranks):
-        points = this.generate_points_by_k10_rank("k10_daily_rank", k10_ranks)
+    def save_k10_daily_rank(this, table_name, k10_rank):
+        points = this.generate_points_by_k10_rank(table_name, k10_rank)
         this.client.write_points(points)
 
     def save_k10_index(this, k10_index):
