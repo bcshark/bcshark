@@ -10,8 +10,7 @@ class kline_service(object):
     def get_tvkline_by_market_symbol(this, symbol, from_time, to_time, size):
         sql = "select time, open, close, low, high from k10_index where time >= %d and time <= %d order by time desc limit %d" % (from_time * 1e9, to_time * 1e9, size)
         rows = this.client.query(sql, epoch = 's')
-        print "%d, %d rows:" % (from_time, to_time)
-        print rows
+        print "%d, %d rows: %d" % (from_time, to_time, len(rows))
         return rows 
 
     def get_kline_by_market_symbol(this, market, symbol, size):
