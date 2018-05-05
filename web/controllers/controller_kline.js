@@ -130,8 +130,6 @@ var KlineController = ['$scope', '$http', '$interval', '$location', '$window', '
 		//$scope.promise = $http.get('http://192.168.56.101:5000/api/kline/' + $scope.selectedMarket.name + '/' + $scope.selectedSymbol)
 		klineService.market_index_kline($scope.selectedMarket.name, $scope.selectedSymbol.name,
 			function(resp) {
-				console.log(resp);
-
 				var data0 = splitData(resp);
 				var option = null;
 
