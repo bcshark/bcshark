@@ -78,6 +78,14 @@ var KlineController = ['$scope', '$http', '$interval', '$location', '$window', '
 		};
 	}
 
+	function calculateAvg(data0) {
+		var result = [];
+		for (var i = 0, len = data0.length; i < len; i++) {
+			result.push((data0[i][2] + data0[i][3]) / 2);
+		}
+		return result;
+	}
+
 	function calculateMA(data0, dayCount) {
 		var result = [];
 		for (var i = 0, len = data0.values.length; i < len; i++) {
@@ -138,7 +146,7 @@ var KlineController = ['$scope', '$http', '$interval', '$location', '$window', '
 						xAxis: { data: data0.categoryData },
 						series: [ 
 							{ data: data0.values },
-							{ data: data0.values }
+							{ data: calculateAvg(data0.values) }
 						]
 					};
 
@@ -157,7 +165,7 @@ var KlineController = ['$scope', '$http', '$interval', '$location', '$window', '
 						},
 						legend: {
 							bottom: 10,
-							data: ['日K', 'MA5', 'MA10', 'MA20', 'MA30']
+							data: ['日K', 'Index']
 						},
 						grid: {
 							left: 60,
@@ -236,7 +244,7 @@ var KlineController = ['$scope', '$http', '$interval', '$location', '$window', '
 							}, {
 								name: 'Index',
 								type: 'line',
-								data: data0.values,
+								data: calculateAvg(data0.values),
 								smooth: true,
 								lineStyle: {
 									normal: {opacity: 0.5}
