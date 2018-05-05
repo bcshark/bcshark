@@ -209,7 +209,7 @@ def api_kline():
     finally:
         client.close()
 
-    if kline:
+    if kline and kline.has_key('series'):
         columns = kline['series'][0]['columns']
         for i in range(0, len(columns)):
             if columns[i] == 'time':
@@ -238,7 +238,7 @@ def api_kline():
 
         return json.dumps(kline)
     else:
-        return None
+        return json.dumps({})
 
 if __name__ == '__main__':
     global settings

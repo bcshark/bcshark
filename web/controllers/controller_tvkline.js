@@ -111,11 +111,7 @@ var TvKlineController = ['$scope', '$http', '$interval', '$window', 'MarketServi
 	}
 
 	function getMarketTicks() {
-		console.log('getMarketTicks');
-
 		TradingView.onready(function() {
-			console.log('TradingView is ready!');
-
 			var widget = window.tvWidget = new TradingView.widget({
 				// debug: true, // uncomment this line to see Library errors and warnings in the console
 				fullscreen: true,
