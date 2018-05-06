@@ -18,6 +18,7 @@ class collector_k10_index_calc(collector):
         super(collector_k10_index_calc, this).__init__(settings, market_settings)
 
     def translate_ranks(this, objs):
+        this.logger.debug('rank result from db: %s', objs)
         k10_ranks = []
         for obj in objs:
             if int(obj[3]) > 10:

@@ -144,7 +144,7 @@ class collector(object):
             this.db_adapter.save_k10_daily_rank(this.market_name, rank)
 
     def query_k10_daily_rank(this):
-        sql = "select time, symbol, market_cap_usd, rank from k10_daily_rank order by time desc limit 19"
+        sql = "select time, symbol, market_cap_usd, rank from k10_daily_rank order by time desc limit 29"
         result = this.db_adapter.query(sql, epoch = 's')
         if len(result) == 0 or not result.has_key('series'):
             return None
