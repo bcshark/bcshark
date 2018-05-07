@@ -56,7 +56,7 @@ def tv_history():
     try:
         client.open()
         service = kline_service(client, settings)
-        kline =  service.get_tvkline_by_market_symbol(symbol, long(from_time), long(to_time), settings['kline']['size'])
+        kline =  service.get_tvkline_by_market_symbol(symbol, long(from_time), long(to_time), resolution, settings['kline']['size'])
     finally:
         client.close()
 
@@ -90,6 +90,11 @@ def tv_history():
 
         for index in range(len(ticks)):
             tick = ticks[index]
+
+            # remove the timeslot contains no data
+            if tick[open_index] == None or tick[close_index] == None or tick[high_index] == None or tick[low_index] == None:
+                continue
+
             tick["t"].append(tick[time_index])
             tick["o"].append(tick[open_index])
             tick["c"].append(tick[close_index])
@@ -191,7 +196,7 @@ def api_kline():
     try:
         client.open()
         service = kline_service(client, settings)
-        kline =  service.get_kline_by_market_symbol(market, symbol, settings['kline']['size'])
+        kline =  service.get_kline_by_market_symbol(market, symbol, '1', settings['kline']['size'])
     finally:
         client.close()
 
