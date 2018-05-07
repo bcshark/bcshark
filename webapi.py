@@ -104,11 +104,12 @@ def tv_symbols():
         "minmov2": 0,
         "pointvalue": 1,
         "session": "0930-1630",
-        "has_intraday": False,
+        "has_intraday": True,
         "has_no_volume": True,
         "description": "Index",
         "type": "stock",
-        "supported_resolutions": ["1", "15", "30", "60", "D", "2D", "3D", "W", "3W", "M", "6M"],
+        "supported_resolutions": [ "1", "15", "30", "60", "D", "2D", "3D", "W", "3W", "M", "6M" ],
+        "intraday_multipliers": [ "1", "15", "30", "60" ],
         "pricescale": 100,
         "ticker": "Index"
     }
@@ -149,7 +150,8 @@ def tv_config():
                 "value": ""
             }
         ],
-        "supported_resolutions": ["1", "15", "30", "60", "D", "2D", "3D", "W", "3W", "M", "6M"]
+        #"intraday_multipliers": [ "1", "15", "30", "60" ],
+        "supported_resolutions": [ "1", "15", "30", "60", "D", "2D", "3D", "W", "3W", "M", "6M" ]
     }
 
     return json.dumps(ret)
