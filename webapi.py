@@ -81,12 +81,21 @@ def tv_history():
 
         kline = {
             "s": "ok",
-            "t": [tick[time_index] for tick in ticks],
-            "o": [tick[open_index] for tick in ticks],
-            "c": [tick[close_index] for tick in ticks],
-            "h": [tick[high_index] for tick in ticks],
-            "l": [tick[low_index] for tick in ticks],
+            "t": [],    #timestamp
+            "o": [],    #open
+            "c": [],    #close
+            "h": [],    #high
+            "l": [],    #low
         }
+
+        for index in range(len(ticks)):
+            tick = ticks[index]
+            tick["t"].append(tick[time_index])
+            tick["o"].append(tick[open_index])
+            tick["c"].append(tick[close_index])
+            tick["h"].append(tick[high_index])
+            tick["l"].append(tick[low_index])
+
     else:
         #kline = { "s": "no_data", "nextTime": long(time.time() + 60) }
         kline = { "s": "no_data" }
