@@ -225,7 +225,7 @@ def api_kline():
             float(tick[close_index]),
             float(tick[low_index]),
             float(tick[high_index])
-        ] for tick in ticks]
+        ] for tick in ticks if not (tick[open_index] == None or tick[close_index] == None or tick[high_index] == None or tick[low_index] == None)]
 
         return json.dumps(kline)
     else:
