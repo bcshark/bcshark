@@ -220,7 +220,7 @@ def api_kline():
         ticks.sort(lambda x, y: cmp(x[time_index], y[time_index]))
 
         kline = [[
-            get_timestamp_str(tick[time_index], 0),
+            get_timestamp_str_short(tick[time_index], 0),
             float(tick[open_index]),
             float(tick[close_index]),
             float(tick[low_index]),
