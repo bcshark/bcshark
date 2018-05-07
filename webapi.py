@@ -152,6 +152,12 @@ def tv_config():
         "name": market,
         "desc": market
     } for market in support_markets])
+    symbols_types = [
+        {
+            "name": "All types",
+            "value": ""
+        }
+    ]
 
     ret = {
         "supports_search": True,
@@ -160,12 +166,7 @@ def tv_config():
         "supports_timescale_marks": False,
         "supports_time": False,
         "exchanges": exchanges,
-        "symbols_types": [
-            {
-                "name": "All types",
-                "value": ""
-            }
-        ],
+        "symbols_types": symbols_types,
         #"intraday_multipliers": [ "1", "15", "30", "60" ],
         "supported_resolutions": [ "1", "15", "30", "60", "D", "2D", "3D", "W", "3W", "M", "6M" ]
     }
@@ -177,10 +178,15 @@ def tv_search():
     # http://18.218.165.228:5000/tv/search?limit=30&query=B&type=&exchange=
     query = request.args.get('query', '')
     limit = request.args.get('limit', '')
+    exchange = request.args.get('exchange', '')
 
     support_symbols = settings['symbols']['default']
     support_symbols_title = settings['symbols']['_title']
-    support_markets = [market for market in settings['markets'].keys() if not market in ['default', '_title', 'k10_daily_rank', 'k10_index_calc']]
+
+    if exchange:
+        support_markets = [exchange]
+    else:
+        support_markets = [market for market in settings['markets'].keys() if not market in ['default', '_title', 'k10_daily_rank', 'k10_index_calc']]
 
     matches = []
 
