@@ -1,3 +1,5 @@
+import re
+
 class kline_service(object):
     def __init__(this, client, settings):
         this.client = client
@@ -8,10 +10,12 @@ class kline_service(object):
         return result_set.raw
 
     def get_influx_timegroup_by_resolution(this, resolution):
-        if resolution == 'D':
+        match = re.search(r'^([0-9]+)$', resolution)
+
+        if match:
+            sql_time_group = '%sm' % match.group(1)
+        elif resolution == 'D':
             sql_time_group = "1d"
-        elif resolution == '1':
-            sql_time_group = "1m"
         else:
             sql_time_group = "1d"
 
