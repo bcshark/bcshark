@@ -170,6 +170,36 @@ def tv_config():
 
     return json.dumps(ret)
 
+@app.route('/tv/search', methods=['GET'])
+def tv_search():
+    # http://18.218.165.228:5000/tv/search?limit=30&query=B&type=&exchange=
+    query = request.args.get('query', '')
+    limit = request.args.get('limit', '')
+
+    support_symbols = settings['symbols']['default']
+    support_symbols_title = settings['symbols']['_title']
+    support_markets = [market for market in settings['markets'].keys() if not market in ['default', '_title', 'k10_daily_rank', 'k10_index_calc']]
+
+    matches = []
+
+    for index in range(len(support_symbols)):
+        symbol = support_symbols[index]
+        title = support_symbols_title[index]
+
+        if query.lower() in symbol.lower():
+            markets = [market for market in support_markets if settings['symbols'][market][index]]
+            results = [{
+                "description": title,
+                "exchange": market,
+                "symbol": symbol,
+                "type": "bitcoin",
+            } for market in markets]
+
+            if results:
+                matches.append(results)
+
+    return json.dumps(matches)
+
 @app.route('/api/markets', methods=['GET'])
 def api_markets():
     support_markets = [{ "name": key, "title": setting['title'], "order": setting['order'] } for key, setting in settings['markets'].items()]
@@ -196,7 +226,7 @@ def api_kline():
     try:
         client.open()
         service = kline_service(client, settings)
-        kline =  service.get_kline_by_market_symbol(market, symbol, '1', settings['kline']['size'])
+        kline = service.get_kline_by_market_symbol(market, symbol, '1', settings['kline']['size'])
     finally:
         client.close()
 
