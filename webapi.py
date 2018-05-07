@@ -121,7 +121,7 @@ def tv_symbols():
         "has_intraday": True,
         "has_no_volume": True,
         "description": "Index",
-        "type": "stock",
+        "type": "bitcoin",
         "supported_resolutions": [ "1", "15", "30", "60", "D", "2D", "3D", "W", "3W", "M", "6M" ],
         "intraday_multipliers": [ "1", "15", "30", "60" ],
         "pricescale": 100,
@@ -145,19 +145,21 @@ def tv_time():
 
 @app.route('/tv/config', methods=['GET'])
 def tv_config():
+    support_markets = [market for market in settings['markets'].keys() if not market in ['default', '_title', 'k10_daily_rank', 'k10_index_calc']]
+    exchanges = [{ "value": "", "name": "All Exchanges", "desc": "" }]
+    exchanges.extend([{
+        "value": market,
+        "name": market,
+        "desc": market
+    } for market in support_markets])
+
     ret = {
         "supports_search": True,
         "supports_group_request": False,
         "supports_marks": False,
         "supports_timescale_marks": False,
         "supports_time": False,
-        "exchanges": [
-            {
-                "value": "",
-                "name": "All Exchanges",
-                "desc": ""
-            }
-        ],
+        "exchanges": exchanges,
         "symbols_types": [
             {
                 "name": "All types",
@@ -190,13 +192,14 @@ def tv_search():
             markets = [market for market in support_markets if settings['symbols'][market][index]]
             results = [{
                 "description": title,
+                "fullname": title,
                 "exchange": market,
                 "symbol": symbol,
                 "type": "bitcoin",
             } for market in markets]
 
             if results:
-                matches.append(results)
+                matches.extend(results)
 
     return json.dumps(matches)
 
