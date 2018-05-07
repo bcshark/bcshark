@@ -95,11 +95,11 @@ def tv_history():
             if tick[open_index] == None or tick[close_index] == None or tick[high_index] == None or tick[low_index] == None:
                 continue
 
-            tick["t"].append(tick[time_index])
-            tick["o"].append(tick[open_index])
-            tick["c"].append(tick[close_index])
-            tick["h"].append(tick[high_index])
-            tick["l"].append(tick[low_index])
+            kline["t"].append(tick[time_index])
+            kline["o"].append(tick[open_index])
+            kline["c"].append(tick[close_index])
+            kline["h"].append(tick[high_index])
+            kline["l"].append(tick[low_index])
 
     else:
         #kline = { "s": "no_data", "nextTime": long(time.time() + 60) }
