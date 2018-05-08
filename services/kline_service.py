@@ -22,7 +22,10 @@ class kline_service(object):
         return sql_time_group
 
     def get_tvkline_by_market_symbol(this, symbol, from_time, to_time, resolution, size):
-        sql = "select time, first(open) as open, last(close) as close, min(low) as low, max(high) as high from k10_index where time >= %d and time <= %d group by time(%s) order by time desc limit %d" % (from_time * 1e9, to_time * 1e9, this.get_influx_timegroup_by_resolution(resolution), size)
+        #sql = "select time, first(open) as open, last(close) as close, min(low) as low, max(high) as high from k10_index where time >= %d and time <= %d group by time(%s) order by time desc limit %d" % (from_time * 1e9, to_time * 1e9, this.get_influx_timegroup_by_resolution(resolution), size)
+
+        #NOTE: ignore limits as tradingview will alwasy send from_time and to_time in a reasonable range
+        sql = "select time, first(open) as open, last(close) as close, min(low) as low, max(high) as high from k10_index where time >= %d and time <= %d group by time(%s) order by time desc" % (from_time * 1e9, to_time * 1e9, this.get_influx_timegroup_by_resolution(resolution))
         rows = this.client.query(sql, epoch = 's')
         print "%d, %d rows: %d" % (from_time, to_time, len(rows))
         return rows 
