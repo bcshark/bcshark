@@ -58,8 +58,9 @@ class collector_k10_index_calc(collector):
 
     def collect_rest(this):
 
+        start_second = this.getStartSecondPreviousMinute()
         index = k10_index()
-        rank_result = this.query_k10_daily_rank()
+        rank_result = this.query_k10_daily_rank(start_second)
         if rank_result == None:
             this.logger.error('k10 calc Error - k10_daily_rank table has no data!')
             return
@@ -71,8 +72,6 @@ class collector_k10_index_calc(collector):
             this.logger.error('k10 calc Error - rank obj generated: %s not match result from DB query: %s, program exit', len(ranks), len(rank_result))
             return
         ranks = this.fillRatio(ranks)
-
-        start_second = this.getStartSecondPreviousMinute()
 
         cal_length = len(ranks)
         this.logger.debug('k10 calc - length of rank object generated: %s', cal_length)

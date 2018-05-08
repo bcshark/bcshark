@@ -17,13 +17,13 @@ class collector_k10_daily_rank(collector):
 
     def translate(this, objs):
         k10_ranks = []
-
         for obj in objs:
             if obj["symbol"] == 'USDT':
                 continue
             rank = k10_rank()
             rank.timezone_offset = this.timezone_offset
-            rank.time = obj["last_updated"]
+            update_time = long(obj["last_updated"])
+            rank.time = update_time - update_time % 100
             rank.id = obj["id"]
             rank.name = obj["name"]
             rank.symbol = obj["symbol"]
@@ -48,7 +48,6 @@ class collector_k10_daily_rank(collector):
         return k10_ranks
 
     def collect_rest(this):
-
         data = this.http_request_json(this.REST_URL, None)
 
         if not data or not isinstance(data, list):
