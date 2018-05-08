@@ -1,6 +1,8 @@
 logs/
-.vscode
+node_modules/
+.vscode/
 
+package-lock.json
 *.pyc
 *.swp
 *.code-workspace
