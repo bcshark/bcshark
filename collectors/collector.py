@@ -122,12 +122,11 @@ class collector(object):
     def bulk_save_ticks(this, symbol_name, ticks):
         sql = "select time, market, symbol, high, low, open, close from %s where market = '%s' and symbol = '%s' group by market, symbol order by time desc limit 1" % (this.table_market_ticks, this.market_name, symbol_name)
         ret = this.db_adapter.query(sql, epoch = 's')
-
         if ret and ret.has_key('series'):
             latest_timestamp = ret['series'][0]['values'][0][0]
-            # print('-----before lambda filter: ', len(ticks), '  --- latest timestamp:', latest_timestamp)
-            ticks = filter(lambda x: x.time + x.timezone_offset > latest_timestamp, ticks)
-            # print('-----after lambda filter: ', len(ticks))
+            #print('-----before lambda filter: ', len(ticks), '  --- latest timestamp:', latest_timestamp)
+            ticks = filter(lambda x: x.time + x.timezone_offset >= latest_timestamp, ticks)
+            #print('-----after lambda filter: ', len(ticks))
 
         for tick in ticks:
             this.save_tick(symbol_name, tick)
@@ -161,7 +160,6 @@ class collector(object):
         sql = "select time, market, symbol, high, low, open, close from market_ticks where (symbol = '%s' or symbol = '%s') and time >= %s and time < %s  group by market, symbol order by time desc limit 1" % (symbol_name_usdt, symbol_name_btc, startSecond*1000000000, startSecond*1000000000+60000000000)
         this.logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
-        this.logger.debug(result)
         if len(result) == 0 or not result.has_key('series') or result['series'][0]['values'][0][1] == None:
             this.logger.warn('k10 calc Warning - market_ticks table has no previous minute price for symbol: %s , %s ', symbol_name_usdt, symbol_name_btc)
             return None
