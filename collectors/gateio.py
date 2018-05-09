@@ -5,7 +5,7 @@ from .collector import collector
 from .utility import *
 
 class collector_gateio(collector):
-    DEFAULT_PERIOD = "1"
+    DEFAULT_PERIOD = "0.1"
     DEFAULT_GROUP = "60"
     DEFAULT_TYPE = "this_week"
 

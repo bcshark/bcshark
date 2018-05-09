@@ -35,7 +35,7 @@ class collector_poloniex(collector):
 
     def collect_rest(this):
         time_second = int(time.time())
-        time_second = time_second - time_second % 60 - 3600
+        time_second = time_second - time_second % 60 - 1500
 
         for symbol in this.symbols_market:
             if symbol == "":

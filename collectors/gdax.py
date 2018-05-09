@@ -38,7 +38,7 @@ class collector_gdax(collector):
         return ticks
 
     def collect_rest(this):
-        start = (datetime.datetime.utcnow() - datetime.timedelta(minutes = 60)).strftime('%Y-%m-%dT%H:%MZ')
+        start = (datetime.datetime.utcnow() - datetime.timedelta(minutes = 5)).strftime('%Y-%m-%dT%H:%MZ')
         end = (datetime.datetime.utcnow()).strftime('%Y-%m-%dT%H:%MZ')
 
         for symbol in this.symbols_market:
