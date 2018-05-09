@@ -1,5 +1,11 @@
 import time
 
+def get_timestamp_str_date(time_in_seconds, timezone_offset):
+    if isinstance(time_in_seconds, str) or isinstance(time_in_seconds, unicode):
+        return time_in_seconds
+    ret = time.strftime('%m-%d', time.localtime(time_in_seconds + timezone_offset))
+    return ret
+
 def get_timestamp_str_short(time_in_seconds, timezone_offset):
     if isinstance(time_in_seconds, str) or isinstance(time_in_seconds, unicode):
         return time_in_seconds

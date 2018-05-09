@@ -352,7 +352,7 @@ def api_trend():
         ticks.sort(lambda x, y: cmp(x[time_index], y[time_index]))
 
         kline = [[
-            get_timestamp_str_short(tick[time_index], 0),
+            get_timestamp_str_date(tick[time_index], 0),
             float(tick[price_index])
         ] for tick in ticks if not (tick[price_index] == None)]
 

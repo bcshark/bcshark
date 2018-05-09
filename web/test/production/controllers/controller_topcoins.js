@@ -25,6 +25,14 @@ var IndexTopCoinsController = ['$scope', '$http', '$interval', '$location', '$wi
 				console.log(resp);
 				var echartLine = echarts.init(document.getElementById('coin_chart_' + coin.symbol));
 
+				var date_text = [];
+				var price_value = [];
+
+				for (var index = 0; index < 7; index++) {
+					date_text.push(resp[index]["0"]);
+					price_value.push(resp[index]["1"]);
+				}
+
 				echartLine.setOption({
 					title: {
 					  show: false,
@@ -39,9 +47,6 @@ var IndexTopCoinsController = ['$scope', '$http', '$interval', '$location', '$wi
 					},
 					tooltip: {
 					  trigger: 'axis',
-					  formatter: function(value) {
-						  return value;
-					  }
 					},
 					legend: {
 					  show: false,
@@ -54,13 +59,13 @@ var IndexTopCoinsController = ['$scope', '$http', '$interval', '$location', '$wi
 					xAxis: [{
 					  type: 'category',
 					  boundaryGap: false,
-					  data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+					  data: date_text
 					}],
 					yAxis: [{
 					  type: 'value'
 					}],
 					series: [{
-					  name: 'Intent',
+					  name: 'Price',
 					  type: 'line',
 					  smooth: true,
 					  itemStyle: {
@@ -70,7 +75,7 @@ var IndexTopCoinsController = ['$scope', '$http', '$interval', '$location', '$wi
 						  }
 						}
 					  },
-					  data: [1320, 1132, 601, 234, 120, 90, 20]
+					  data: price_value
 					}]
 				  });
 			});
