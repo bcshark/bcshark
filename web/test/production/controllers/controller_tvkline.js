@@ -1,6 +1,11 @@
 "use strict";
+angular.module('MarketIndex', ['ngResource'])
 
-var TvKlineController = ['$scope', '$http', '$interval', '$window', 'MarketService', 'SymbolService', 'KlineService', function($scope, $http, $interval, $window, marketService, symbolService, klineService) {
+.service('ConfigService', ConfigService)
+.service('MarketService', MarketService)
+.service('SymbolService', SymbolService)
+.service('KlineService', KlineService)
+.controller('TvKlineController', ['$scope', '$http', '$interval', '$window', 'MarketService', 'SymbolService', 'KlineService', function($scope, $http, $interval, $window, marketService, symbolService, klineService) {
 	var upColor = '#ec0000';
 	var upBorderColor = '#8A0000';
 	var downColor = '#00da3c';
@@ -67,7 +72,7 @@ var TvKlineController = ['$scope', '$http', '$interval', '$window', 'MarketServi
 	function getMarketTicks() {
 		TradingView.onready(function() {
 			var widget = window.tvWidget = new TradingView.widget({
-				fullscreen: true,
+				fullscreen: false,
 				symbol: 'Index',
 				allow_symbol_change: true,
 				interval: '15',
@@ -107,4 +112,4 @@ var TvKlineController = ['$scope', '$http', '$interval', '$window', 'MarketServi
 		}
 	});
 	*/
-}];
+}]);
