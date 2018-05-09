@@ -6,7 +6,7 @@ from .utility import *
 
 class collector_binance(collector):
     DEFAULT_PERIOD = "1m"
-    DEFAULT_SIZE = 1
+    DEFAULT_SIZE = 60
 
     @property
     def market_name(this):

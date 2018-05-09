@@ -10,7 +10,7 @@ from .utility import *
 
 class collector_huobi(collector):
     DEFAULT_PERIOD = "1min"
-    DEFAULT_SIZE = 1
+    DEFAULT_SIZE = 60
     PATTERN_TICK = "market.([a-zA-Z]+).kline.1min"
 
     @property
@@ -82,7 +82,7 @@ class collector_huobi(collector):
             if symbol == '':
                 continue
 
-            url = "kline?Timestamp=%s&peroid=%s&size=%s&symbol=%s" % (timestamp, this.DEFAULT_PERIOD, this.DEFAULT_SIZE, symbol)
+            url = "kline?peroid=%s&size=%s&symbol=%s" % (this.DEFAULT_PERIOD, this.DEFAULT_SIZE, symbol)
             url = this.REST_URL + url
             ticks = this.http_request_json(url, None)
         
