@@ -254,6 +254,19 @@ def api_symbols():
     support_symbols = [{ "name": setting['default'][index], "title": setting['_title'][index] } for index in range(0, len(setting['default']))]
     return json.dumps(support_symbols)
 
+@app.route('/api/topcoins', methods=['GET'])
+def api_topcoins():
+    count = request.args.get('c', '')
+
+    top_coins = [
+        { "name": "Bitcoin", "symbol": "btcusdt", "latest_price": 231809 },	
+        { "name": "Ethereum", "symbol": "ethusdt", "latest_price": 231809 },	
+        { "name": "Ethereum Classic", "symbol": "etcusdt", "latest_price": 231809 },	
+        { "name": "EOS", "symbol": "eosusdt", "latest_price": 231809 }
+    ]
+
+    return json.dumps(top_coins)
+
 @app.route('/api/kline', methods=['GET'])
 def api_kline():
     market = request.args.get('m', '')
@@ -270,6 +283,58 @@ def api_kline():
         client.open()
         service = kline_service(client, settings)
         kline = service.get_kline_by_market_symbol(market, symbol, '1', settings['kline']['size'])
+    finally:
+        client.close()
+
+    if kline and kline.has_key('series'):
+        columns = kline['series'][0]['columns']
+        for i in range(0, len(columns)):
+            if columns[i] == 'time':
+                time_index = i
+            elif columns[i] == 'open':
+                open_index = i
+            elif columns[i] == 'close':
+                close_index = i
+            elif columns[i] == 'low':
+                low_index = i
+            elif columns[i] == 'high':
+                high_index = i
+
+        timezone_offset = settings['timezone_offset']
+
+        ticks = kline['series'][0]['values']
+        ticks.sort(lambda x, y: cmp(x[time_index], y[time_index]))
+
+        kline = [[
+            get_timestamp_str_short(tick[time_index], 0),
+            float(tick[open_index]),
+            float(tick[close_index]),
+            float(tick[low_index]),
+            float(tick[high_index])
+        ] for tick in ticks if not (tick[open_index] == None or tick[close_index] == None or tick[high_index] == None or tick[low_index] == None)]
+
+        return json.dumps(kline)
+    else:
+        return json.dumps({})
+
+@app.route('/api/trend', methods=['GET'])
+def api_trend():
+    symbol = request.args.get('s', '')
+
+    client = settings['db_adapter']
+    support_markets = settings['markets'].keys()
+    support_symbols = settings['symbols']['default']
+    to_time = int(time.time())
+    from_time = to_time - 7 * 24 * 3600
+
+
+    if not symbol in support_symbols:
+        return 'not supported'
+
+    try:
+        client.open()
+        service = kline_service(client, settings)
+        kline = service.get_trend_by_symbol(symbol, from_time, to_time, 'D', 7)
     finally:
         client.close()
 
