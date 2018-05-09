@@ -50,9 +50,6 @@ def tv_history():
     support_markets = settings['markets'].keys()
     support_symbols = settings['symbols']['default']
 
-    if not symbol == 'Index':
-        return 'not supported'
-
     try:
         client.open()
         service = kline_service(client, settings)
@@ -115,7 +112,6 @@ def tv_symbols():
     if symbol and not symbol == 'Index':
         support_symbols = settings['symbols']['default']
         support_symbols_title = settings['symbols']['_title']
-        support_markets = settings['markets'].keys()
 
         for index in range(len(support_symbols)):
             symbol = symbol.lower()
@@ -123,11 +119,10 @@ def tv_symbols():
             if symbol == support_symbols[index]:
                 title = support_symbols_title[index]
 
-                markets = [market for market in support_markets if settings['symbols'][market][index]]
                 ret = {
                     "name": title,
-                    "exchange-traded": markets,
-                    "exchange-listed": markets,
+                    "exchange-traded": "Market",
+                    "exchange-listed": "Market",
                     "timezone": "UTC",
                     "minmov": 1,
                     "minmov2": 0,
@@ -191,6 +186,9 @@ def tv_config():
         {
             "name": "All types",
             "value": ""
+        },{
+            "name": "Bitcoin",
+            "value": "bitcoin"
         }
     ]
 
@@ -234,7 +232,7 @@ def tv_search():
             markets = [market for market in support_markets if settings['symbols'][market][index]]
             results = [{
                 "description": title,
-                "fullname": title,
+                "fullname": symbol,
                 "exchange": market,
                 "symbol": symbol,
                 "type": "bitcoin",
