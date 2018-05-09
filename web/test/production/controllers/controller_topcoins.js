@@ -22,7 +22,6 @@ var IndexTopCoinsController = ['$scope', '$http', '$interval', '$location', '$wi
 	function getTopCoinChart(coin) {
 		if (coin && coin.symbol) {
 			klineService.market_index_trend(coin.symbol, function(resp) {
-				console.log(resp);
 				var echartLine = echarts.init(document.getElementById('coin_chart_' + coin.symbol));
 
 				var date_text = [];
