@@ -6,7 +6,7 @@ from .utility import *
 
 class collector_okcoin(collector):
     DEFAULT_PERIOD = "1min"
-    DEFAULT_SIZE = 1
+    DEFAULT_SIZE = 5
 
     @property
     def market_name(this):
@@ -33,15 +33,12 @@ class collector_okcoin(collector):
         return tick
 
     def collect_rest(this):
-        symbol_index = -1
 
-        time_second = int(time.time())
-        time_second = time_second - time_second % 60 - 300 ## possible to miss data each 5 mins ?
         for symbol in this.symbols_market:
             if symbol == '':
                 continue
 
-            url = "kline.do?symbol=%s&type=%s&size=%d&since=%d" % (symbol, this.DEFAULT_PERIOD, this.DEFAULT_SIZE, time_second)
+            url = "kline.do?symbol=%s&type=%s&size=%d" % (symbol, this.DEFAULT_PERIOD, this.DEFAULT_SIZE)
             url = this.REST_URL + url
             ticks = this.http_request_json(url, None)
 
