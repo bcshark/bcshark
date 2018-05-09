@@ -5,5 +5,9 @@ var KlineService = ['$resource', '$http', 'ConfigService', function($resource, $
         $resource(config_service.market_index_kline).query({ market: market_name, symbol: symbol_name }, callback);
 	};
 
+	service.market_index_trend = function(symbol_name, callback) {
+        $resource(config_service.market_index_trend).query({ symbol: symbol_name }, callback);
+	};
+
 	return service;
 }];

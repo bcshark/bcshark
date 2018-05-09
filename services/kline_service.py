@@ -42,3 +42,10 @@ class kline_service(object):
         rows = this.client.query(sql, epoch = 's')
 
         return rows 
+
+    def get_trend_by_symbol(this, symbol, from_time, to_time, resolution, size):
+        sql = "select (mean(low) + mean(high)) / 2 as price from market_ticks where symbol = '%s' and time >= %d and time <= %d group by time(%s) order by time desc limit %d" % (symbol, from_time * 1e9, to_time * 1e9, this.get_influx_timegroup_by_resolution(resolution), size)
+        print sql
+        rows = this.client.query(sql, epoch = 's')
+
+        return rows 
