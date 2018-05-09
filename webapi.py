@@ -343,14 +343,8 @@ def api_trend():
         for i in range(0, len(columns)):
             if columns[i] == 'time':
                 time_index = i
-            elif columns[i] == 'open':
-                open_index = i
-            elif columns[i] == 'close':
-                close_index = i
-            elif columns[i] == 'low':
-                low_index = i
-            elif columns[i] == 'high':
-                high_index = i
+            elif columns[i] == 'price':
+                price_index = i
 
         timezone_offset = settings['timezone_offset']
 
@@ -359,11 +353,8 @@ def api_trend():
 
         kline = [[
             get_timestamp_str_short(tick[time_index], 0),
-            float(tick[open_index]),
-            float(tick[close_index]),
-            float(tick[low_index]),
-            float(tick[high_index])
-        ] for tick in ticks if not (tick[open_index] == None or tick[close_index] == None or tick[high_index] == None or tick[low_index] == None)]
+            float(tick[price_index])
+        ] for tick in ticks if not (tick[price_index] == None)]
 
         return json.dumps(kline)
     else:
