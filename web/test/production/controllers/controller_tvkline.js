@@ -73,12 +73,14 @@ angular.module('MarketIndex', ['ngResource'])
 		TradingView.onready(function() {
 			var widget = window.tvWidget = new TradingView.widget({
 				fullscreen: false,
+				height: 500,
+				width: '100%',
 				symbol: 'Index',
 				allow_symbol_change: true,
 				interval: '15',
 				container_id: "kline-chart",
 				datafeed: new Datafeeds.UDFCompatibleDatafeed("http://18.218.165.228:5000/tv"),
-				library_path: "/public/javascript/charting_library/",
+				library_path: "public/javascript/charting_library/",
 				locale: getParameterByName('lang') || "en",
 				drawings_access: { type: 'black', tools: [ { name: "Regression Trend" } ] },
 				disabled_features: [ "study_templates", "left_toolbar", "control_bar", "timeframes_toolbar", "header_undo_redo", "header_interval_dialog_button", "header_screenshot", "header_saveload", "display_market_status" ],

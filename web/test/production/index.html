@@ -149,16 +149,14 @@
 
             <div class="row">
               <div class="col-md-12 col-sm-12 col-xs-12">
-                <div class="dashboard_graph x_panel">
-                  <div class="row x_title">
+                <div class="dashboard_graph x_panel" style="padding: 7px 0px;">
+                  <div class="row x_title" style="margin-left: 6px; margin-right: 6px; margin-bottom: 0px;">
                     <div class="col-md-12">
                       <h3>K20 Index <small>The Kuang's Index</small></h3>
                     </div>
                   </div>
-                  <div class="x_content" ng-controller="TvKlineController">>
-                    <div class="demo-container" style="height:250px">
-                      <div id="kline-chart" class="demo-placeholder"></div>
-                    </div>
+                  <div class="x_content" ng-controller="TvKlineController">
+					  <div id="kline-chart" class="demo-placeholder" style="height:500px"></div>
                   </div>
                 </div>
               </div>
@@ -470,7 +468,7 @@
 	<script src="public/javascript/datafeeds/bundle.js"></script>
 
     <!-- Custom Theme Scripts -->
-	<!-- <script src="../build/js/custom.min.js"></script> -->
+	<script src="../build/js/custom.min.js"></script>
 	<script src="config/config.js"></script>
 	<script src="services/service_market.js"></script>
 	<script src="services/service_symbol.js"></script>
