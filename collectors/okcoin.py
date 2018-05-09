@@ -6,7 +6,7 @@ from .utility import *
 
 class collector_okcoin(collector):
     DEFAULT_PERIOD = "1min"
-    DEFAULT_SIZE = 60
+    DEFAULT_SIZE = 5
 
     @property
     def market_name(this):

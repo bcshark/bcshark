@@ -6,7 +6,7 @@ from .collector import collector
 from .utility import *
 
 class collector_gdax(collector):
-    DEFAULT_SIZE = 60
+    DEFAULT_SIZE = 5
     DEFAULT_PERIOD = "1min"
 
     @property
