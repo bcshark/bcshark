@@ -161,6 +161,7 @@ class collector(object):
         sql = "select time, market, symbol, high, low, open, close from market_ticks where (symbol = '%s' or symbol = '%s') and time >= %s and time < %s  group by market, symbol order by time desc limit 1" % (symbol_name_usdt, symbol_name_btc, startSecond*1000000000, startSecond*1000000000+60000000000)
         this.logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
+        this.logger.debug(result)
         if len(result) == 0 or not result.has_key('series') or result['series'][0]['values'][0][1] == None:
             this.logger.warn('k10 calc Warning - market_ticks table has no previous minute price for symbol: %s , %s ', symbol_name_usdt, symbol_name_btc)
             return None
