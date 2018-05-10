@@ -263,7 +263,7 @@ def api_topcoins():
 
     if rank:
         top_coins = [
-            { "name": coin[1], "symbol": "%susdt" % coin[1].lower(), "latest_price": coin[2], "rank": coin[3], "fullname": coin[4], "market_cap_usd": coin[5], "percent_change_24h p": coin[6], "volume_usd_24h": coin[7] }
+            { "name": coin[1], "symbol": "%susdt" % coin[1].lower(), "latest_price": coin[2], "rank": coin[3], "fullname": coin[4], "market_cap_usd": coin[5], "percent_change_24h": coin[6], "volume_usd_24h": coin[7] }
             for coin in rank
         ]
 
