@@ -50,12 +50,8 @@ def tv_history():
     support_markets = settings['markets'].keys()
     support_symbols = settings['symbols']['default']
 
-    try:
-        client.open()
-        service = kline_service(client, settings)
-        kline =  service.get_tvkline_by_market_symbol(symbol, long(from_time), long(to_time), resolution, settings['kline']['size'])
-    finally:
-        client.close()
+    service = kline_service(client, settings)
+    kline =  service.get_tvkline_by_market_symbol(symbol, long(from_time), long(to_time), resolution, settings['kline']['size'])
 
     if kline and kline.has_key('series'):
         columns = kline['series'][0]['columns']
@@ -279,12 +275,8 @@ def api_kline():
     if (not market == 'market_index') and (not market in support_markets or not symbol in support_symbols):
         return 'not supported'
 
-    try:
-        client.open()
-        service = kline_service(client, settings)
-        kline = service.get_kline_by_market_symbol(market, symbol, '1', settings['kline']['size'])
-    finally:
-        client.close()
+    service = kline_service(client, settings)
+    kline = service.get_kline_by_market_symbol(market, symbol, '1', settings['kline']['size'])
 
     if kline and kline.has_key('series'):
         columns = kline['series'][0]['columns']
@@ -325,18 +317,13 @@ def api_trend():
     support_markets = settings['markets'].keys()
     support_symbols = settings['symbols']['default']
     to_time = int(time.time())
-    from_time = to_time - 7 * 24 * 3600
-
+    from_time = to_time - 4 * 24 * 3600
 
     if not symbol in support_symbols:
         return 'not supported'
 
-    try:
-        client.open()
-        service = kline_service(client, settings)
-        kline = service.get_trend_by_symbol(symbol, from_time, to_time, 'D', 7)
-    finally:
-        client.close()
+    service = kline_service(client, settings)
+    kline = service.get_trend_by_symbol(symbol, from_time, to_time, 'D')
 
     if kline and kline.has_key('series'):
         columns = kline['series'][0]['columns']
@@ -368,5 +355,7 @@ if __name__ == '__main__':
     settings['db_adapter'] = influxdb_adapter(settings['influxdb'])
     #settings['db_adapter'] = mysqldb_adapter(settings['mysqldb'])
     settings['symbols'] = get_symbols_from_csv(settings['symbols']['path'])
+
+    settings['db_adapter'].open()
 
     app.run(debug = True, threaded = True, host = '0.0.0.0', port = 5000)
