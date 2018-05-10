@@ -3,7 +3,7 @@ _title,BTC-USDT,EOS-BTC,ETH-BTC,ETC-BTC,XRP-BTC,BCH-BTC,LTC-BTC,ADA-BTC,XLM-BTC,
 huobi,btcusdt,,,,,,,,,,,,,,,,,,,ethusdt,xrpusdt,bchusdt,eosusdt,ltcusdt,adausdt,,,neousdt,,dashusdt,trxusdt,xemusdt,etcusdt,venusdt,qtumusdt,omgusdt,
 binance,BTCUSDT,EOSBTC,,ETCBTC,XRPBTC,,,,XLMBTC,IOTABTC,,XMRBTC,DASHBTC,TRXBTC,XEMBTC,VENBTC,,OMGBTC,,ETHUSDT,,,,LTCUSDT,ADAUSDT,,,NEOUSDT,,,,,,,QTUMUSDT,,BNBUSDT
 bitfinex,tBTCUSD,,,,,,,,,,,,,,,,,,,tETHUSD,tXRPUSD,tBCHUSD,tEOSUSD,tLTCUSD,,,,tNEOUSD,tXMRUSD,,tTRXUSD,,tETCUSD,,tQTMUSD,tOMGUSD,
-okex,btc_usd,,,,,,,,,iota_btc,,,,,,,,,,eth_usd,xrp_usd,bch_usd,eos_usd,ltc_usd,,,,,,,,,etc_usd,,,,
+okex,btc_usd,,,,,,,,,,,,,,,,,,,eth_usd,xrp_usd,bch_usd,eos_usd,ltc_usd,,,,,,,,,etc_usd,,,,
 okcoin,btc_usd,,,,,,,,,,,,,,,,,,,eth_usd,,bch_usd,,ltc_usd,,,,,,,,,etc_usd,,,,
 poloniex,USDT_BTC,,,,,,,,,,,,,,BTC_XEM,,,BTC_OMG,,USDT_ETH,USDT_XRP,USDT_BCH,,USDT_LTC,,,,,USDT_XMR,USDT_DASH,,,USDT_ETC,,,,
 gdax,BTC-USD,,,,,,,,,,,,,,,,,,,ETH-USD,,BCH-USD,,LTC-USD,,,,,,,,,,,,,
