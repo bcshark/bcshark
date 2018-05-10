@@ -45,7 +45,16 @@ class kline_service(object):
 
     def get_trend_by_symbol(this, symbol, from_time, to_time, resolution):
         sql = "select (mean(low) + mean(high)) / 2 as price from market_ticks where symbol = '%s' and time >= %d and time <= %d group by time(%s) order by time desc" % (symbol, from_time * 1e9, to_time * 1e9, this.get_influx_timegroup_by_resolution(resolution))
-        print sql
         rows = this.client.query(sql, epoch = 's')
 
         return rows 
+
+    def query_symbol_daily_rank(this, from_time, to_time, count):
+        sql = "select time, symbol, price_usd, rank from k10_daily_rank where time >= %s and time <= %s order by time desc limit %d" % (from_time * 1e9, to_time, * 1e9, 29)
+        result = this.client.query(sql, epoch = 's')
+        if len(result) == 0 or not result.has_key('series'):
+            return None
+        ranks = result['series'][0]['values']
+        ranks.sort(lambda x, y: cmp(x[3], y[3]))
+        return ranks[:count]
+

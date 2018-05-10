@@ -254,14 +254,22 @@ def api_symbols():
 def api_topcoins():
     count = request.args.get('c', '')
 
-    top_coins = [
-        { "name": "Bitcoin", "symbol": "btcusdt", "latest_price": 231809 },	
-        { "name": "Ethereum", "symbol": "ethusdt", "latest_price": 231809 },	
-        { "name": "Ethereum Classic", "symbol": "etcusdt", "latest_price": 231809 },	
-        { "name": "EOS", "symbol": "eosusdt", "latest_price": 231809 }
-    ]
+    client = settings['db_adapter']
+    service = kline_service(client, settings)
 
-    return json.dumps(top_coins)
+    to_time = long(time.time())
+    from_time = to_time - 24 * 3600
+    rank = service.query_symbol_daily_rank(from_time, to_time, count)
+
+    if rank:
+        top_coins = [
+            { "name": coin[1], "symbol": "%susdt" % coin[1].lower(), "latest_price": coin[2] }
+            for coin in rank
+        ]
+
+        return json.dumps(top_coins)
+    else:
+        return json.dumps({})
 
 @app.route('/api/kline', methods=['GET'])
 def api_kline():
