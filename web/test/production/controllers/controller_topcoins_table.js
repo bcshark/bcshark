@@ -1,8 +1,8 @@
 "use strict";
 
-var IndexTopCoinsController = ['$scope', '$http', '$interval', '$location', '$window', 'MarketService', 'SymbolService', 'KlineService', function($scope, $http, $interval, $location, $window, marketService, symbolService, klineService) {
-	var DEFAULT_TOP_COINS_COUNT = 4;
-	var SHOW_SYMBOL_CHART = true;
+var IndexTopCoinsTableController = ['$scope', '$http', '$interval', '$location', '$window', 'MarketService', 'SymbolService', 'KlineService', function($scope, $http, $interval, $location, $window, marketService, symbolService, klineService) {
+	var DEFAULT_TOP_COINS_COUNT = 10;
+	var SHOW_SYMBOL_CHART = false;
 
 	function getTopCoinChart(coin) {
 		if (coin && coin.symbol) {
