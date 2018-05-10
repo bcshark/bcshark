@@ -39,9 +39,9 @@ var IndexTopCoinsController = ['$scope', '$http', '$interval', '$location', '$wi
 					  subtext: 'Subtitle'
 					},
 					grid: {
-						top: 0,
+						top: 20,
 						left: 40,
-						right: 0,
+						right: 20,
 						bottom: 20,
 					},
 					tooltip: {
@@ -88,13 +88,7 @@ var IndexTopCoinsController = ['$scope', '$http', '$interval', '$location', '$wi
 					$scope.top_coins = resp;
 
 					for (var index = 0; index < resp.length; index++) {
-						var init_chart = function(coin) {
-							$interval(function() { 
-								getTopCoinChart(coin); 
-							}, 200, 1)
-						};
-
-						init_chart(resp[index]);
+						getTopCoinChart(resp[index]);
 					}
 				}
 			}, function(resp) {
