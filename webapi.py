@@ -259,7 +259,7 @@ def api_topcoins():
 
     to_time = long(time.time())
     from_time = to_time - 24 * 3600
-    rank = service.query_symbol_daily_rank(from_time, to_time, count)
+    rank = service.query_symbol_daily_rank(from_time, to_time, int(count))
 
     if rank:
         top_coins = [
