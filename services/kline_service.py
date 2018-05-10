@@ -50,7 +50,7 @@ class kline_service(object):
         return rows 
 
     def query_symbol_daily_rank(this, from_time, to_time, count):
-        sql = "select time, symbol, price_usd, rank from k10_daily_rank where time >= %d and time <= %d order by time desc limit %d" % (from_time * 1e9, to_time * 1e9, 29)
+        sql = "select time, symbol, price_usd, rank, name, market_cap_usd, rcent_change_24h, volume_usd_24h from k10_daily_rank where time >= %d and time <= %d order by time desc limit %d" % (from_time * 1e9, to_time * 1e9, 29)
         result = this.client.query(sql, epoch = 's')
         if len(result) == 0 or not result.has_key('series'):
             return None
