@@ -9,6 +9,7 @@ from .utility import *
 
 class collector_k10_index_calc(collector):
     DEFAULT_PERIOD = "1min"
+    MULTIPLY_RATIO = 10
 
     @property
     def market_name(this):
@@ -76,20 +77,28 @@ class collector_k10_index_calc(collector):
         cal_length = len(ranks)
         this.logger.debug('k10 calc - length of rank object generated: %s', cal_length)
         total_high_weight = total_low_weight = total_open_weight = total_close_weight = 0
+        miss_price_market = []
 
         for rank in ranks:
+            ticks = []
             print(rank.symbol[0], rank.symbol[1], start_second)
             tick_result = this.query_previous_min_price(rank.symbol[0], rank.symbol[1], start_second)
             if tick_result == None:
-                #remove this rank from array and re-calculate the ratio for all ranks
-                #rank_index = ranks.index(rank)
-                #del ranks[rank_index]
-                #ranks = this.fillRatio(ranks)
-                tick_result_exist = this.query_latest_price_exist(rank.symbol[0], rank.symbol[1])
+                miss_price_market = this.find_miss_price_market(rank.symbol, None)
+            else:
+                ticks = this.translate_ticks(tick_result)
+                miss_price_market = this.find_miss_price_market(rank.symbol, ticks)
+            for miss_market in miss_price_market:
+                tick_result_exist = this.query_latest_price_exist(rank.symbol[0], rank.symbol[1], miss_market, start_second)
                 if tick_result_exist == None:
                     continue
-                tick_result = tick_result_exist
-            ticks = this.translate_ticks(tick_result)
+                miss_ticks = this.translate_ticks(tick_result_exist)
+                ticks.extend(miss_ticks)
+                this.logger.debug('k10 calc - Tick object appended for calc: %s, %s, %s, %s, %s, %s, %s', miss_ticks.time, miss_ticks.market, miss_ticks.symbol, miss_ticks.high, miss_ticks.low, miss_ticks.open, miss_ticks.close)
+            if len(ticks) == 0:
+                this.logger.error('k10 calc Error - No price found, bypass this symbol: %s, %s ', rank.symbol[0], rank.symbol[1])
+                cal_length = cal_length - 1 ###TODO: by pass one symbol in index calc need to re-calculate the ratio for each existing symbol again
+                continue
             avg_high = this.calculateSymbolAvgPrice(ticks, 'high')
             total_high_weight = total_high_weight + avg_high * rank.cap_ratio
             avg_low = this.calculateSymbolAvgPrice(ticks, 'low')
@@ -103,10 +112,10 @@ class collector_k10_index_calc(collector):
             this.logger.error('k10 calc Error - validated symbol weight is 0 ! program exit')
             return
         index.timezone_offset = this.timezone_offset
-        index.high = (total_high_weight / cal_length) * 100
-        index.low = (total_low_weight / cal_length) * 100
-        index.open = (total_open_weight / cal_length) * 100
-        index.close = (total_close_weight / cal_length) * 100
+        index.high = (total_high_weight / cal_length) * this.MULTIPLY_RATIO
+        index.low = (total_low_weight / cal_length) * this.MULTIPLY_RATIO
+        index.open = (total_open_weight / cal_length) * this.MULTIPLY_RATIO
+        index.close = (total_close_weight / cal_length) * this.MULTIPLY_RATIO
         index.time = start_second
         index.period = '1min'
 
@@ -165,6 +174,39 @@ class collector_k10_index_calc(collector):
         avg_price = sum_price/(len(ticks))
         this.logger.debug('k10 calc - Calculated Avg Price %s Is: %s for symbol: %s', price_field, avg_price, ticks[0].symbol)
         return avg_price
+
+    def find_miss_price_market(this, symbols, ticks):
+        if symbols is None:
+            return None
+        miss_market = []
+        symbol_usdt = symbols[0]
+        symbol_btc = symbols[1]
+        index_usdt = this.symbols_all_market['default'].index(symbol_usdt)
+        index_btc = this.symbols_all_market['default'].index(symbol_btc)
+        valid_markets = this.find_all_valid_markets()
+        if ticks == None:
+            for key in valid_markets:
+                if this.symbols_all_market[key][index_usdt] != '' or this.symbols_all_market[key][index_btc] != '':
+                    miss_market.append(key)
+        else:
+            for key in valid_markets:
+                market_exist = False
+                for tick in ticks:
+                    if tick.market == key:
+                        market_exist = True
+                        break
+                if not market_exist:
+                    if this.symbols_all_market[key][index_usdt] != '' or this.symbols_all_market[key][index_btc] != '':
+                        miss_market.append(key)
+        return miss_market
+
+    def find_all_valid_markets(this):
+        valid_markets = []
+        symbol_dict = this.symbols_all_market
+        for key in symbol_dict:
+            if key != 'default' and key != '_title' and key != 'bittrex' and key != 'bitfinex' and key != 'bitstamp':
+                valid_markets.append(key)
+        return valid_markets
 
     def getSymbol(this, rank_symbol):
         if "BTC" == rank_symbol:
