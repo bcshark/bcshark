@@ -11,17 +11,24 @@ var IndexTopCoinsController = ['$scope', '$http', '$interval', '$location', '$wi
 
 				var date_text = [];
 				var price_value = [];
+				var max_value = resp[0]["1"];
+				var min_value = resp[0]["1"];
 
 				for (var index = 0; index < 5; index++) {
+					var price = resp[index]["1"];
+
 					date_text.push(resp[index]["0"]);
-					price_value.push(resp[index]["1"]);
+					price_value.push(price);
+
+					if (price > max_value) max_value = price; 
+					if (price < min_value) min_value = price; 
 				}
 
 				echartLine.setOption({
 					title: {
 					  show: false,
-					  text: 'Line Graph',
-					  subtext: 'Subtitle'
+					  text: 'Symbol Price',
+					  subtext: 'Symbol Price'
 					},
 					grid: {
 						top: 20,
@@ -46,18 +53,16 @@ var IndexTopCoinsController = ['$scope', '$http', '$interval', '$location', '$wi
 					  data: date_text
 					}],
 					yAxis: [{
-					  type: 'value'
+					  type: 'value',
+					  min: min_value * 0.9,
+					  max: max_value * 1.1
 					}],
 					series: [{
 					  name: 'Price',
 					  type: 'line',
 					  smooth: true,
 					  itemStyle: {
-						normal: {
-						  areaStyle: {
-							type: 'default'
-						  }
-						}
+						normal: { }
 					  },
 					  data: price_value
 					}]

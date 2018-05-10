@@ -73,7 +73,7 @@ var TvKlineController = ['$scope', '$http', '$interval', '$window', 'MarketServi
 				symbol: 'Index',
 				allow_symbol_change: true,
 				symbol_search_request_delay: 1000,
-				interval: '15',
+				interval: '1',
 				container_id: "kline-chart",
 				datafeed: new Datafeeds.UDFCompatibleDatafeed("http://18.218.165.228:5000/tv"),
 				library_path: "public/javascript/charting_library/",
