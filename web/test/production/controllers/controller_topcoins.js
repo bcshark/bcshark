@@ -27,7 +27,7 @@ var IndexTopCoinsController = ['$scope', '$http', '$interval', '$location', '$wi
 				var date_text = [];
 				var price_value = [];
 
-				for (var index = 0; index < 7; index++) {
+				for (var index = 0; index < 5; index++) {
 					date_text.push(resp[index]["0"]);
 					price_value.push(resp[index]["1"]);
 				}
@@ -40,9 +40,9 @@ var IndexTopCoinsController = ['$scope', '$http', '$interval', '$location', '$wi
 					},
 					grid: {
 						top: 0,
-						left: 0,
+						left: 40,
 						right: 0,
-						bottom: 0,
+						bottom: 20,
 					},
 					tooltip: {
 					  trigger: 'axis',
