@@ -66,8 +66,8 @@ var IndexTopCoinsTableController = ['$scope', '$http', '$interval', '$location',
 		}
 	}
 
-	function getTopCoins(count) {
-		symbolService.top_coins(count,
+	$scope.getTopCoins = function() {
+		symbolService.top_coins(DEFAULT_TOP_COINS_COUNT,
 			function(resp) {
 				if (resp && resp instanceof Array) {
 					$scope.top_coins = resp;
@@ -89,5 +89,5 @@ var IndexTopCoinsTableController = ['$scope', '$http', '$interval', '$location',
 	//getMarkets();
 	//getSymbols();
 	
-	getTopCoins(DEFAULT_TOP_COINS_COUNT);
+	$scope.getTopCoins();
 }];
