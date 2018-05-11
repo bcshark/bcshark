@@ -1,7 +1,7 @@
 "use strict";
 
 var TvKlineController = ['$scope', '$http', '$interval', '$window', 'MarketService', 'SymbolService', 'KlineService', function($scope, $http, $interval, $window, marketService, symbolService, klineService) {
-	var ENABLE_MOVING_AVERAGE = false;
+	var ENABLE_MOVING_AVERAGE = true;
 
 	var upColor = '#ec0000';
 	var upBorderColor = '#8A0000';
