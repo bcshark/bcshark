@@ -1,6 +1,8 @@
 "use strict";
 
 var TvKlineController = ['$scope', '$http', '$interval', '$window', 'MarketService', 'SymbolService', 'KlineService', function($scope, $http, $interval, $window, marketService, symbolService, klineService) {
+	var ENABLE_MOVING_AVERAGE = false;
+
 	var upColor = '#ec0000';
 	var upBorderColor = '#8A0000';
 	var downColor = '#00da3c';
@@ -87,12 +89,14 @@ var TvKlineController = ['$scope', '$http', '$interval', '$window', 'MarketServi
 				user_id: 'market_index'
 			});
 
-			widget.onChartReady(function() {
-				widget.chart().createStudy('Moving Average', false, true, [ 5, "close", 0 ]);
-				widget.chart().createStudy('Moving Average', false, true, [ 10, "close", 0 ]);
-				widget.chart().createStudy('Moving Average', false, true, [ 30, "close", 0 ]);
-				widget.chart().createStudy('Moving Average', false, true, [ 60, "close", 0 ]);
-			});
+			if (ENABLE_MOVING_AVERAGE) {
+				widget.onChartReady(function() {
+					widget.chart().createStudy('Moving Average', false, true, [ 5, "close", 0 ]);
+					widget.chart().createStudy('Moving Average', false, true, [ 10, "close", 0 ]);
+					widget.chart().createStudy('Moving Average', false, true, [ 30, "close", 0 ]);
+					widget.chart().createStudy('Moving Average', false, true, [ 60, "close", 0 ]);
+				});
+			}
 		});
 	}
 
