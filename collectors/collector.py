@@ -138,6 +138,7 @@ class collector(object):
     def save_k10_daily_rank(this, rank):
         symbol_name = rank.symbol
         sql = "select time, rank from %s where symbol = '%s' order by time desc limit 1" % (this.market_name, symbol_name)
+        this.logger.debug(sql)
         ret = this.db_adapter.query(sql, epoch = 's')
         if ret and ret.has_key('series'):
             latest_timestamp = ret['series'][0]['values'][0][0]

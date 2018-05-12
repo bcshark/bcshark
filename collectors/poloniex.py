@@ -26,8 +26,8 @@ class collector_poloniex(collector):
         tick.high = float(format(obj["high"], '.12f'))
         tick.low = float(format(obj["low"], '.12f'))
         tick.close = float(format(obj["close"], '.12f'))
-        tick.volume = float(format(obj["volume"], '.12f'))
-        tick.amount = 0.0
+        tick.volume = float(format(obj["quoteVolume"], '.12f'))
+        tick.amount = float(format(obj["volume"], '.12f'))
         tick.count = 0.0
         tick.period = this.get_generic_period_name()
 
