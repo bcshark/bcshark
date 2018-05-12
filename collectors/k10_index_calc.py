@@ -24,7 +24,7 @@ class collector_k10_index_calc(collector):
             rank = k10_rank()
             symbol = this.getSymbol(obj['values'][0][1])
             if symbol == None:
-                this.logger.debug('k10 calc - Warning: New symbol found on top 20, no price collected, bypass it!: %s', obj[1])
+                this.logger.debug('k10 calc - Warning: New symbol found on top 20, no price collected, bypass it!: %s', obj['values'][0][1])
                 continue
             rank.symbol = symbol
             rank.time = long(obj['values'][0][0])
@@ -67,7 +67,7 @@ class collector_k10_index_calc(collector):
             this.logger.error('k10 calc Error - translate k10 rank object length is 0, program exit %s', rank_result)
             return
         if len(ranks) != 10:
-            this.logger.error('k10 calc Error - rank length generated: %s is not 10! ', len(ranks))
+            this.logger.error('k10 calc Error - rank length generated: %s is not 10 program exit!', len(ranks))
             return
         ranks = this.fillRatio(ranks)
 

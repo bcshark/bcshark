@@ -31,8 +31,8 @@ class collector_huobi(collector):
         tick.close = float(obj['close'])
         tick.low = float(obj['low'])
         tick.high = float(obj['high'])
-        tick.amount = float(obj['amount'])
-        tick.volume = float(obj['vol'])
+        tick.amount = float(obj['vol'])
+        tick.volume = float(obj['amount'])
         tick.count = float(obj['count'])
         tick.period = this.get_generic_period_name(this.period)
 

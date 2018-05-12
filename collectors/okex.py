@@ -25,8 +25,8 @@ class collector_okex(collector):
         tick.high = float(obj[2])
         tick.low = float(obj[3])
         tick.close = float(obj[4])
-        tick.volume = float(obj[5])
-        tick.amount = 0.0
+        tick.volume = float(obj[6])
+        tick.amount = float(obj[5])
         tick.count = 0.0
         tick.period = this.get_generic_period_name()
 
