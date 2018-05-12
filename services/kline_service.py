@@ -54,7 +54,10 @@ class kline_service(object):
         result = this.client.query(sql, epoch = 's')
         if len(result) == 0 or not result.has_key('series'):
             return None
-        ranks = result['series'][0]['values']
-        ranks.sort(lambda x, y: cmp(x[3], y[3]))
-        return ranks[:count]
 
+        ranks = result['series'][0]['values']
+        # remove dupliated symbols (same name)
+        ranks = reduce(lambda collection, item: filter(lambda x: x[4] != item[4], collection) + [item], [[],] + ranks)
+        ranks.sort(lambda x, y: cmp(x[3], y[3]))
+
+        return ranks[:count]
