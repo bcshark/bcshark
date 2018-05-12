@@ -46,3 +46,11 @@ class k10_index(object):
     @period.setter
     def period(this, value):
         this._period = value
+
+    @property
+    def volume(this):
+        return this._volume
+
+    @volume.setter
+    def volume(this, value):
+        this._volume = value

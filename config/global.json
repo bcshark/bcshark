@@ -103,12 +103,19 @@
 			"title": "k10_daily_rank",
 			"order": 10,
 			"api": {
-				"rest": "https://api.coinmarketcap.com/v1/ticker/?limit=30"
+				"rest": "https://api.coinmarketcap.com/v2/ticker/"
 			}
 		},
 		"k10_index_calc": {
 			"title": "k10_index_calc",
 			"order": 11,
+			"api": {
+				"rest": ""
+			}
+		},
+		"market_ticks_validator": {
+			"title": "market_ticks_validator",
+			"order": 12,
 			"api": {
 				"rest": ""
 			}
