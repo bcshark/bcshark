@@ -20,7 +20,7 @@ class collector_binance(collector):
     def translate(this, obj):
         tick = market_tick()
 
-        tick.time = long(obj[6] / 1000)
+        tick.time = long(obj[0] / 1000)
         tick.timezone_offset = this.timezone_offset
         tick.open = float(obj[1])
         tick.close = float(obj[4])

@@ -84,14 +84,11 @@ class influxdb_adapter(database_adapter):
             },
             'time': get_timestamp_str(long(k10_rank.time)+k10_rank.timezone_offset, k10_rank.timezone_offset),
             'fields': {
-                #'time': long(k10_rank.time) + k10_rank.timezone_offset + k10_rank.timezone_offset,
                 'id': k10_rank.id,
                 'name': k10_rank.name,
                 'price_usd': float(k10_rank.price_usd),
-                'price_btc': float(k10_rank.price_btc),
                 'volume_usd_24h': float(k10_rank.volume_usd_24h),
                 'market_cap_usd': float(k10_rank.market_cap_usd),
-                'available_supply': float(k10_rank.available_supply),
                 'total_supply': float(k10_rank.total_supply),
                 'max_supply': float(k10_rank.max_supply),
                 'percent_change_1h': float(k10_rank.percent_change_1h),
@@ -117,6 +114,7 @@ class influxdb_adapter(database_adapter):
                 'low': float(k10_index['low']),
                 'open': float(k10_index['open']),
                 'close': float(k10_index['close']),
+                'volume': float(k10_index['volume']),
                 'period': k10_index['period']
             }
         }
