@@ -21,7 +21,7 @@
 		<link href="../vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
 		
 		<!-- Custom Theme Style -->
-		<link href="../build/css/custom.min.css" rel="stylesheet">
+		<link href="../build/css/custom.dark.min.css" rel="stylesheet">
 		<link rel="stylesheet" type="text/css" href="public/stylesheet/site.css">
 	</head>
 
@@ -114,7 +114,7 @@
 				<div class="right_col" role="main">
 					<div class="">
 						<div class="row top_tiles" style="margin: 10px 0;" ng-controller="IndexTopCoinsController">
-							<div class="col-md-3 col-sm-3 col-xs-6 tile" ng-repeat="coin in top_coins">
+							<div class="col-md-3 col-sm-3 col-xs-6 tile" ng-repeat="coin in top_coins" style="background-color: #282828; border: 2px solid #141414;">
 								<span>{{ coin.name }}</span>
 								<h2>{{ coin.latest_price | currency }}</h2>
 								<canvas id="{{ 'coin_chart_' + coin.symbol }}" style="display: inline-block; vertical-align: top; width: 100%; height: 125px;"></canvas>
@@ -140,7 +140,7 @@
 
 
 						<div class="row">
-							<div class="col-md-4 col-sm-6 col-xs-12 widget_tally_box">
+							<div class="col-md-6 col-sm-6 col-xs-12 widget_tally_box">
 								<div class="x_panel fixed_height_480" ng-controller="IndexTopCoinsTableController">
 									<div class="x_title">
 										<h2>Top 10</h2>
@@ -153,7 +153,7 @@
 										<div class="clearfix"></div>
 									</div>
 									<div class="x_content">
-										<table class="table table-striped">
+										<table class="table">
 										  <thead>
 											<tr>
 											  <th>#</th>
@@ -175,7 +175,7 @@
 								</div>
 							</div>
 
-							<div class="col-md-4 col-sm-6 col-xs-12 widget_tally_box">
+							<div class="col-md-6 col-sm-6 col-xs-12 widget_tally_box">
 								<div class="x_panel fixed_height_480" ng-controller="IndexNewsController">
 									<div class="x_title">
 										<h2>News</h2>
@@ -194,50 +194,6 @@
 											<div class="ns-item-content">{{ item.shortDescription }}</div>
 											<div class="ns-item-desc">{{ item.published * 1000 | date: 'yyyy-MM-dd' }}</div>
 										</div>	
-									</div>
-								</div>
-							</div>
-
-							<div class="col-md-4 col-sm-6 col-xs-12">
-								<div class="x_panel fixed_height_480">
-									<div class="x_title">
-										<h2>Incomes <small>Sessions</small></h2>
-										<ul class="nav navbar-right panel_toolbox">
-											<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-											</li>
-											<li class="dropdown">
-												<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-												<ul class="dropdown-menu" role="menu">
-													<li><a href="#">Settings 1</a>
-													</li>
-													<li><a href="#">Settings 2</a>
-													</li>
-												</ul>
-											</li>
-											<li><a class="close-link"><i class="fa fa-close"></i></a>
-											</li>
-										</ul>
-										<div class="clearfix"></div>
-									</div>
-									<div class="x_content">
-										<div class="dashboard-widget-content">
-											<ul class="quick-list">
-												<li><i class="fa fa-bars"></i><a href="#">Subscription</a></li>
-												<li><i class="fa fa-bar-chart"></i><a href="#">Auto Renewal</a> </li>
-												<li><i class="fa fa-support"></i><a href="#">Help Desk</a> </li>
-												<li><i class="fa fa-heart"></i><a href="#">Donations</a> </li>
-											</ul>
-
-											<div class="sidebar-widget">
-												<h4>Goal</h4>
-												<canvas width="150" height="80" id="chart_gauge_02" class="" style="width: 160px; height: 100px;"></canvas>
-												<div class="goal-wrapper">
-													<span class="gauge-value pull-left">$</span>
-													<span id="gauge-text2" class="gauge-value pull-left">3,200</span>
-													<span id="goal-text2" class="goal-value pull-right">$5,000</span>
-												</div>
-											</div>
-										</div>
 									</div>
 								</div>
 							</div>
@@ -304,9 +260,10 @@
 
 		<!-- ECharts -->
 		<script src="../vendors/echarts/dist/echarts.min.js"></script>
+		<script src="../vendors/echarts/theme/dark.js"></script>
 		<script src="../vendors/echarts/map/js/world.js"></script>
 
-			<!-- Custom Theme Scripts -->
+		<!-- Custom Theme Scripts -->
 		<script src="../build/js/custom.min.js"></script>
 		<script src="config/config.js"></script>
 		<script src="services/service_market.js"></script>

@@ -60,6 +60,7 @@
 }
 
 .fixed_height_480 {
+	background-color: #282828;
 	height: 480px;
 	overflow: scroll;
 	contain: strict;
@@ -81,17 +82,17 @@
 }
 
 .ns-item-title a {
-    color: #4a4a4a;
+    color: #fff;
     transition: color .35s ease
 }
 
 .ns-item-title a:visited {
-    color: #4a4a4a;
-    fill: #4a4a4a
+    color: #fff;
+    fill: #fff
 }
 
 .ns-item-content {
-    color: #7d7d7d;
+    color: #ccc;
     margin: 9px 12px;
     font-size: 13px;
     line-height: 20px

@@ -7,7 +7,7 @@ var IndexTopCoinsController = ['$scope', '$http', '$interval', '$location', '$wi
 	function getTopCoinChart(coin) {
 		if (coin && coin.symbol) {
 			klineService.market_index_trend(coin.symbol, function(resp) {
-				var echartLine = echarts.init(document.getElementById('coin_chart_' + coin.symbol));
+				var echartLine = echarts.init(document.getElementById('coin_chart_' + coin.symbol), 'dark');
 
 				var date_text = [];
 				var price_value = [];
@@ -54,8 +54,8 @@ var IndexTopCoinsController = ['$scope', '$http', '$interval', '$location', '$wi
 					}],
 					yAxis: [{
 					  type: 'value',
-					  min: min_value * 0.9,
-					  max: max_value * 1.1
+					  min: Math.floor(min_value * 0.9),
+					  max: Math.floor(max_value * 1.1)
 					}],
 					series: [{
 					  name: 'Price',
