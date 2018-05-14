@@ -228,7 +228,7 @@ def tv_search():
             markets = [market for market in support_markets if settings['symbols'][market][index]]
             results = [{
                 "description": title,
-                "fullname": symbol,
+                "full_name": symbol,
                 "exchange": market,
                 "symbol": symbol,
                 "type": "bitcoin",
