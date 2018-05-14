@@ -164,7 +164,7 @@
 										  </thead>
 										  <tbody>
 											<tr ng-repeat="coin in top_coins">
-											  <th scope="row">{{ coin.rank }}</th>
+											  <th scope="row">{{ $index + 1 }}</th>
 											  <td>{{ coin.fullname }}</td>
 											  <td>{{ coin.name }}</td>
 											  <td ng-style='{ "color": coin.percent_change_24h >= 0 ? "green": "red", "text-align": "right" } '>{{ coin.percent_change_24h }}</td>
