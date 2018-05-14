@@ -125,6 +125,8 @@ def tv_symbols():
                     "pointvalue": 1,
                     "session": "0930-1630",
                     "has_intraday": True,
+                    "has_daily": True,
+                    "has_weekly_and_monthly": True,
                     "has_no_volume": True,
                     "description": title,
                     "type": "bitcoin",
@@ -145,6 +147,8 @@ def tv_symbols():
             "pointvalue": 1,
             "session": "0930-1630",
             "has_intraday": True,
+            "has_daily": True,
+            "has_weekly_and_monthly": True,
             "has_no_volume": True,
             "description": "Index",
             "type": "bitcoin",
@@ -228,7 +232,7 @@ def tv_search():
             markets = [market for market in support_markets if settings['symbols'][market][index]]
             results = [{
                 "description": title,
-                "fullname": symbol,
+                "full_name": symbol,
                 "exchange": market,
                 "symbol": symbol,
                 "type": "bitcoin",

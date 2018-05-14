@@ -16,6 +16,10 @@ class kline_service(object):
             sql_time_group = '%sm' % match.group(1)
         elif resolution == 'D':
             sql_time_group = "1d"
+        elif resolution == 'W':
+            sql_time_group = "1w"
+        elif resolution == 'M':
+            sql_time_group = "30d"
         else:
             sql_time_group = "1d"
 
