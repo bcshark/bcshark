@@ -31,18 +31,18 @@ class kline_service(object):
         #NOTE: ignore limits as tradingview will alwasy send from_time and to_time in a reasonable range
         symbol = symbol.lower()
         if not symbol == 'index':
-            sql = "select time, first(open) as open, last(close) as close, min(low) as low, max(high) as high from market_ticks where symbol = '%s' and time >= %d and time <= %d group by time(%s) order by time desc" % (symbol, from_time * 1e9, to_time * 1e9, this.get_influx_timegroup_by_resolution(resolution))
+            sql = "select time, first(open) as open, last(close) as close, min(low) as low, max(high) as high, sum(volume) as volume from market_ticks where symbol = '%s' and time >= %d and time <= %d group by time(%s) order by time desc" % (symbol, from_time * 1e9, to_time * 1e9, this.get_influx_timegroup_by_resolution(resolution))
         else:
-            sql = "select time, first(open) as open, last(close) as close, min(low) as low, max(high) as high from k10_index where time >= %d and time <= %d group by time(%s) order by time desc" % (from_time * 1e9, to_time * 1e9, this.get_influx_timegroup_by_resolution(resolution))
+            sql = "select time, first(open) as open, last(close) as close, min(low) as low, max(high) as high, sum(volume) as volume from k10_index where time >= %d and time <= %d group by time(%s) order by time desc" % (from_time * 1e9, to_time * 1e9, this.get_influx_timegroup_by_resolution(resolution))
         rows = this.client.query(sql, epoch = 's')
         print "%d, %d rows: %d" % (from_time, to_time, len(rows))
         return rows 
 
     def get_kline_by_market_symbol(this, market, symbol, resolution, size):
         if market == 'market_index':
-            sql = "select time, first(open) as open, last(close) as close, min(low) as low, max(high) as high from k10_index group by time(%s) order by time desc limit %d" % (this.get_influx_timegroup_by_resolution(resolution), size)
+            sql = "select time, first(open) as open, last(close) as close, min(low) as low, max(high) as high, sum(volume) as volume from k10_index group by time(%s) order by time desc limit %d" % (this.get_influx_timegroup_by_resolution(resolution), size)
         else:
-            sql = "select time, first(open) as open, last(close) as close, min(low) as low, max(high) as high from %s_ticks where market = '%s' and symbol = '%s' group by time(%s) order by time desc limit %d" % (market, market, symbol, this.get_influx_timegroup_by_resolution(resolution), size)
+            sql = "select time, first(open) as open, last(close) as close, min(low) as low, max(high) as high, sum(volume) as volume from %s_ticks where market = '%s' and symbol = '%s' group by time(%s) order by time desc limit %d" % (market, market, symbol, this.get_influx_timegroup_by_resolution(resolution), size)
         rows = this.client.query(sql, epoch = 's')
 
         return rows 
