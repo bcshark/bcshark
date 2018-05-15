@@ -10,7 +10,7 @@ from .utility import *
 
 class collector_huobi(collector):
     DEFAULT_PERIOD = "1min"
-    DEFAULT_SIZE = 5
+    DEFAULT_SIZE = 60
     PATTERN_TICK = "market.([a-zA-Z]+).kline.1min"
 
     @property
@@ -24,7 +24,6 @@ class collector_huobi(collector):
 
     def translate(this, ts, obj):
         tick = market_tick()
-
         tick.time = long(obj['id'])
         tick.timezone_offset = this.timezone_offset
         tick.open = float(obj['open'])

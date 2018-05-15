@@ -6,7 +6,7 @@ from .utility import *
 
 class collector_okex(collector):
     DEFAULT_PERIOD = "1min"
-    DEFAULT_SIZE = 5
+    DEFAULT_SIZE = 60
     DEFAULT_TYPE = "this_week"
 
     @property

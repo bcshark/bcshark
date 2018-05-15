@@ -19,7 +19,6 @@ class collector_poloniex(collector):
 
     def translate(this, obj):
         tick = market_tick()
-
         tick.time = long(obj["date"])
         tick.timezone_offset = this.timezone_offset
         tick.open = float(format(obj["open"], '.12f'))
@@ -35,7 +34,7 @@ class collector_poloniex(collector):
 
     def collect_rest(this):
         time_second = int(time.time())
-        time_second = time_second - time_second % 60 - 1500
+        time_second = time_second - time_second % 60 - 3600
 
         for symbol in this.symbols_market:
             if symbol == "":
