@@ -2,6 +2,7 @@ logs/
 node_modules/
 .vscode/
 
+.DS_Store
 *.pyc
 *.swp
 *.code-workspace

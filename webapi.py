@@ -66,6 +66,8 @@ def tv_history():
                 low_index = i
             elif columns[i] == 'high':
                 high_index = i
+            elif columns[i] == 'volume':
+                volume_index = i
 
         timezone_offset = settings['timezone_offset']
 
@@ -79,6 +81,7 @@ def tv_history():
             "c": [],    #close
             "h": [],    #high
             "l": [],    #low
+            "v": []     #volume
         }
 
         for index in range(len(ticks)):
@@ -93,6 +96,7 @@ def tv_history():
             kline["c"].append(tick[close_index])
             kline["h"].append(tick[high_index])
             kline["l"].append(tick[low_index])
+            kline["v"].append(tick[volume_index])
 
     else:
         #kline = { "s": "no_data", "nextTime": long(time.time() + 60) }
@@ -127,7 +131,7 @@ def tv_symbols():
                     "has_intraday": True,
                     "has_daily": True,
                     "has_weekly_and_monthly": True,
-                    "has_no_volume": True,
+                    "has_no_volume": False,
                     "description": title,
                     "type": "bitcoin",
                     "supported_resolutions": [ "1", "15", "30", "60", "D", "2D", "3D", "W", "3W", "M", "6M" ],
@@ -149,7 +153,7 @@ def tv_symbols():
             "has_intraday": True,
             "has_daily": True,
             "has_weekly_and_monthly": True,
-            "has_no_volume": True,
+            "has_no_volume": False,
             "description": "Index",
             "type": "bitcoin",
             "supported_resolutions": [ "1", "15", "30", "60", "D", "2D", "3D", "W", "3W", "M", "6M" ],
@@ -303,6 +307,8 @@ def api_kline():
                 low_index = i
             elif columns[i] == 'high':
                 high_index = i
+            elif columns[i] == 'volume':
+                volume_index = i
 
         timezone_offset = settings['timezone_offset']
 
@@ -314,7 +320,8 @@ def api_kline():
             float(tick[open_index]),
             float(tick[close_index]),
             float(tick[low_index]),
-            float(tick[high_index])
+            float(tick[high_index]),
+            float(tick[volume_index])
         ] for tick in ticks if not (tick[open_index] == None or tick[close_index] == None or tick[high_index] == None or tick[low_index] == None)]
 
         return json.dumps(kline)
