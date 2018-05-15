@@ -6,7 +6,7 @@ from .utility import *
 
 class collector_binance(collector):
     DEFAULT_PERIOD = "1m"
-    DEFAULT_SIZE = 5
+    DEFAULT_SIZE = 60
 
     @property
     def market_name(this):
@@ -19,7 +19,6 @@ class collector_binance(collector):
 
     def translate(this, obj):
         tick = market_tick()
-
         tick.time = long(obj[0] / 1000)
         tick.timezone_offset = this.timezone_offset
         tick.open = float(obj[1])

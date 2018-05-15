@@ -5,7 +5,7 @@ from .collector import collector
 from .utility import *
 
 class collector_gateio(collector):
-    DEFAULT_PERIOD = "0.1"
+    DEFAULT_PERIOD = "1"
     DEFAULT_GROUP = "60"
     DEFAULT_TYPE = "this_week"
 
@@ -17,9 +17,9 @@ class collector_gateio(collector):
         super(collector_gateio, this).__init__(settings, market_settings)
         this.period = this.DEFAULT_PERIOD
 
-    def translate(this, obj):
+    def translate(this, obj, symbol):
         tick = market_tick()
-        tick.time = long(obj[0]/1000)
+        tick.time = long(obj[0])/1000
         tick.volume = float(obj[1])
         tick.close = float(obj[2])
         tick.high = float(obj[3])
@@ -44,7 +44,7 @@ class collector_gateio(collector):
             if not ticks or not isinstance(ticks, dict):
                 this.logger.error('cannot get response from gateio (%s)' % symbol)
                 continue
-            this.bulk_save_ticks(this.get_generic_symbol_name(symbol), [ this.translate(tick) for tick in ticks["data"] ])
+            this.bulk_save_ticks(this.get_generic_symbol_name(symbol), [ this.translate(tick, symbol) for tick in ticks["data"] ])
 
             this.logger.info('get response from gateio')
 

@@ -115,7 +115,7 @@ class collector_k10_index_calc(collector):
         index.low = (total_low_weight / cal_length) * this.MULTIPLY_RATIO
         index.open = (total_open_weight / cal_length) * this.MULTIPLY_RATIO
         index.close = (total_close_weight / cal_length) * this.MULTIPLY_RATIO
-        index.volume = (total_volume_weight / cal_length)
+        index.volume = (total_volume_weight)
         index.time = start_second
         index.period = '1min'
 

@@ -19,16 +19,15 @@ class collector_gdax(collector):
 
     def translate(this, objs):
         ticks = []
-
         for obj in objs:
             tick = market_tick()
-            tick.time = long(objs[0][0])
+            tick.time = long(obj[0])
             tick.timezone_offset = this.timezone_offset
-            tick.open = float(objs[0][3])
-            tick.high = float(objs[0][2])
-            tick.low = float(objs[0][1])
-            tick.close = float(objs[0][4])
-            tick.volume = float(objs[0][5])
+            tick.open = float(obj[3])
+            tick.high = float(obj[2])
+            tick.low = float(obj[1])
+            tick.close = float(obj[4])
+            tick.volume = float(obj[5])
             tick.amount = 0.0
             tick.count = 0.0
             tick.period = this.period
@@ -38,7 +37,7 @@ class collector_gdax(collector):
         return ticks
 
     def collect_rest(this):
-        start = (datetime.datetime.utcnow() - datetime.timedelta(minutes = 5)).strftime('%Y-%m-%dT%H:%MZ')
+        start = (datetime.datetime.utcnow() - datetime.timedelta(minutes = 60)).strftime('%Y-%m-%dT%H:%MZ')
         end = (datetime.datetime.utcnow()).strftime('%Y-%m-%dT%H:%MZ')
 
         for symbol in this.symbols_market:
