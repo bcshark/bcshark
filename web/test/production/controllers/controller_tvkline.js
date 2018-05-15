@@ -81,7 +81,7 @@ var TvKlineController = ['$scope', '$http', '$interval', '$window', 'MarketServi
 				library_path: "public/javascript/charting_library/",
 				locale: getParameterByName('lang') || "en",
 				drawings_access: { type: 'black', tools: [ { name: "Regression Trend" } ] },
-				disabled_features: [ "study_templates", "left_toolbar", "control_bar", "timeframes_toolbar", "header_settings", "header_undo_redo", "header_interval_dialog_button", "header_screenshot", "header_saveload", "display_market_status", "use_localstorage_for_settings" ],
+				disabled_features: [ "study_templates", "left_toolbar", "control_bar", "timeframes_toolbar", "header_settings", "header_undo_redo", "header_interval_dialog_button", "header_screenshot", "header_saveload", "display_market_status", "use_localstorage_for_settings", "volume_force_overlay" ],
 				// enabled_features: [ "use_localstorage_for_settings" ],
 				charts_storage_url: 'http://18.218.165.228:5000/tv',
 				charts_storage_api_version: "1.1",
@@ -89,6 +89,7 @@ var TvKlineController = ['$scope', '$http', '$interval', '$window', 'MarketServi
 				user_id: 'market_index',
 				toolbar_bg: "#222222",
 				overrides: {
+					"volumePaneSize": "medium",
 					"paneProperties.background": "#282828",
 					"paneProperties.vertGridProperties.color": "#444243",
 					"paneProperties.horzGridProperties.color": "#444243",
