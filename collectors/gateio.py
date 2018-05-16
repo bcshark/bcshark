@@ -17,7 +17,7 @@ class collector_gateio(collector):
         super(collector_gateio, this).__init__(settings, market_settings)
         this.period = this.DEFAULT_PERIOD
 
-    def translate(this, obj, symbol):
+    def translate(this, obj):
         tick = market_tick()
         tick.time = long(obj[0])/1000
         tick.volume = float(obj[1])
@@ -44,7 +44,7 @@ class collector_gateio(collector):
             if not ticks or not isinstance(ticks, dict):
                 this.logger.error('cannot get response from gateio (%s)' % symbol)
                 continue
-            this.bulk_save_ticks(this.get_generic_symbol_name(symbol), [ this.translate(tick, symbol) for tick in ticks["data"] ])
+            this.bulk_save_ticks(this.get_generic_symbol_name(symbol), [ this.translate(tick) for tick in ticks["data"] ])
 
             this.logger.info('get response from gateio')
 

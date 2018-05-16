@@ -173,17 +173,24 @@ class collector(object):
             return None
         return result['series']
 
-    def query_market_ticks_for_validation(this, endSecond, validatePeriod):
-        start = endSecond * 1000000000 - 60 * validatePeriod * 1000000000
-        end = endSecond * 1000000000
-        sql = "select time, market, symbol, high, low, open, close, volume, period, timezone_offset from market_ticks where time >= %s and time <= %s" % (start, end)
+    def query_market_ticks_for_validation(this, start_second, end_second, key, generic_symbol):
+        sql = "select time, market, symbol, high, low, open, close, volume, period, timezone_offset from market_ticks where time >= %s and time <= %s and market = '%s' and symbol = '%s' order by time asc" % (start_second, end_second, key, generic_symbol)
         print sql
         result = this.db_adapter.query(sql, epoch = 's')
-        print result
         if len(result) == 0 or not result.has_key('series'):
-            this.logger.error('validation Error - market_ticks table has price for time range: %s , %s ', start, end)
+            this.logger.error('validation Error - market_ticks table has no price for time range: %s , %s ', start_second, end_second)
             return None
         return result['series']
+
+    def save_validation(this, validation):
+        sql = "select time, market, symbole, table from validation where time = %s and market = '%s' and symbol = '%s' order by time desc limit 1" % (validation.time * 1000000000, validation.market, validation.symbol)
+        this.logger.debug(sql)
+        ret = this.db_adapter.query(sql, epoch = 's')
+        if ret and ret.has_key('series'):
+            latest_timestamp = ret['series'][0]['values'][0][0]
+            if latest_timestamp > 0:
+                return
+        this.db_adapter.save_validation(validation)
 
     def get_generic_symbol_name(this, symbol_name):
         for symbol_index in range(len(this.symbols_market)):
