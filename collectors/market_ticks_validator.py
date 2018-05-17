@@ -4,9 +4,10 @@ import datetime
 from model.market_tick import  market_tick
 from .collector import collector
 from .utility import *
+from model.validation import validation
 
 class market_ticks_validator(collector):
-    DEFAULT_PERIOD = 1
+    MULTIPLIER = 1000000000
 
     @property
     def market_name(this):
@@ -14,7 +15,6 @@ class market_ticks_validator(collector):
 
     def __init__(this, settings, market_settings):
         super(market_ticks_validator, this).__init__(settings, market_settings)
-        this.period = this.DEFAULT_PERIOD
 
     def translate(this, objs):
         ticks = []
@@ -30,40 +30,64 @@ class market_ticks_validator(collector):
             tick.volume = float(obj[7])
             tick.period = obj[8]
             tick.timezone_offset = obj[9]
-            print('validation - market tick generated', tick.time, tick.market, tick.symbol, tick.high, tick.low, tick.open, tick.close, tick.volume, tick.period, tick.timezone_offset)
+            #print('validation - market tick generated', tick.time, tick.market, tick.symbol, tick.high, tick.low, tick.open, tick.close, tick.volume, tick.period, tick.timezone_offset)
             ticks.append(tick)
 
         return ticks
 
     def collect_rest(this):
-        time_second = int(time.time())
-        time_second = time_second - (time_second % 60) - 60 + this.timezone_offset
-        print time_second
-        result = this.query_market_ticks_for_validation(time_second, this.DEFAULT_PERIOD)
-        if result == None:
-            print 'Error! validation fail due to no price found in this minute'
-            return
-        ticks = this.translate(result[0]['values'])
+        time_second = int(time.time()) #TODO: verify time format and timezone should be UTC
+        start_second = time_second - (time_second % 60) - 1800 + this.timezone_offset
+        end_second = time_second - (time_second % 60) - 300 + this.timezone_offset
+        this.logger.info('validation start with range: %s, %s', start_second, end_second)
         symbol_dict = this.symbols_all_market
-
         for key in symbol_dict:
-            if key != 'default' and key != '_title' and key != 'k10_daily_rank' and key != 'bittrex' and key != 'bitfinex' and key != 'bitstamp':
+            # if key != 'default' and key != '_title' and key != 'k10_daily_rank' and key != 'bittrex' and key != 'bitfinex' and key != 'bitstamp':
+            if key == 'okcoin' or key == 'gdax' or key == 'gateio':
                 symbols = symbol_dict[key]
                 for symbol in symbols:
                     if symbol == '':
                         continue
-                    count = 0
-                    symbol = this.get_generic_symbol_name(key, symbol)
-                    print symbol
-                    for tick in ticks:
-                        if tick.market == key and tick.symbol == symbol:
-                            count = count + 1
-                    if count == 0:
-                        print('error! symbol price missing: ', key, symbol, count)
-                    elif count > 1:
-                        print('error! symbol price duplicate: ', key, symbol, count)
+                    generic_symbol = this.get_generic_symbol_name(key, symbol)
+                    #print('generic symbol: ', generic_symbol)
+                    result = this.query_market_ticks_for_validation(start_second * this.MULTIPLIER, end_second * this.MULTIPLIER, key, generic_symbol)
+                    if result == None:
+                        this.logger.info('validation error! no price found in time range: %s, %s, %s, %s', key, generic_symbol, start_second, end_second)
+                        # validation_s = validation()
+                        # validation_s.time = start_second
+                        # validation_s.market = key
+                        # validation_s.symbol = generic_symbol
+                        # validation_s.period = 'time range'
+                        # validation_s.timezone_offset = this.timezone_offset
+                        # validation_s.table = 'market_ticks'
+                        # validation_s.msg = 'miss time range price'
+                        # this.save_validation(validation_s)
+                        # break
                     else:
-                        print('validation passed for symbol: ', key, symbol, count)
+                        ticks = this.translate(result[0]['values'])
+                        period = temp_time = 0
+                        if ticks[0].period == '1min':
+                            period = 60
+                            temp_time = start_second
+                        else:
+                            period = 300
+                            temp_time = ticks[0].time #TODO: need to search from DB with market and time range then find the min time for poloniex
+                        global validation_s
+                        for tick in ticks:
+                            #print('+++++', tick.symbol, tick.market, tick.time, temp_time)
+                            while tick.time > temp_time:
+                                validation_s = validation()
+                                validation_s.time = temp_time
+                                validation_s.market = key
+                                validation_s.symbol = generic_symbol
+                                validation_s.period = tick.period
+                                validation_s.timezone_offset = tick.timezone_offset
+                                validation_s.table = 'market_ticks'
+                                validation_s.msg = 'miss 1min price'
+                                #print('validation fail for', validation_s.time, validation_s.market, validation_s.symbol)
+                                this.save_validation(validation_s)
+                                temp_time = temp_time + period
+                            temp_time = temp_time + period
 
         this.logger.info('validation done!')
 

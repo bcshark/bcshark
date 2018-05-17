@@ -1,30 +1,59 @@
+import sys
+import getopt
+
 from influxdb import InfluxDBClient
 
-from .database_adapter import database_adapter
-from .utility import *
+def print_usage():
+    print "%s --host <db ip> --port <db port> --database <db name> --username <username> --password <password>" % sys.argv[0]
 
-class influxdb_adapter(database_adapter):
-    def __init__(this, settings):
-        super(influxdb_adapter, this).__init__(settings)
+def resolve_params():
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "h:o:d:u:p:", [ "host=", "port=", "database=", "username=", "password=" ])
 
-        this.client = None
+        for opt, arg in opts:
+            if opt in ("-h", "--host"):
+                db_host = arg
+            elif opt in ("-o", "--port"):
+                db_port = int(arg)
+            elif opt in ("-d", "--database"):
+                db_database = arg
+            elif opt in ("-u", "--username"):
+                db_username = arg
+            elif opt in ("-p", "--password"):
+                db_password = arg
 
-    def open(this):
-        if not this.client:
-            this.client = InfluxDBClient(host = this.host, port = this.port, database = this.database)
-            this.create_database_if_not_exists(this.database)
+        return (db_host, db_port, db_database, db_username, db_password)
+    except getopt.GetoptError:
+        return (None, None, None, None, None)
 
-        return this.client
+def open_influx_connection(db_host, db_port, db_database, db_username, db_password):
+    db_conn = InfluxDBClient(host = db_host, port = db_port, database = db_database)
+    if not filter(lambda db : db['name'] == db_database, db_conn.get_list_database()):
+        db_conn.create_database(db_database) 
 
-    def close(this):
-        if this.client:
-            this.client.close()
-            this.client = None
+def close_influx_connection(db_conn):
+    if db_conn:
+        db_conn.close()
 
-    def create_database_if_not_exists(this, database_name):
-        if not filter(lambda db : db['name'] == database_name, this.client.get_list_database()):
-            this.client.create_database(database_name) 
+if __name__ == '__main__':
+    (db_host, db_port, db_database, db_username, db_password) = resolve_params()
 
+    if not db_host or not db_port or not db_database:
+        print_usage()
+        exit(1)
+
+    db_conn = None
+
+    try:
+        db_conn = open_influx_connection(db_host, db_port, db_database, db_username, db_password)
+
+
+    except Exception, e:
+        print e
+    finally:
+        close_influx_connection(db_conn)
+
+    """
     def generate_point_by_trade(this, measurement_name, market_name, symbol_name, trade):
         fields = None
 
@@ -120,22 +149,6 @@ class influxdb_adapter(database_adapter):
         }
         return [ point ]
 
-    def generate_points_validation(this, measurement_name, validation):
-        point = {
-            'measurement': measurement_name,
-            'tags': {
-                'symbol': validation.symbol,
-                'market': validation.market
-            },
-            'time': get_timestamp_str(long(validation.time), validation.timezone_offset),
-            'fields': {
-                'period': validation.period,
-                'table': validation.table,
-                'msg':  validation.msg
-            }
-        }
-        return [ point ]
-
     def save_trade(this, measurement_name, market_name, symbol_name, trade):
         points = [ this.generate_point_by_trade(measurement_name, market_name, symbol_name, trade) ]
 
@@ -162,9 +175,6 @@ class influxdb_adapter(database_adapter):
         this.client.write_points(points)
 
     def save_k10_index(this, k10_index):
-        points = this.generate_points_by_k10_index('k10_index', k10_index)
+        points = this.generate_points_by_k10_index("k10_index", k10_index)
         this.client.write_points(points)
-
-    def save_validation(this, validation):
-        points = this.generate_points_validation('validation', validation)
-        this.client.write_points(points)
+    """
