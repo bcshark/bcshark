@@ -120,6 +120,22 @@ class influxdb_adapter(database_adapter):
         }
         return [ point ]
 
+    def generate_points_validation(this, measurement_name, validation):
+        point = {
+            'measurement': measurement_name,
+            'tags': {
+                'symbol': validation.symbol,
+                'market': validation.market
+            },
+            'time': get_timestamp_str(long(validation.time), validation.timezone_offset),
+            'fields': {
+                'period': validation.period,
+                'table': validation.table,
+                'msg':  validation.msg
+            }
+        }
+        return [ point ]
+
     def save_trade(this, measurement_name, market_name, symbol_name, trade):
         points = [ this.generate_point_by_trade(measurement_name, market_name, symbol_name, trade) ]
 
@@ -146,5 +162,9 @@ class influxdb_adapter(database_adapter):
         this.client.write_points(points)
 
     def save_k10_index(this, k10_index):
-        points = this.generate_points_by_k10_index("k10_index", k10_index)
+        points = this.generate_points_by_k10_index('k10_index', k10_index)
+        this.client.write_points(points)
+
+    def save_validation(this, validation):
+        points = this.generate_points_validation('validation', validation)
         this.client.write_points(points)
