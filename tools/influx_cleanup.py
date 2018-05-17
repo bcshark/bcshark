@@ -46,6 +46,8 @@ if __name__ == '__main__':
 
     try:
         db_conn = open_influx_connection(db_host, db_port, db_database, db_username, db_password)
+
+
     except Exception, e:
         print e
     finally:
