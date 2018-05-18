@@ -1,13 +1,28 @@
 import sys
 import getopt
+import time
 
 from influxdb import InfluxDBClient
+
+TOP_N = 10
+
+class coin_symbol(object):
+    pass
+
+class coin_symbol_price(object):
+    pass
 
 def print_usage():
     print "%s --host <db ip> --port <db port> --database <db name> --username <username> --password <password>" % sys.argv[0]
 
 def resolve_params():
     try:
+        db_host = None
+        db_port = None
+        db_database = None
+        db_username = None
+        db_password = None
+
         opts, args = getopt.getopt(sys.argv[1:], "h:o:d:u:p:", [ "host=", "port=", "database=", "username=", "password=" ])
 
         for opt, arg in opts:
@@ -30,6 +45,63 @@ def open_influx_connection(db_host, db_port, db_database, db_username, db_passwo
     db_conn = InfluxDBClient(host = db_host, port = db_port, database = db_database)
     if not filter(lambda db : db['name'] == db_database, db_conn.get_list_database()):
         db_conn.create_database(db_database) 
+    return db_conn
+
+def translate_to_symbol(row):
+    symbol = coin_symbol()
+    symbol.time = row[0]
+    symbol.symbol = row[1]
+    symbol.rank = row[2]
+    symbol.market_cap_usd = row[3]
+    symbol.price_btc = row[4]
+    symbol.price_usd = row[5]
+    symbol.volume_usd_24h = row[6]
+    return symbol
+
+def get_first_and_last_timestamp(db_conn):
+    # get maximal timestamp
+    sql = "select time, * from market_ticks order by time desc limit 1"
+    rows = db_conn.query(sql, epoch = 's').raw
+    last_timestamp = rows['series'][0]['values'][0][0]
+
+    # get minimal timestamp
+    sql = "select time, * from market_ticks order by time limit 1"
+    rows = db_conn.query(sql, epoch = 's').raw
+    first_timestamp = rows['series'][0]['values'][0][0]
+
+    return (first_timestamp, last_timestamp)
+
+def get_top10_symbols(db_conn, begin_timestamp):
+    end_timestamp = begin_timestamp + 60
+    sql = "select time, symbol, rank, market_cap_usd, price_btc, price_usd, volume_usd_24h from k10_daily_rank where time >= %d and time < %d group by symbol" % (begin_timestamp * 1e9, end_timestamp * 1e9)
+    rows = db_conn.query(sql, epoch = 's').raw
+
+    if not rows.has_key('series'):
+        return None
+    else:
+        symbols = []
+        for row in rows['series']:
+            symbols.append(translate_to_symbol(row['values'][0]))
+        symbols.sort(lambda x, y: cmp(x.rank, y.rank))
+        return symbols[:TOP_N]
+
+def get_top10_symbols_ratio(db_conn, begin_timestamp, symbols):
+    total = reduce(lambda last, current: last + current.market_cap_usd, [0,] + symbols)
+    for symbol in symbols:
+        symbol.ratio = 1.0 * symbol.market_cap_usd / total
+    return symbols
+
+def get_top10_symbols_prices(db_conn, begin_timestamp, symbols):
+    end_timestamp = begin_timestamp + 60
+
+    for symbol in symbols:
+        tick_symbol_filter = "(symbol = %susdt or symbol = %sbtc)" % (symbol.symbol.lower(), symbol.symbol.lower())
+        sql = "select time, symbol, market, open, close, high, low, volume from market_ticks where time >= %d and time < %d and %s group by symbol, market" % (begin_timestamp * 1e9, end_timestamp * 1e9, tick_symbol_filter)
+        print sql
+        rows = db_conn.query(sql, epoch = 's').raw
+
+def save_top10_symbols_index(db_conn, timestamp, prices, period, symbol):
+    pass
 
 def close_influx_connection(db_conn):
     if db_conn:
@@ -44,137 +116,37 @@ if __name__ == '__main__':
 
     db_conn = None
 
+    previous_top10_symbols = None
+
     try:
         db_conn = open_influx_connection(db_host, db_port, db_database, db_username, db_password)
 
+        (first_timestamp, last_timestamp) = get_first_and_last_timestamp(db_conn)
 
+        for first_timestamp in range(first_timestamp, last_timestamp, 60):
+            total_high = 0
+            total_low = 0
+            total_open = 0
+            total_close = 0
+
+            symbols = get_top10_symbols(db_conn, first_timestamp)
+
+            if symbols == None:
+                continue
+
+            symbols = get_top10_symbols_ratio(db_conn, first_timestamp, symbols)
+            symbols = get_top10_symbols_prices(db_conn, first_timestamp, symbols)
+
+            for symbol in symbols:
+                total_high = total_high + symbol['ratio'] * sum(symbols['prices']['high']) / len(symbols['prices']['high'])
+                total_low = total_low + symbol['ratio'] * sum(symbols['prices']['low']) / len(symbols['prices']['low'])
+                total_open = total_open + symbol['ratio'] * sum(symbols['prices']['open']) / len(symbols['prices']['open'])
+                total_close = total_close + symbol['ratio'] * sum(symbols['prices']['close']) / len(symbols['prices']['close'])
+
+            save_top10_symbols_index(db_conn, first_timestamp, (total_high, total_low, total_open, total_close), period, symbol)
+
+            print "%s\thigh: %f, low: %f, open: %f, close: %f" % (time.strftime("%Y-%m-%d %H-%M-%S", time.gmtime(first_timestamp)), total_high, total_low, total_open, total_close)
     except Exception, e:
         print e
     finally:
         close_influx_connection(db_conn)
-
-    """
-    def generate_point_by_trade(this, measurement_name, market_name, symbol_name, trade):
-        fields = None
-
-        if isinstance(trade, dict):
-            fields = trade
-
-        point = {
-            'measurement': measurement_name,
-            'tags': {
-                'market': market_name,
-                'symbol': symbol_name
-            },
-            'time': get_timestamp_str(fields['time'], fields['timezone_offset']),
-            'fields': fields
-        }
-
-        return point
-
-    def generate_point_by_tick(this, measurement_name, market_name, symbol_name, tick):
-        fields = None
-
-        if isinstance(tick, dict):
-            fields = tick
-        elif isinstance(tick, object):
-            fields = {
-                'time': tick.time + tick.timezone_offset,
-                'timezone_offset': tick.timezone_offset,
-                'open': float(tick.open),
-                'close': float(tick.close),
-                'low': float(tick.low),
-                'high': float(tick.high),
-                'amount': float(tick.amount),
-                'volume': float(tick.volume),
-                'count': float(tick.count),
-                'period': tick.period
-            }
-           
-        if fields:
-            point = {
-                'measurement': measurement_name,
-                'tags': {
-                    'market': market_name,
-                    'symbol': symbol_name
-                },
-                'time': get_timestamp_str(fields['time'], fields['timezone_offset']),
-                'fields': fields
-            }
-            return point
-
-        return None
-
-    def generate_points_by_k10_rank(this, measurement_name, k10_rank):
-        point = {
-            'measurement': measurement_name,
-            'tags': {
-                'symbol': k10_rank.symbol
-            },
-            'time': get_timestamp_str(long(k10_rank.time)+k10_rank.timezone_offset, k10_rank.timezone_offset),
-            'fields': {
-                'id': k10_rank.id,
-                'name': k10_rank.name,
-                'price_usd': float(k10_rank.price_usd),
-                'volume_usd_24h': float(k10_rank.volume_usd_24h),
-                'market_cap_usd': float(k10_rank.market_cap_usd),
-                'total_supply': float(k10_rank.total_supply),
-                'max_supply': float(k10_rank.max_supply),
-                'percent_change_1h': float(k10_rank.percent_change_1h),
-                'percent_change_24h': float(k10_rank.percent_change_24h),
-                'percent_change_7d': float(k10_rank.percent_change_7d),
-                'rank': int(k10_rank.rank),
-                'period': k10_rank.period
-            }
-        }
-        return [ point ]
-
-    def generate_points_by_k10_index(this, measurement_name, k10_index):
-
-        point = {
-            'measurement': measurement_name,
-            'tags': {
-                'symbol': 'k10',
-            },
-            'time': get_timestamp_str(long(k10_index['time']), k10_index['timezone_offset']),
-            'fields': {
-                'time': long(k10_index['time']) + k10_index['timezone_offset'],
-                'high': float(k10_index['high']),
-                'low': float(k10_index['low']),
-                'open': float(k10_index['open']),
-                'close': float(k10_index['close']),
-                'volume': float(k10_index['volume']),
-                'period': k10_index['period']
-            }
-        }
-        return [ point ]
-
-    def save_trade(this, measurement_name, market_name, symbol_name, trade):
-        points = [ this.generate_point_by_trade(measurement_name, market_name, symbol_name, trade) ]
-
-        this.client.write_points(points)
-
-    def save_tick(this, measurement_name, market_name, symbol_name, tick):
-        points = [ this.generate_point_by_tick(measurement_name, market_name, symbol_name, tick) ]
-
-        this.client.write_points(points)
-
-    def bulk_save_ticks(this, market_name, symbol_name, ticks):
-        measurement_name = 'market_ticks'
-
-        points = [ this.generate_point_by_tick(measurement_name, market_name, symbol_name, tick) for tick in ticks ]
-
-        this.client.write_points(points)
-
-    def query(this, sql, epoch = None):
-        result_set = this.client.query(sql, epoch = epoch)
-        return result_set.raw
-
-    def save_k10_daily_rank(this, table_name, k10_rank):
-        points = this.generate_points_by_k10_rank(table_name, k10_rank)
-        this.client.write_points(points)
-
-    def save_k10_index(this, k10_index):
-        points = this.generate_points_by_k10_index("k10_index", k10_index)
-        this.client.write_points(points)
-    """

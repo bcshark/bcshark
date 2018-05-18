@@ -128,7 +128,9 @@ class collector(object):
             ticks = filter(lambda x: x.time + x.timezone_offset >= latest_timestamp, ticks)
             #print('-----after lambda filter: ', len(ticks))
 
-        for tick in ticks:
+        ticks.sort(lambda x, y: cmp(x.time, y.time))
+        for index in range(len(ticks)):
+            tick = ticks[index]
             this.save_tick(symbol_name, tick)
         #this.db_adapter.bulk_save_ticks(this.market_name, symbol_name, ticks)
 
