@@ -4,6 +4,14 @@ import time
 
 from influxdb import InfluxDBClient
 
+TOP_N = 10
+
+class coin_symbol(object):
+    pass
+
+class coin_symbol_price(object):
+    pass
+
 def print_usage():
     print "%s --host <db ip> --port <db port> --database <db name> --username <username> --password <password>" % sys.argv[0]
 
@@ -39,6 +47,17 @@ def open_influx_connection(db_host, db_port, db_database, db_username, db_passwo
         db_conn.create_database(db_database) 
     return db_conn
 
+def translate_to_symbol(row):
+    symbol = coin_symbol()
+    symbol.time = row[0]
+    symbol.symbol = row[1]
+    symbol.rank = row[2]
+    symbol.market_cap_usd = row[3]
+    symbol.price_btc = row[4]
+    symbol.price_usd = row[5]
+    symbol.volume_usd_24h = row[6]
+    return symbol
+
 def get_first_and_last_timestamp(db_conn):
     # get maximal timestamp
     sql = "select time, * from market_ticks order by time desc limit 1"
@@ -61,17 +80,25 @@ def get_top10_symbols(db_conn, begin_timestamp):
         return None
     else:
         symbols = []
-        for row in rows['series'][0]['values'][0]:
-            symbols.append(row)
-
-        return symbols
+        for row in rows['series']:
+            symbols.append(translate_to_symbol(row['values'][0]))
+        symbols.sort(lambda x, y: cmp(x.rank, y.rank))
+        return symbols[:TOP_N]
 
 def get_top10_symbols_ratio(db_conn, begin_timestamp, symbols):
-    print (begin_timestamp, symbols)
-    pass
+    total = reduce(lambda last, current: last + current.market_cap_usd, [0,] + symbols)
+    for symbol in symbols:
+        symbol.ratio = 1.0 * symbol.market_cap_usd / total
+    return symbols
 
 def get_top10_symbols_prices(db_conn, begin_timestamp, symbols):
-    pass
+    end_timestamp = begin_timestamp + 60
+
+    for symbol in symbols:
+        tick_symbol_filter = "(symbol = %susdt or symbol = %sbtc)" % (symbol.symbol.lower(), symbol.symbol.lower())
+        sql = "select time, symbol, market, open, close, high, low, volume from market_ticks where time >= %d and time < %d and %s group by symbol, market" % (begin_timestamp * 1e9, end_timestamp * 1e9, tick_symbol_filter)
+        print sql
+        rows = db_conn.query(sql, epoch = 's').raw
 
 def save_top10_symbols_index(db_conn, timestamp, prices, period, symbol):
     pass
