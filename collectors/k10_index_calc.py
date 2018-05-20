@@ -146,7 +146,7 @@ class collector_k10_index_calc(collector):
 
     def getStartSecondPreviousMinute(this):
         time_second = int(time.time())
-        time_second = time_second - (time_second % 60) - 120 + this.timezone_offset
+        time_second = time_second - (time_second % 60) - 300 + this.timezone_offset
         this.logger.debug('k10 calc - start second generated: %s', time_second)
         return time_second;
 
