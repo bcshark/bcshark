@@ -4,7 +4,8 @@ import time
 
 from influxdb import InfluxDBClient
 
-TOP_N = 10
+DEFAULT_TOP_N = 10
+DEFAULT_PERIOD = '1min'
 
 class coin_symbol(object):
     pass
@@ -83,7 +84,7 @@ def get_top10_symbols(db_conn, begin_timestamp):
         for row in rows['series']:
             symbols.append(translate_to_symbol(row['values'][0]))
         symbols.sort(lambda x, y: cmp(x.rank, y.rank))
-        return symbols[:TOP_N]
+        return symbols[:DEFAULT_TOP_N]
 
 def get_top10_symbols_ratio(db_conn, begin_timestamp, symbols):
     total = reduce(lambda last, current: last + current.market_cap_usd, [0,] + symbols)
@@ -95,10 +96,27 @@ def get_top10_symbols_prices(db_conn, begin_timestamp, symbols):
     end_timestamp = begin_timestamp + 60
 
     for symbol in symbols:
-        tick_symbol_filter = "(symbol = %susdt or symbol = %sbtc)" % (symbol.symbol.lower(), symbol.symbol.lower())
+        tick_symbol_filter = "(symbol = '%susdt' or symbol = '%sbtc')" % (symbol.symbol.lower(), symbol.symbol.lower())
         sql = "select time, symbol, market, open, close, high, low, volume from market_ticks where time >= %d and time < %d and %s group by symbol, market" % (begin_timestamp * 1e9, end_timestamp * 1e9, tick_symbol_filter)
-        print sql
         rows = db_conn.query(sql, epoch = 's').raw
+
+        symbol.prices = coin_symbol_price()
+        symbol.prices.open = []
+        symbol.prices.close = []
+        symbol.prices.high = []
+        symbol.prices.low = []
+        symbol.volumes = []
+
+        if rows.has_key('series'):
+            for row in rows['series']:
+                prices = row['values'][0]
+                symbol.prices.open.append(prices[3])
+                symbol.prices.close.append(prices[4])
+                symbol.prices.high.append(prices[5])
+                symbol.prices.low.append(prices[6])
+                symbol.volumes.append(prices[7])
+
+    return symbols
 
 def save_top10_symbols_index(db_conn, timestamp, prices, period, symbol):
     pass
@@ -128,6 +146,7 @@ if __name__ == '__main__':
             total_low = 0
             total_open = 0
             total_close = 0
+            total_volume = 0
 
             symbols = get_top10_symbols(db_conn, first_timestamp)
 
@@ -138,14 +157,20 @@ if __name__ == '__main__':
             symbols = get_top10_symbols_prices(db_conn, first_timestamp, symbols)
 
             for symbol in symbols:
-                total_high = total_high + symbol['ratio'] * sum(symbols['prices']['high']) / len(symbols['prices']['high'])
-                total_low = total_low + symbol['ratio'] * sum(symbols['prices']['low']) / len(symbols['prices']['low'])
-                total_open = total_open + symbol['ratio'] * sum(symbols['prices']['open']) / len(symbols['prices']['open'])
-                total_close = total_close + symbol['ratio'] * sum(symbols['prices']['close']) / len(symbols['prices']['close'])
+                if len(symbol.prices.high) > 0:
+                    total_high = total_high + symbol.ratio * sum(symbol.prices.high) / len(symbol.prices.high)
+                if len(symbol.prices.low) > 0:
+                    total_low = total_low + symbol.ratio * sum(symbol.prices.low) / len(symbol.prices.low)
+                if len(symbol.prices.open) > 0:
+                    total_open = total_open + symbol.ratio * sum(symbol.prices.open) / len(symbol.prices.open)
+                if len(symbol.prices.close) > 0:
+                    total_close = total_close + symbol.ratio * sum(symbol.prices.close) / len(symbol.prices.close)
+                if len(symbol.volumes) > 0:
+                    total_volume = total_volume + symbol.ratio * sum(symbol.volumes) / len(symbol.volumes)
 
-            save_top10_symbols_index(db_conn, first_timestamp, (total_high, total_low, total_open, total_close), period, symbol)
+            save_top10_symbols_index(db_conn, first_timestamp, (total_high, total_low, total_open, total_close), DEFAULT_PERIOD, symbol)
 
-            print "%s\thigh: %f, low: %f, open: %f, close: %f" % (time.strftime("%Y-%m-%d %H-%M-%S", time.gmtime(first_timestamp)), total_high, total_low, total_open, total_close)
+            print "[%s high: \033[32;1m%f\033[0m, low: \033[32;1m%f\033[0m, open: \033[32;1m%f\033[0m, close: \033[32;1m%f\033[0m" % (time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(first_timestamp)), total_high, total_low, total_open, total_close)
     except Exception, e:
         print e
     finally:
