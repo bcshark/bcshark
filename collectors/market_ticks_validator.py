@@ -30,29 +30,27 @@ class market_ticks_validator(collector):
             tick.volume = float(obj[7])
             tick.period = obj[8]
             tick.timezone_offset = obj[9]
-            print('validation - market tick generated', tick.time, tick.market, tick.symbol, tick.high, tick.low, tick.open, tick.close, tick.volume, tick.period, tick.timezone_offset)
+            # print('validation - market tick generated', tick.time, tick.market, tick.symbol, tick.high, tick.low, tick.open, tick.close, tick.volume, tick.period, tick.timezone_offset)
             ticks.append(tick)
 
         return ticks
 
     def collect_rest(this):
         time_second = int(time.time()) #TODO: verify time format and timezone should be UTC
-        start_second = time_second - (time_second % 60) - 480 + this.timezone_offset
+        start_second = time_second - (time_second % 60) - 1800 + this.timezone_offset
         end_second = time_second - (time_second % 60) - 300 + this.timezone_offset
         this.logger.info('validation start with range: %s, %s', start_second, end_second)
         symbol_dict = this.symbols_all_market
         for key in symbol_dict:
             # if key != 'default' and key != '_title' and key != 'k10_daily_rank' and key != 'bittrex' and key != 'bitfinex' and key != 'bitstamp':
-            #if key == 'okcoin' or key == 'gdax' or key == 'gateio':
-            if key == 'poloniex' or key == 'gdax':
+            if key == 'binance' or key == 'poloniex' or key == 'gdax':
                 symbols = symbol_dict[key]
                 for symbol in symbols:
                     if symbol == '':
                         continue
                     generic_symbol = this.get_generic_symbol_name(key, symbol)
-                    #print('generic symbol: ', generic_symbol)
                     result = this.query_market_ticks_for_validation(start_second * this.MULTIPLIER, end_second * this.MULTIPLIER, key, generic_symbol)
-                    if result == None:
+                    if result is None:
                         this.logger.error('validation error! no price found in time range: %s, %s, %s, %s', key, generic_symbol, start_second, end_second)
                     else:
                         ticks_db = this.translate_db(result[0]['values'])
@@ -66,7 +64,6 @@ class market_ticks_validator(collector):
                             temp_time = ticks_db[0].time #TODO: need to search from DB with market and time range then find the min time for poloniex
                         global validation_s
                         for tick in ticks_db:
-                            #print('+++++', tick.symbol, tick.market, tick.time, temp_time)
                             while tick.time > temp_time:
                                 validation_s = validation()
                                 validation_s.time = temp_time
@@ -93,7 +90,6 @@ class market_ticks_validator(collector):
                                     validation_s.timezone_offset = tick1.timezone_offset
 
                                     if 'usdt' in tick1.symbol:
-                                        print('++++match time++++: t1, t2 ', tick1.time, tick1.time - this.timezone_offset)
                                         if float(format(tick2.high, '.6f')) == float(format(tick1.high, '.6f')) and float(format(tick2.low, '.6f')) == float(format(tick1.low, '.6f')) and float(format(tick2.open, '.6f')) == float(format(tick1.open, '.6f')) and float(format(tick2.close, '.6f')) == float(format(tick1.close, '.6f')) and float(format(tick2.volume, '.6f')) == float(format(tick1.volume, '.6f')):
                                             this.logger.info('pass validation usdt price: %s, %s, %s, %s', tick1.time, key, generic_symbol, tick1.market)
                                             break
@@ -105,9 +101,8 @@ class market_ticks_validator(collector):
                                             break
                                     else:
                                         table_name = key + '_ticks'
-                                        db_query = this.query_ticks_table_for_validation(table_name, tick1.time, key, generic_symbol)
-                                        print(db_query)
-                                        if result == None:
+                                        db_query = this.query_ticks_table_for_validation(table_name, tick1.time * this.MULTIPLIER, key, generic_symbol)
+                                        if result is None:
                                             this.logger.error('fail validation - miss btc price & btcusdt price: %s, %s, %s, %s ', tick1.time, key, generic_symbol, table_name)
                                             validation_s.table = table_name
                                             validation_s.msg = 'miss btc price & btcusdt price'
@@ -134,19 +129,19 @@ class market_ticks_validator(collector):
                                                 tick_obj = ticks_objs[0]
                                             if float(format(tick2.high, '.6f')) == float(format(tick_obj.high, '.6f')) and float(format(tick2.low, '.6f')) == float(format(tick_obj.low, '.6f')) and float(format(tick2.open, '.6f')) == float(format(tick_obj.open, '.6f')) and float(format(tick2.close, '.6f')) == float(format(tick_obj.close, '.6f')) and float(format(tick2.volume, '.6f')) == float(format(tick_obj.volume, '.6f')):
                                                 if float(format(tick1.high, '.6f')) == float(format(tick_obj.high * btc_tick.high, '.6f')) and float(format(tick1.low, '.6f')) == float(format(tick_obj.low * btc_tick.low, '.6f')) and float(format(tick1.open, '.6f')) == float(format(tick_obj.open * btc_tick.open, '.6f')) and float(format(tick1.close, '.6f')) == float(format(tick_obj.close * btc_tick.close, '.6f')) and float(format(tick1.volume, '.6f')) == float(format(tick_obj.volume * btc_tick.volume, '.6f')):
-                                                    this.logger.error('pass validation btc convert usdt price: %s, %s, %s, %s', tick1.time, key, symbol, table_name)
+                                                    this.logger.info('pass validation btc convert usdt price: %s, %s, %s, %s', tick1.time, key, symbol, table_name)
                                                     break
                                                 else:
+                                                    this.logger.error('fail validation - btc convert usdt price not match: %s, %s, %s, %s', tick1.time, key, generic_symbol, 'market_ticks')
                                                     validation_s.table = 'market_ticks'
                                                     validation_s.msg = 'btc convert usdt price not match'
                                                     this.save_validation(validation_s)
-                                                    this.logger.error('fail validation - btc convert usdt price not match: %s, %s, %s, %s', tick1.time, key, generic_symbol, 'market_ticks')
                                                     break
                                             else:
+                                                this.logger.error('fail validation - btc price not match: %s, %s, %s, %s', tick1.time, key, generic_symbol, table_name)
                                                 validation_s.table = table_name
                                                 validation_s.msg = 'btc price not match'
                                                 this.save_validation(validation_s)
-                                                this.logger.error('fail validation - btc price not match: %s, %s, %s, %s', tick1.time, key, generic_symbol, table_name)
                                                 break
 
 
