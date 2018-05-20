@@ -188,7 +188,7 @@ class collector(object):
 
     def query_ticks_table_for_validation(this, table_name, time_second, key, generic_symbol):
         sql = "select time, market, symbol, high, low, open, close, volume, period, timezone_offset from %s where time = %s and market = '%s' and (symbol = '%s' or symbol = 'btcusdt')" % (table_name, time_second, key, generic_symbol)
-        print sql
+        this.logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
         if len(result) == 0 or not result.has_key('series'):
             this.logger.error('validation Error - ticks table has no price for time: %s , %s, %s, %s ', table_name, time_second, key, generic_symbol)
