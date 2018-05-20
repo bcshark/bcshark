@@ -1,5 +1,6 @@
 import requests
 import json
+import time
 
 from websocket import WebSocketApp
 from struct import pack_into, unpack_from
@@ -116,6 +117,7 @@ class collector(object):
             tick = this.calculate_usd_prices(tick)
 
         if tick:
+            this.logger.info('+++++: %s,%d,%s,%s,open: %f, close: %f, high: %f, low: %f, volume: %f', time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(time.time())), tick.time, this.market_name, symbol_name, tick.open, tick.close, tick.high, tick.low, tick.volume)
             this.db_adapter.save_tick(this.table_market_ticks_usd, this.market_name, symbol_name, tick)
             this.db_adapter.save_tick('market_ticks', this.market_name, symbol_name, tick)
 
@@ -184,8 +186,17 @@ class collector(object):
             return None
         return result['series']
 
+    def query_ticks_table_for_validation(this, table_name, time_second, key, generic_symbol):
+        sql = "select time, market, symbol, high, low, open, close, volume, period, timezone_offset from %s where time = %s and market = '%s' and (symbol = '%s' or symbol = 'btcusdt')" % (table_name, time_second, key, generic_symbol)
+        print sql
+        result = this.db_adapter.query(sql, epoch = 's')
+        if len(result) == 0 or not result.has_key('series'):
+            this.logger.error('validation Error - ticks table has no price for time: %s , %s, %s, %s ', table_name, time_second, key, generic_symbol)
+            return None
+        return result['series']
+
     def save_validation(this, validation):
-        sql = "select time, market, symbole, table from validation where time = %s and market = '%s' and symbol = '%s' order by time desc limit 1" % (validation.time * 1000000000, validation.market, validation.symbol)
+        sql = "select time, market, symbole, table from validation where time = %s and market = '%s' and symbol = '%s' and table = '%s' order by time desc limit 1" % (validation.time * 1000000000, validation.market, validation.symbol, validation.table)
         this.logger.debug(sql)
         ret = this.db_adapter.query(sql, epoch = 's')
         if ret and ret.has_key('series'):
