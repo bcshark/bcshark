@@ -17,12 +17,19 @@ TIMEOUT_COLLECT_IN_SECONDS = 60
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
+validation_logger = logging.getLogger('validation_logger')
 
 file_logger_handler = logging.handlers.TimedRotatingFileHandler(os.path.normpath(os.path.join(sys.path[0], 'logs/collect.log')), when = 'D', interval = 1, backupCount = 10)
 file_logger_handler.suffix = "%Y-%m-%d_%H-%M-%S.log"
 file_logger_handler.setFormatter(formatter)
 file_logger_handler.setLevel(logging.DEBUG)
 logger.addHandler(file_logger_handler)
+
+file_logger_handler_validation = logging.handlers.TimedRotatingFileHandler(os.path.normpath(os.path.join(sys.path[0], 'logs/validation.log')), when = 'D', interval = 1, backupCount = 10)
+file_logger_handler_validation.suffix = "%Y-%m-%d_%H-%M-%S.log"
+file_logger_handler_validation.setFormatter(formatter)
+file_logger_handler_validation.setLevel(logging.DEBUG)
+validation_logger.addHandler(file_logger_handler_validation)
 
 def get_symbols_from_csv(file_path):
     symbols_dict = {}
@@ -50,6 +57,7 @@ if __name__ == '__main__':
 
     settings = ConfigurationManager(os.path.normpath(os.path.join(sys.path[0], 'config/global.json')))
     settings['logger'] = logger
+    settings['validation_logger'] = validation_logger
     settings['db_adapter'] = influxdb_adapter(settings['influxdb'])
     #settings['db_adapter'] = mysqldb_adapter(settings['mysqldb'])
     settings['cache_manager'] = cache_manager_factory.create(settings['cache'])
