@@ -147,7 +147,8 @@ def generate_index_points(measurement_name, timestamp, symbol, period, prices):
             'high': total_high,
             'low': total_low,
             'open': total_open,
-            'close': total_close
+            'close': total_close,
+            'volume': total_volume
         }
     }
     return [ point ]
