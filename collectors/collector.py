@@ -15,6 +15,7 @@ class collector(object):
         this.settings = settings
         this.market_settings = market_settings
         this.logger = settings['logger']
+        this.validation_logger = settings['validation_logger']
         this.db_adapter = settings['db_adapter']
         this.cache_manager = settings['cache_manager']
         this.symbols = settings['symbols']
