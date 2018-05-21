@@ -6,6 +6,8 @@ from influxdb import InfluxDBClient
 
 DEFAULT_TOP_N = 10
 DEFAULT_PERIOD = '1min'
+DEFAULT_INDEX_SYMBOL = 'index'
+DEFAULT_TIMEZONE_OFFSET = 0
 
 class coin_symbol(object):
     pass
@@ -58,6 +60,12 @@ def translate_to_symbol(row):
     symbol.price_usd = row[5]
     symbol.volume_usd_24h = row[6]
     return symbol
+
+def get_timestamp_str(time_in_seconds, timezone_offset):
+    if isinstance(time_in_seconds, str) or isinstance(time_in_seconds, unicode):
+        return time_in_seconds
+    ret = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.localtime(time_in_seconds + timezone_offset))
+    return ret
 
 def get_first_and_last_timestamp(db_conn):
     # get maximal timestamp
@@ -119,11 +127,30 @@ def get_top10_symbols_prices(db_conn, begin_timestamp, symbols):
     return symbols
 
 def save_top10_symbols_index(db_conn, timestamp, prices, period, symbol):
-    pass
+    points = generate_index_points('k10_index_recalc', timestamp, symbol, period, prices)
+    db_conn.write_points(points)
 
 def close_influx_connection(db_conn):
     if db_conn:
         db_conn.close()
+
+def generate_index_points(measurement_name, timestamp, symbol, period, prices):
+    (total_high, total_low, total_open, total_close, total_volume) = prices
+    point = {
+        'measurement': measurement_name,
+        'tags': {
+            'symbol': symbol
+        },
+        'time': get_timestamp_str(timestamp, DEFAULT_TIMEZONE_OFFSET),
+        'fields': {
+            'period': period,
+            'high': total_high,
+            'low': total_low,
+            'open': total_open,
+            'close': total_close
+        }
+    }
+    return [ point ]
 
 if __name__ == '__main__':
     (db_host, db_port, db_database, db_username, db_password) = resolve_params()
@@ -149,7 +176,6 @@ if __name__ == '__main__':
             total_volume = 0
 
             symbols = get_top10_symbols(db_conn, first_timestamp)
-
             if symbols == None:
                 continue
 
@@ -168,7 +194,7 @@ if __name__ == '__main__':
                 if len(symbol.volumes) > 0:
                     total_volume = total_volume + symbol.ratio * sum(symbol.volumes) / len(symbol.volumes)
 
-            save_top10_symbols_index(db_conn, first_timestamp, (total_high, total_low, total_open, total_close), DEFAULT_PERIOD, symbol)
+            save_top10_symbols_index(db_conn, first_timestamp, (total_high, total_low, total_open, total_close, total_volume), DEFAULT_PERIOD, DEFAULT_INDEX_SYMBOL)
 
             print "[%s high: \033[32;1m%f\033[0m, low: \033[32;1m%f\033[0m, open: \033[32;1m%f\033[0m, close: \033[32;1m%f\033[0m" % (time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(first_timestamp)), total_high, total_low, total_open, total_close)
     except Exception, e:
