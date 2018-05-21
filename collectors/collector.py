@@ -15,6 +15,7 @@ class collector(object):
         this.settings = settings
         this.market_settings = market_settings
         this.logger = settings['logger']
+        this.validation_logger = settings['validation_logger']
         this.db_adapter = settings['db_adapter']
         this.cache_manager = settings['cache_manager']
         this.symbols = settings['symbols']
@@ -107,6 +108,10 @@ class collector(object):
         this.db_adapter.save_trade(this.table_market_trades, this.market_name, symbol_name, trade)
 
     def save_tick(this, symbol_name, tick):
+        current_minute = int(time.time()) - int(time.time()) % 60
+        this.internal_save_tick(current_minute, symbol_name, tick)
+
+    def internal_save_tick(this, current_minute, symbol_name, tick):
         if symbol_name == this.symbols_default[0]:
             this.update_cache(symbol_name, tick)
 
@@ -114,7 +119,7 @@ class collector(object):
 
         # calculate usd prices except btc-usd pair
         if not this.is_usd_price(symbol_name):
-            tick = this.calculate_usd_prices(tick)
+            tick = this.calculate_usd_prices(current_minute, tick)
 
         if tick:
             this.logger.info('+++++: %s,%d,%s,%s,open: %f, close: %f, high: %f, low: %f, volume: %f', time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(time.time())), tick.time, this.market_name, symbol_name, tick.open, tick.close, tick.high, tick.low, tick.volume)
@@ -122,6 +127,7 @@ class collector(object):
             this.db_adapter.save_tick('market_ticks', this.market_name, symbol_name, tick)
 
     def bulk_save_ticks(this, symbol_name, ticks):
+        current_minute = int(time.time()) - int(time.time()) % 60
         sql = "select time, market, symbol, high, low, open, close from %s where market = '%s' and symbol = '%s' group by market, symbol order by time desc limit 1" % (this.table_market_ticks, this.market_name, symbol_name)
         ret = this.db_adapter.query(sql, epoch = 's')
         if ret and ret.has_key('series'):
@@ -133,7 +139,7 @@ class collector(object):
         ticks.sort(lambda x, y: cmp(x.time, y.time))
         for index in range(len(ticks)):
             tick = ticks[index]
-            this.save_tick(symbol_name, tick)
+            this.internal_save_tick(current_minute, symbol_name, tick)
         #this.db_adapter.bulk_save_ticks(this.market_name, symbol_name, ticks)
 
     def save_k10_index(this, k10_index):
@@ -212,12 +218,20 @@ class collector(object):
 
         return None
     
-    def calculate_usd_prices(this, tick):
+    def calculate_usd_prices(this, current_minute, tick):
         if (not isinstance(tick, market_tick)) and (not isinstance(tick, dict)):
             return None
 
         if this.cache_manager:
-            cached_prices = this.cache_manager.load_market_symbol_tick(this.market_name, this.symbols_default[0])
+            if tick.time < current_minute:
+                # get btc-usdt price by record timestamp
+                current_minute = tick.time - tick.time % 60 + 60
+                sql = "select time, open, close, high, low from %s where symbol = '%s' and time < %d order by time desc limit 1" % (this.table_market_ticks, this.symbols_default[0], current_minute * 1e9)
+                ret = this.db_adapter.query(sql, epoch = 's')
+                cached_prices = ret['series'][0]['values'][0][:5]
+            else:
+                # get latest btc-usdt price
+                cached_prices = this.cache_manager.load_market_symbol_tick(this.market_name, this.symbols_default[0])
 
             if cached_prices:
                 if isinstance(tick, market_tick):
