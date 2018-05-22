@@ -49,8 +49,9 @@ class collector_k10_index_calc(collector):
             tick.open = float(obj['values'][0][5])
             tick.close = float(obj['values'][0][6])
             tick.volume = float(obj['values'][0][7])
+            tick.amount = float(obj['values'][0][8])
             ticks.append(tick)
-            this.logger.debug('k10 calc - Tick object generated from DB query: %s, %s, %s, %s, %s, %s, %s, %s', tick.time, tick.market, tick.symbol, tick.high, tick.low, tick.open, tick.close, tick.volume)
+            this.logger.debug('k10 calc - Tick object generated from DB query: %s, %s, %s, %s, %s, %s, %s, %s, %s', tick.time, tick.market, tick.symbol, tick.high, tick.low, tick.open, tick.close, tick.volume, tick.amount)
         this.logger.debug('k10 calc - length of Tick object generated from DB query: %s', len(ticks))
         return ticks
 
@@ -180,7 +181,10 @@ class collector_k10_index_calc(collector):
     def calculate_symbol_volume(this, ticks):
         sum_volume = 0
         for tick in ticks:
-            sum_volume = sum_volume + tick.volume
+            if tick.symbol != 'btcusdt' and ('btc' in tick.symbol):
+                sum_volume = sum_volume + tick.amount
+            else:
+                sum_volume = sum_volume + tick.volume
         this.logger.debug('k10 calc - Calculated Volume Is: %s for symbol: %s', sum_volume, ticks[0].symbol)
         return sum_volume
 
