@@ -18,7 +18,7 @@ restore:
 
 ### Run with Docker ###
 
-    docker run --name CoinMarket.Web -d -p 80:80 -v ~/Projects/CoinMarket/web/latest/:/usr/share/nginx/html:ro nginx:stable
+    docker run --name CoinMarket.Web -d -p 80:80 -v `pwd`/CoinMarket/web/latest/:/usr/share/nginx/html:ro nginx:stable
     docker run --name CoinMarket.Influx -d -p 8086:8086 -v `pwd`/influxdb:/var/lib/influxdb influxdb:latest
     docker run --name CoinMarket.Collector -it -link=CoinMarket.Influx:influxdb -p 5000:5000 -v `pwd`/CoinMarket:/home/ python:2 /bin/bash
 
