@@ -97,7 +97,7 @@ class market_ticks_validator(collector):
                                             validation_s.table = 'market_ticks'
                                             validation_s.msg = 'usdt price not match'
                                             this.save_validation(validation_s)
-                                            this.validation_logger.error('fail validation - usdt price not match: %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s', tick1.time, key, generic_symbol, tick1.high,tick2.high,tick1.low,tick2.low,tick1.open,tick2.open,tick1.close,tick2.close,tick1.volume,tick2.volume)
+                                            this.validation_logger.error('fail validation - usdt price not match: %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s', tick1.time, key, generic_symbol, float(format(tick2.high, '.6f')), float(format(tick1.high, '.6f')), float(format(tick2.low, '.6f')), float(format(tick1.low, '.6f')), float(format(tick2.open, '.6f')), float(format(tick1.open, '.6f')), float(format(tick2.close, '.6f')), float(format(tick1.close, '.6f')), float(format(tick2.volume, '.6f')), float(format(tick1.volume, '.6f')))
                                             break
                                     else:
                                         table_name = key + '_ticks'
