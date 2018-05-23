@@ -37,13 +37,12 @@ class market_ticks_validator(collector):
 
     def collect_rest(this):
         time_second = int(time.time()) #TODO: verify time format and timezone should be UTC
-        start_second = time_second - (time_second % 60) - 1800 + this.timezone_offset
+        start_second = time_second - (time_second % 60) - 2400 + this.timezone_offset
         end_second = time_second - (time_second % 60) - 300 + this.timezone_offset
         this.validation_logger.info('validation start with range: %s, %s', start_second, end_second)
         symbol_dict = this.symbols_all_market
         for key in symbol_dict:
-            # if key != 'default' and key != '_title' and key != 'k10_daily_rank' and key != 'bittrex' and key != 'bitfinex' and key != 'bitstamp':
-            if key == 'gdax':
+            if key != 'default' and key != '_title' and key != 'k10_daily_rank' and key != 'bittrex' and key != 'bitfinex' and key != 'bitstamp':
                 symbols = symbol_dict[key]
                 for symbol in symbols:
                     if symbol == '':
@@ -78,6 +77,9 @@ class market_ticks_validator(collector):
                                 temp_time = temp_time + period
                             temp_time = temp_time + period
 
+                        if ticks_rest is None:
+                            this.validation_logger.error('validation error! fail to get REST response for: %s, %s', key, symbol)
+                            break;
                         for tick1 in ticks_db:
                             for tick2 in ticks_rest:
                                 if tick2.time == tick1.time - this.timezone_offset:
@@ -97,7 +99,7 @@ class market_ticks_validator(collector):
                                             validation_s.table = 'market_ticks'
                                             validation_s.msg = 'usdt price not match'
                                             this.save_validation(validation_s)
-                                            this.validation_logger.error('fail validation - usdt price not match: %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s', tick1.time, key, generic_symbol, tick1.high,tick2.high,tick1.low,tick2.low,tick1.open,tick2.open,tick1.close,tick2.close,tick1.volume,tick2.volume)
+                                            this.validation_logger.error('fail validation - usdt price not match: %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s', tick1.time, key, generic_symbol, float(format(tick2.high, '.6f')), float(format(tick1.high, '.6f')), float(format(tick2.low, '.6f')), float(format(tick1.low, '.6f')), float(format(tick2.open, '.6f')), float(format(tick1.open, '.6f')), float(format(tick2.close, '.6f')), float(format(tick1.close, '.6f')), float(format(tick2.volume, '.6f')), float(format(tick1.volume, '.6f')))
                                             break
                                     else:
                                         table_name = key + '_ticks'
@@ -128,17 +130,17 @@ class market_ticks_validator(collector):
                                                 btc_tick = ticks_objs[1]
                                                 tick_obj = ticks_objs[0]
                                             if float(format(tick2.high, '.6f')) == float(format(tick_obj.high, '.6f')) and float(format(tick2.low, '.6f')) == float(format(tick_obj.low, '.6f')) and float(format(tick2.open, '.6f')) == float(format(tick_obj.open, '.6f')) and float(format(tick2.close, '.6f')) == float(format(tick_obj.close, '.6f')) and float(format(tick2.volume, '.6f')) == float(format(tick_obj.volume, '.6f')):
-                                                if float(format(tick1.high, '.6f')) == float(format(tick_obj.high * btc_tick.high, '.6f')) and float(format(tick1.low, '.6f')) == float(format(tick_obj.low * btc_tick.low, '.6f')) and float(format(tick1.open, '.6f')) == float(format(tick_obj.open * btc_tick.open, '.6f')) and float(format(tick1.close, '.6f')) == float(format(tick_obj.close * btc_tick.close, '.6f')) and float(format(tick1.volume, '.6f')) == float(format(tick_obj.volume * btc_tick.volume, '.6f')):
+                                                if float(format(tick1.high, '.6f')) == float(format(tick_obj.high * btc_tick.high, '.6f')) and float(format(tick1.low, '.6f')) == float(format(tick_obj.low * btc_tick.low, '.6f')) and float(format(tick1.open, '.6f')) == float(format(tick_obj.open * btc_tick.open, '.6f')) and float(format(tick1.close, '.6f')) == float(format(tick_obj.close * btc_tick.close, '.6f')) and float(format(tick1.volume, '.6f')) == float(format(tick_obj.volume, '.6f')):
                                                     this.validation_logger.info('pass validation btc convert usdt price: %s, %s, %s, %s', tick1.time, key, symbol, table_name)
                                                     break
                                                 else:
-                                                    this.validation_logger.error('fail validation - btc convert usdt price not match: %s, %s, %s, %s', tick1.time, key, generic_symbol, 'market_ticks')
+                                                    this.validation_logger.error('fail validation - btc convert usdt price not match: %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s', tick1.time, key, generic_symbol, 'market_ticks', float(format(tick1.high, '.6f')), float(format(tick_obj.high * btc_tick.high, '.6f')), float(format(tick1.low, '.6f')), float(format(tick_obj.low * btc_tick.low, '.6f')), float(format(tick1.open, '.6f')), float(format(tick_obj.open * btc_tick.open, '.6f')), float(format(tick1.close, '.6f')), float(format(tick_obj.close * btc_tick.close, '.6f')), float(format(tick1.volume, '.6f')), float(format(tick_obj.volume, '.6f')))
                                                     validation_s.table = 'market_ticks'
                                                     validation_s.msg = 'btc convert usdt price not match'
                                                     this.save_validation(validation_s)
                                                     break
                                             else:
-                                                this.validation_logger.error('fail validation - btc price not match: %s, %s, %s, %s', tick1.time, key, generic_symbol, table_name)
+                                                this.validation_logger.error('fail validation - btc price not match: %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s', tick1.time, key, generic_symbol, table_name, float(format(tick2.high, '.6f')), float(format(tick_obj.high, '.6f')), float(format(tick2.low, '.6f')), float(format(tick_obj.low, '.6f')), float(format(tick2.open, '.6f')), float(format(tick_obj.open, '.6f')), float(format(tick2.close, '.6f')), float(format(tick_obj.close, '.6f')), float(format(tick2.volume, '.6f')), float(format(tick_obj.volume, '.6f')))
                                                 validation_s.table = table_name
                                                 validation_s.msg = 'btc price not match'
                                                 this.save_validation(validation_s)
@@ -211,7 +213,7 @@ class market_ticks_validator(collector):
                 ticks.append(tick)
             return ticks
         if key == 'gdax':
-            start = (datetime.datetime.utcnow() - datetime.timedelta(minutes = 12)).strftime('%Y-%m-%dT%H:%MZ')
+            start = (datetime.datetime.utcnow() - datetime.timedelta(minutes = 60)).strftime('%Y-%m-%dT%H:%MZ')
             end = (datetime.datetime.utcnow()).strftime('%Y-%m-%dT%H:%MZ')
             url = "https://api.gdax.com/products/%s/candles?start=%s&end=%s&granularity=60" % (symbol, start, end)
             rest = this.http_request_json(url, None)

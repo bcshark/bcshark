@@ -197,7 +197,7 @@ if __name__ == '__main__':
 
             save_top10_symbols_index(db_conn, first_timestamp, (total_high, total_low, total_open, total_close, total_volume), DEFAULT_PERIOD, DEFAULT_INDEX_SYMBOL)
 
-            print "[%s high: \033[32;1m%f\033[0m, low: \033[32;1m%f\033[0m, open: \033[32;1m%f\033[0m, close: \033[32;1m%f\033[0m" % (time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(first_timestamp)), total_high, total_low, total_open, total_close)
+            print "[%s high: \033[32;1m%f\033[0m, low: \033[32;1m%f\033[0m, open: \033[32;1m%f\033[0m, close: \033[32;1m%f\033[0m, volume: \033[32;1m%f\033[0m" % (time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(first_timestamp)), total_high, total_low, total_open, total_close, total_volume)
     except Exception, e:
         print e
     finally:
