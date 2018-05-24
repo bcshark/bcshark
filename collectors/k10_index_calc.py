@@ -181,10 +181,7 @@ class collector_k10_index_calc(collector):
     def calculate_symbol_volume(this, ticks):
         sum_volume = 0
         for tick in ticks:
-            if tick.symbol != 'btcusdt' and ('btc' in tick.symbol):
-                sum_volume = sum_volume + tick.amount
-            else:
-                sum_volume = sum_volume + tick.volume
+            sum_volume = sum_volume + ((tick.high + tick.low) / 2 * tick.volume)
         this.logger.debug('k10 calc - Calculated Volume Is: %s for symbol: %s', sum_volume, ticks[0].symbol)
         return sum_volume
 
