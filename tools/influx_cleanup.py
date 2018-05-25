@@ -8,6 +8,7 @@ DEFAULT_TOP_N = 10
 DEFAULT_PERIOD = '1min'
 DEFAULT_INDEX_SYMBOL = 'index'
 DEFAULT_TIMEZONE_OFFSET = 0
+DEFAULT_MULTIPLE = 10
 
 class coin_symbol(object):
     pass
@@ -72,32 +73,55 @@ def get_first_and_last_timestamp(db_conn):
     sql = "select time, * from market_ticks order by time desc limit 1"
     rows = db_conn.query(sql, epoch = 's').raw
     last_timestamp = rows['series'][0]['values'][0][0]
+    last_timestamp = last_timestamp - last_timestamp % 60 + 60
 
     # get minimal timestamp
     sql = "select time, * from market_ticks order by time limit 1"
     rows = db_conn.query(sql, epoch = 's').raw
     first_timestamp = rows['series'][0]['values'][0][0]
+    first_timestamp = first_timestamp - first_timestamp % 60
 
     return (first_timestamp, last_timestamp)
 
 def get_top10_symbols(db_conn, begin_timestamp):
+    global latest_symbols_rank
+
     end_timestamp = begin_timestamp + 60
-    sql = "select time, symbol, rank, market_cap_usd, price_btc, price_usd, volume_usd_24h from k10_daily_rank where time >= %d and time < %d group by symbol" % (begin_timestamp * 1e9, end_timestamp * 1e9)
+    #sql = "select time, symbol, rank, market_cap_usd, price_btc, price_usd, volume_usd_24h from k10_daily_rank where time >= %d and time < %d group by symbol" % (begin_timestamp * 1e9, end_timestamp * 1e9)
+    sql = "select time, symbol, rank, market_cap_usd, price_btc, price_usd, volume_usd_24h from k10_daily_rank where time < %d group by symbol order by time desc limit 1" % (end_timestamp * 1e9)
     rows = db_conn.query(sql, epoch = 's').raw
 
-    if not rows.has_key('series'):
-        return None
-    else:
-        symbols = []
+    if rows.has_key('series'):
         for row in rows['series']:
-            symbols.append(translate_to_symbol(row['values'][0]))
-        symbols.sort(lambda x, y: cmp(x.rank, y.rank))
-        return symbols[:DEFAULT_TOP_N]
+            symbol = translate_to_symbol(row['values'][0])
+            latest_symbols_rank[symbol.symbol] = (symbol.rank, symbol)
+
+    symbols = []
+    latest_symbols_rank_items = latest_symbols_rank.items()
+
+    if len(latest_symbols_rank_items) >= DEFAULT_TOP_N:
+        latest_symbols_rank_items.sort(lambda (xk, (xr, x)), (yk, (yr, y)): cmp(xr, yr))
+        for rank_item in latest_symbols_rank_items[:DEFAULT_TOP_N]:
+            symbol = rank_item[1][1]
+            symbols.append(symbol)
+            #print (begin_timestamp, symbol.symbol, symbol.rank, symbol.price_usd, symbol.market_cap_usd)
+        return symbols
+    else:
+        return None
 
 def get_top10_symbols_ratio(db_conn, begin_timestamp, symbols):
+    left_ratio = 1.0
     total = reduce(lambda last, current: last + current.market_cap_usd, [0,] + symbols)
-    for symbol in symbols:
+    for symbol in symbols[:len(symbols) - 1]:
         symbol.ratio = 1.0 * symbol.market_cap_usd / total
+        left_ratio = left_ratio - symbol.ratio
+    symbols[len(symbols) - 1].ratio = left_ratio
+
+    """
+    for symbol in symbols:
+        print (begin_timestamp, symbol.symbol, symbol.rank, symbol.price_usd, symbol.market_cap_usd, symbol.ratio)
+    """
+
     return symbols
 
 def get_top10_symbols_prices(db_conn, begin_timestamp, symbols):
@@ -105,7 +129,8 @@ def get_top10_symbols_prices(db_conn, begin_timestamp, symbols):
 
     for symbol in symbols:
         tick_symbol_filter = "(symbol = '%susdt' or symbol = '%sbtc')" % (symbol.symbol.lower(), symbol.symbol.lower())
-        sql = "select time, symbol, market, open, close, high, low, volume from market_ticks where time >= %d and time < %d and %s group by symbol, market" % (begin_timestamp * 1e9, end_timestamp * 1e9, tick_symbol_filter)
+        #sql = "select time, symbol, market, open, close, high, low, volume from market_ticks where time >= %d and time < %d and %s group by symbol, market order by time desc" % (begin_timestamp * 1e9, end_timestamp * 1e9, tick_symbol_filter)
+        sql = "select time, symbol, market, open, close, high, low, volume from market_ticks where time < %d and %s group by symbol, market order by time desc limit 1" % (end_timestamp * 1e9, tick_symbol_filter)
         rows = db_conn.query(sql, epoch = 's').raw
 
         symbol.prices = coin_symbol_price()
@@ -123,6 +148,7 @@ def get_top10_symbols_prices(db_conn, begin_timestamp, symbols):
                 symbol.prices.high.append(prices[5])
                 symbol.prices.low.append(prices[6])
                 symbol.volumes.append(prices[7])
+                #print (begin_timestamp, symbol.symbol, prices)
 
     return symbols
 
@@ -154,6 +180,8 @@ def generate_index_points(measurement_name, timestamp, symbol, period, prices):
     return [ point ]
 
 if __name__ == '__main__':
+    global latest_symbols_rank
+
     (db_host, db_port, db_database, db_username, db_password) = resolve_params()
 
     if not db_host or not db_port or not db_database:
@@ -162,6 +190,7 @@ if __name__ == '__main__':
 
     db_conn = None
 
+    latest_symbols_rank = {}
     previous_top10_symbols = None
 
     try:
@@ -170,11 +199,11 @@ if __name__ == '__main__':
         (first_timestamp, last_timestamp) = get_first_and_last_timestamp(db_conn)
 
         for first_timestamp in range(first_timestamp, last_timestamp, 60):
-            total_high = 0
-            total_low = 0
-            total_open = 0
-            total_close = 0
-            total_volume = 0
+            total_high = 0.0
+            total_low = 0.0
+            total_open = 0.0
+            total_close = 0.0
+            total_volume = 0.0
 
             symbols = get_top10_symbols(db_conn, first_timestamp)
             if symbols == None:
@@ -195,9 +224,15 @@ if __name__ == '__main__':
                 if len(symbol.volumes) > 0:
                     total_volume = total_volume + symbol.ratio * sum(symbol.volumes) / len(symbol.volumes)
 
-            save_top10_symbols_index(db_conn, first_timestamp, (total_high, total_low, total_open, total_close, total_volume), DEFAULT_PERIOD, DEFAULT_INDEX_SYMBOL)
+            if total_high > 0 and total_low > 0 and total_open > 0 and total_close > 0:
+                total_high = total_high / DEFAULT_TOP_N * DEFAULT_MULTIPLE
+                total_low = total_low / DEFAULT_TOP_N * DEFAULT_MULTIPLE
+                total_open = total_open / DEFAULT_TOP_N * DEFAULT_MULTIPLE
+                total_close = total_close / DEFAULT_TOP_N * DEFAULT_MULTIPLE
 
-            print "[%s] high: \033[32;1m%f\033[0m, low: \033[32;1m%f\033[0m, open: \033[32;1m%f\033[0m, close: \033[32;1m%f\033[0m, volume: \033[32;1m%f\033[0m" % (time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(first_timestamp)), total_high, total_low, total_open, total_close, total_volume)
+                save_top10_symbols_index(db_conn, first_timestamp, (total_high, total_low, total_open, total_close, total_volume), DEFAULT_PERIOD, DEFAULT_INDEX_SYMBOL)
+                print "[%s(%d)] high: \033[32;1m%f\033[0m, low: \033[32;1m%f\033[0m, open: \033[32;1m%f\033[0m, close: \033[32;1m%f\033[0m, volume: \033[32;1m%f\033[0m" % (time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(first_timestamp)), first_timestamp, total_high, total_low, total_open, total_close, total_volume)
+
     except Exception, e:
         print e
     finally:

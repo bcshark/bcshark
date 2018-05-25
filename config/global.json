@@ -57,13 +57,6 @@
 				"rest": "https://poloniex.com/" 
 			} 
 		},
-		"okcoin": { 
-			"title": "OkCoin",
-			"order": 4,
-			"api": { 
-				"rest": "https://www.okcoin.com/api/v1/" 
-			} 
-		},
 		"gdax": { 
 			"title": "GDAX",
 			"order": 5,
