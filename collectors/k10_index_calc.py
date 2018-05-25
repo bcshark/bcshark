@@ -106,7 +106,7 @@ class collector_k10_index_calc(collector):
             avg_close = this.calculate_symbol_avg_price(ticks, 'close')
             total_close_weight = total_close_weight + avg_close * rank.cap_ratio
             sum_volume = this.calculate_symbol_volume(ticks)
-            total_volume_weight = total_volume_weight + sum_volume * rank.cap_ratio
+            total_volume_weight = total_volume_weight + sum_volume
 
         if cal_length == 0:
             this.logger.error('k10 calc Error - validated symbol weight is 0 ! program exit')
