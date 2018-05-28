@@ -9,7 +9,7 @@ from .utility import *
 
 class collector_k10_index_calc(collector):
     DEFAULT_PERIOD = "1min"
-    MULTIPLY_RATIO = 100
+    MULTIPLY_RATIO = 1000
     # BASIC PRICE FOR EACH MARKET AT GMT 2018-05-15 08:00 - 08:01 [HIGH, LOW, OPEN, CLOSE]
     BASIC_PRICE = {
     'BASIC_ADA':[0.273427],
@@ -180,16 +180,12 @@ class collector_k10_index_calc(collector):
         for tick in ticks:
             if price_field == 'high':
                 sum_price = sum_price + tick.high
-                this.logger.debug('high++++++sum_price: %s', sum_price)
             if price_field == 'low':
                 sum_price = sum_price + tick.low
-                this.logger.debug('low++++++sum_price: %s', sum_price)
             if price_field == 'open':
                 sum_price = sum_price + tick.open
-                this.logger.debug('open++++++sum_price: %s', sum_price)
             if price_field == 'close':
                 sum_price = sum_price + tick.close
-                this.logger.debug('close++++++sum_price: %s', sum_price)
         weight = (sum_price / len(ticks) / base_price) * rank.cap_ratio
         this.logger.debug('k10 calc - Calculated weight %s Is: %s for symbol: %s', price_field, weight, rank.symbol)
         return weight
