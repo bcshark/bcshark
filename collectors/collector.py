@@ -211,6 +211,19 @@ class collector(object):
                 return
         this.db_adapter.save_validation(validation)
 
+    def query_db_re_gen_table(this):
+        sql = "select flag from re_generate_table"
+        this.logger.debug(sql)
+        result = this.db_adapter.query(sql, epoch = 's')
+        if len(result) == 0 or not result.has_key('series'):
+            this.logger.error('k10 index Calc Error - re_generate_table has no date ')
+            return None
+        return result['series']
+
+    def update_db_re_gen_table_false(this):
+        this.db_adapter.update_db_re_gen_table_false()
+        this.logger.info('table re generate flag updated to false!')
+
     def get_generic_symbol_name(this, symbol_name):
         for symbol_index in range(len(this.symbols_market)):
             if this.symbols_market[symbol_index] == symbol_name:

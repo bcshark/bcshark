@@ -136,6 +136,16 @@ class influxdb_adapter(database_adapter):
         }
         return [ point ]
 
+    def write_db_re_gen_table_false(this, measurement_name):
+        point = {
+            'measurement': measurement_name,
+            'time': get_timestamp_str(1526371200, 0),
+            'fields': {
+                'flag':  'false'
+            }
+        }
+        return [ point ]
+
     def save_trade(this, measurement_name, market_name, symbol_name, trade):
         points = [ this.generate_point_by_trade(measurement_name, market_name, symbol_name, trade) ]
 
@@ -167,4 +177,8 @@ class influxdb_adapter(database_adapter):
 
     def save_validation(this, validation):
         points = this.generate_points_validation('validation', validation)
+        this.client.write_points(points)
+
+    def update_db_re_gen_table_false(this):
+        points = this.write_db_re_gen_table_false('re_generate_table')
         this.client.write_points(points)
