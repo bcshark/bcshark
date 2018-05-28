@@ -9,7 +9,19 @@ from .utility import *
 
 class collector_k10_index_calc(collector):
     DEFAULT_PERIOD = "1min"
-    MULTIPLY_RATIO = 10
+    MULTIPLY_RATIO = 100
+    # BASIC PRICE FOR EACH MARKET AT GMT 2018-05-15 08:00 - 08:01 [HIGH, LOW, OPEN, CLOSE]
+    BASIC_PRICE = {
+    'BASIC_ADA':[0.273427],
+    'BASIC_BTC':[8720.361692494002],
+    'BASIC_BCH':[1425.6034000000002],
+    'BASIC_ETH':[733.152397074],
+    'BASIC_ETC':[19.498168657109375],
+    'BASIC_EOS':[14.127700907812502],
+    'BASIC_DASH':[442.0082719572917],
+    'BASIC_LTC':[146.837522],
+    'BASIC_XRP':[0.73803522421875],
+    'BASIC_XMR':[215.95556397359377]}
 
     @property
     def market_name(this):
@@ -80,7 +92,7 @@ class collector_k10_index_calc(collector):
 
         for rank in ranks:
             ticks = []
-            print(rank.symbol[0], rank.symbol[1], start_second)
+            this.logger.debug('%s, %s, %s', rank.symbol[0], rank.symbol[1], start_second)
             tick_result = this.query_previous_min_price(rank.symbol[0], rank.symbol[1], start_second)
             if tick_result == None:
                 miss_price_market = this.find_miss_price_market(rank.symbol, None)
@@ -97,14 +109,10 @@ class collector_k10_index_calc(collector):
                 this.logger.error('k10 calc Error - No price found, bypass this symbol: %s, %s ', rank.symbol[0], rank.symbol[1])
                 cal_length = cal_length - 1 ###TODO: by pass one symbol in index calc need to re-calculate the ratio for each existing symbol again
                 continue
-            avg_high = this.calculate_symbol_avg_price(ticks, 'high')
-            total_high_weight = total_high_weight + avg_high * rank.cap_ratio
-            avg_low = this.calculate_symbol_avg_price(ticks, 'low')
-            total_low_weight = total_low_weight + avg_low * rank.cap_ratio
-            avg_open = this.calculate_symbol_avg_price(ticks, 'open')
-            total_open_weight = total_open_weight + avg_open * rank.cap_ratio
-            avg_close = this.calculate_symbol_avg_price(ticks, 'close')
-            total_close_weight = total_close_weight + avg_close * rank.cap_ratio
+            total_high_weight = total_high_weight + this.calculate_symbol_weight(ticks, 'high', rank)
+            total_low_weight = total_low_weight + this.calculate_symbol_weight(ticks, 'low', rank)
+            total_open_weight = total_open_weight + this.calculate_symbol_weight(ticks, 'open', rank)
+            total_close_weight = total_close_weight +  this.calculate_symbol_weight(ticks, 'close', rank)
             sum_volume = this.calculate_symbol_volume(ticks)
             total_volume_weight = total_volume_weight + sum_volume
 
@@ -112,11 +120,11 @@ class collector_k10_index_calc(collector):
             this.logger.error('k10 calc Error - validated symbol weight is 0 ! program exit')
             return
         index.timezone_offset = this.timezone_offset
-        index.high = (total_high_weight / cal_length) * this.MULTIPLY_RATIO
-        index.low = (total_low_weight / cal_length) * this.MULTIPLY_RATIO
-        index.open = (total_open_weight / cal_length) * this.MULTIPLY_RATIO
-        index.close = (total_close_weight / cal_length) * this.MULTIPLY_RATIO
-        index.volume = (total_volume_weight)
+        index.high = total_high_weight * this.MULTIPLY_RATIO
+        index.low = total_low_weight * this.MULTIPLY_RATIO
+        index.open = total_open_weight * this.MULTIPLY_RATIO
+        index.close = total_close_weight * this.MULTIPLY_RATIO
+        index.volume = total_volume_weight
         index.time = start_second
         index.period = '1min'
 
@@ -142,12 +150,14 @@ class collector_k10_index_calc(collector):
         indexArray = [indexObj]
         if index.high != 0 and index.low != 0 and index.open != 0 and index.close != 0:
             this.save_k10_index(indexArray[0])
+        else:
+            this.logger.error('k10 Calc Error - index price is 0! %s, %s, %s, %s ', index.high, index.low, index.open, index.close)
 
         this.logger.info('k10 index calc done !')
 
     def getStartSecondPreviousMinute(this):
         time_second = int(time.time())
-        time_second = time_second - (time_second % 60) - 300 + this.timezone_offset
+        time_second = time_second - (time_second % 60) - 600 + this.timezone_offset
         this.logger.debug('k10 calc - start second generated: %s', time_second)
         return time_second;
 
@@ -161,22 +171,28 @@ class collector_k10_index_calc(collector):
         return ranks
 
 
-    def calculate_symbol_avg_price(this, ticks, price_field):
+    def calculate_symbol_weight(this, ticks, price_field, rank):
 
         sum_price = 0
+        index_field = 'BASIC_' + rank.symbol[0].split('usdt')[0].upper()
+        base_price = this.BASIC_PRICE[index_field][0]
+        this.logger.debug('basic price name: %s, %s', index_field, base_price)
         for tick in ticks:
             if price_field == 'high':
                 sum_price = sum_price + tick.high
+                this.logger.debug('high++++++sum_price: %s', sum_price)
             if price_field == 'low':
                 sum_price = sum_price + tick.low
+                this.logger.debug('low++++++sum_price: %s', sum_price)
             if price_field == 'open':
                 sum_price = sum_price + tick.open
+                this.logger.debug('open++++++sum_price: %s', sum_price)
             if price_field == 'close':
                 sum_price = sum_price + tick.close
-
-        avg_price = sum_price/(len(ticks))
-        this.logger.debug('k10 calc - Calculated Avg Price %s Is: %s for symbol: %s', price_field, avg_price, ticks[0].symbol)
-        return avg_price
+                this.logger.debug('close++++++sum_price: %s', sum_price)
+        weight = (sum_price / len(ticks) / base_price) * rank.cap_ratio
+        this.logger.debug('k10 calc - Calculated weight %s Is: %s for symbol: %s', price_field, weight, rank.symbol)
+        return weight
 
     def calculate_symbol_volume(this, ticks):
         sum_volume = 0

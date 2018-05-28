@@ -38,7 +38,7 @@ class market_ticks_validator(collector):
     def collect_rest(this):
         time_second = int(time.time()) #TODO: verify time format and timezone should be UTC
         start_second = time_second - (time_second % 60) - 3300 + this.timezone_offset
-        end_second = time_second - (time_second % 60) - 300 + this.timezone_offset
+        end_second = time_second - (time_second % 60) - 600 + this.timezone_offset
         this.validation_logger.info('validation start with range: %s, %s', start_second, end_second)
         symbol_dict = this.symbols_all_market
         for key in symbol_dict:
