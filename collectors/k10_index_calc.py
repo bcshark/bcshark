@@ -68,8 +68,26 @@ class collector_k10_index_calc(collector):
         return ticks
 
     def collect_rest(this):
+        db_re_gen_flag = this.query_db_re_gen_table()
+        if db_re_gen_flag is not None and db_re_gen_flag[0]['values'][0][1] == 'true':
+            this.logger.info('start to RE Generate k10 index !')
+            this.re_generate_index()
+            this.update_db_re_gen_table_false()
+        else:
+            this.logger.info('start to Calculate k10 index !')
+            start_second = this.getStartSecondPreviousMinute()
+            this.generate_index(start_second)
 
-        start_second = this.getStartSecondPreviousMinute()
+    def re_generate_index(this):
+        re_gen_start = 1526371200  # start from GMT 2018-05-15 08:00
+        re_gen_end = this.getStartSecondPreviousMinute()  # current server time second - 10 minutes
+        while re_gen_start <= re_gen_end:
+            this.logger.info('++++++ generating index for time second: %s', re_gen_start)
+            this.generate_index(re_gen_start)
+            re_gen_start = re_gen_start + 60
+
+    def generate_index(this, start_second):
+
         index = k10_index()
         rank_result = this.query_k10_daily_rank(start_second)
         if rank_result == None:
