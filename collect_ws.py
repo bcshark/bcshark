@@ -69,6 +69,7 @@ if __name__ == '__main__':
 
     settings = ConfigurationManager(os.path.normpath(os.path.join(sys.path[0], 'config/global.json')))
     settings['logger'] = logger
+    settings['validation_logger'] = logger
     settings['db_adapter'] = influxdb_adapter(settings['influxdb'])
     #settings['db_adapter'] = mysqldb_adapter(settings['mysqldb'])
     settings['cache_manager'] = cache_manager_factory.create(settings['cache'])

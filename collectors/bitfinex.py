@@ -24,18 +24,18 @@ class collector_bitfinex(collector):
         this.subscribed_channels = {}
 
     def translate(this, obj):
-        tick = {
-            "time": obj[0] / 1000,
-            "timezone_offset" : this.timezone_offset,
-            "open" : float(obj[1]),
-            "close" : float(obj[2]),
-            "low" : float(obj[4]),
-            "high" : float(obj[3]),
-            "amount" : float(0),
-            "volume" : float(obj[5]),
-            "count" : 0,
-            "period" : this.get_generic_period_name(this.period)
-        }
+        tick = market_tick()
+
+        tick.time = long(obj[0] / 1000)
+        tick.timezone_offset = this.timezone_offset
+        tick.open = float(obj[1])
+        tick.close = float(obj[2])
+        tick.low = float(obj[4])
+        tick.high = float(obj[3])
+        tick.amount = 0.0
+        tick.volume = float(obj[5])
+        tick.count = 0
+        tick.period = this.get_generic_period_name(this.period)
 
         return tick
 
