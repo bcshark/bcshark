@@ -12,8 +12,6 @@ from collectors.collector_factory import collector_factory
 from adapters.influxdb_adapter import influxdb_adapter
 #from adapters.mysqldb_adapter import mysqldb_adapter
 
-TIMEOUT_COLLECT_IN_SECONDS = 60
-
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
@@ -63,6 +61,8 @@ if __name__ == '__main__':
     settings['cache_manager'] = cache_manager_factory.create(settings['cache'])
     settings['symbols'] = get_symbols_from_csv(settings['symbols']['path'])
 
+    rest_api_timeout = settings['rest_api_timeout']
+
     factory = collector_factory(settings)
     threads = []
 
@@ -77,7 +77,7 @@ if __name__ == '__main__':
         thread.start()
 
     for thread in threads:
-        thread.join(TIMEOUT_COLLECT_IN_SECONDS)
+        thread.join(rest_api_timeout)
 
     settings['db_adapter'].close()
     settings['cache_manager'].dispose()

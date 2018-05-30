@@ -1,5 +1,6 @@
 { 
 	"timezone_offset": 0,
+	"rest_api_timeout": 1500,
 	"influxdb": {
 		"host": "influxdb",
 		"port": 8086,

@@ -100,10 +100,10 @@ var TvKlineController = ['$scope', '$http', '$interval', '$window', 'MarketServi
 
 			if (ENABLE_MOVING_AVERAGE) {
 				widget.onChartReady(function() {
-					widget.chart().createStudy('Moving Average', false, true, [  5, "close", 0 ], null, { 'plot.color': '#CC0066' });
-					widget.chart().createStudy('Moving Average', false, true, [ 10, "close", 0 ], null, { 'plot.color': '#FFCCFF' });
-					widget.chart().createStudy('Moving Average', false, true, [ 30, "close", 0 ], null, { 'plot.color': '#66FFFF' });
-					widget.chart().createStudy('Moving Average', false, true, [ 60, "close", 0 ], null, { 'plot.color': '#66FF00' });
+					widget.chart().createStudy('Moving Average', false, true, [  5, "close", 0 ], null, { 'plot.color': '#00CCFF' });
+					widget.chart().createStudy('Moving Average', false, true, [ 10, "close", 0 ], null, { 'plot.color': '#66CC00' });
+					widget.chart().createStudy('Moving Average', false, true, [ 30, "close", 0 ], null, { 'plot.color': '#CC99FF' });
+					widget.chart().createStudy('Moving Average', false, true, [ 60, "close", 0 ], null, { 'plot.color': '#FF0066' });
 				});
 			}
 		});
