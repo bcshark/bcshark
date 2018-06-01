@@ -43,7 +43,8 @@ class collector_bitfinex(collector):
         this.logger.info('bitfinex websocket connection established')
 
     def on_message(this, websocket_client, raw_message):
-        this.logger.info('receive message from bitfinex websocket: %s', raw_message)
+        #this.logger.info('receive message from bitfinex websocket: %s', raw_message)
+        this.logger.info('receive message from bitfinex websocket: (hide)')
         
         message_json = json.loads(raw_message)
 
