@@ -89,7 +89,7 @@ class collector_huobi(collector):
                 this.logger.error('cannot get response from huobi (%s)' % symbol)
                 continue
 
-            this.bulk_save_ticks(this.get_generic_symbol_name(symbol), [ this.translate(ticks['ts'], tick) for tick in ticks['data'] ])
+            this.save_market_ticks(this.get_generic_symbol_name(symbol), [ this.translate(ticks['ts'], tick) for tick in ticks['data'] ])
 
             this.logger.info('get response from huobi')
 

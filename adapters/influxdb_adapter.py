@@ -98,10 +98,10 @@ class influxdb_adapter(database_adapter):
                 'period': k10_rank.period
             }
         }
+
         return [ point ]
 
     def generate_points_by_k10_index(this, measurement_name, k10_index):
-
         point = {
             'measurement': measurement_name,
             'tags': {
@@ -118,6 +118,7 @@ class influxdb_adapter(database_adapter):
                 'period': k10_index['period']
             }
         }
+
         return [ point ]
 
     def generate_points_validation(this, measurement_name, validation):
@@ -134,51 +135,49 @@ class influxdb_adapter(database_adapter):
                 'msg':  validation.msg
             }
         }
+
         return [ point ]
-
-    def write_db_re_gen_table_false(this, measurement_name):
-        point = {
-            'measurement': measurement_name,
-            'time': get_timestamp_str(1526371200, 0),
-            'fields': {
-                'flag':  'false'
-            }
-        }
-        return [ point ]
-
-    def save_trade(this, measurement_name, market_name, symbol_name, trade):
-        points = [ this.generate_point_by_trade(measurement_name, market_name, symbol_name, trade) ]
-
-        this.client.write_points(points)
-
-    def save_tick(this, measurement_name, market_name, symbol_name, tick):
-        points = [ this.generate_point_by_tick(measurement_name, market_name, symbol_name, tick) ]
-
-        this.client.write_points(points)
-
-    def bulk_save_ticks(this, market_name, symbol_name, ticks):
-        measurement_name = 'market_ticks'
-
-        points = [ this.generate_point_by_tick(measurement_name, market_name, symbol_name, tick) for tick in ticks ]
-
-        this.client.write_points(points)
 
     def query(this, sql, epoch = None):
         result_set = this.client.query(sql, epoch = epoch)
         return result_set.raw
+
+    def save_trade(this, measurement_name, market_name, symbol_name, trade):
+        points = [ this.generate_point_by_trade(measurement_name, market_name, symbol_name, trade) ]
+        this.client.write_points(points)
+
+    def save_tick(this, measurement_name, market_name, symbol_name, tick):
+        points = [ this.generate_point_by_tick(measurement_name, market_name, symbol_name, tick) ]
+        this.client.write_points(points)
+
+    def save_market_ticks(this, market_name, symbol_name, ticks):
+        measurement_name = 'market_ticks'
+
+        points = [ this.generate_point_by_tick(measurement_name, market_name, symbol_name, tick) for tick in ticks ]
+        this.client.write_points(points)
 
     def save_k10_daily_rank(this, table_name, k10_rank):
         points = this.generate_points_by_k10_rank(table_name, k10_rank)
         this.client.write_points(points)
 
     def save_k10_index(this, k10_index):
-        points = this.generate_points_by_k10_index('k10_index', k10_index)
+        measurement_name = 'k10_index'
+
+        points = this.generate_points_by_k10_index(measurement_name, k10_index)
         this.client.write_points(points)
 
     def save_validation(this, validation):
-        points = this.generate_points_validation('validation', validation)
+        measurement_name = 'validation'
+
+        points = this.generate_points_validation(measurement_name, validation)
         this.client.write_points(points)
 
     def update_db_re_gen_table_false(this):
-        points = this.write_db_re_gen_table_false('re_generate_table')
-        this.client.write_points(points)
+        point = {
+            'measurement': 're_generate_table',
+            'time': get_timestamp_str(1526371200, 0),
+            'fields': {
+                'flag':  'false'
+            }
+        }
+        this.client.write_points([ point ])
