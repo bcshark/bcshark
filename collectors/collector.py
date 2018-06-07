@@ -165,7 +165,7 @@ class collector(object):
         this.db_adapter.save_k10_daily_rank(this.market_name, rank)
 
     def query_k10_daily_rank(this, start_second):
-        sql = "select time, symbol, market_cap_usd, rank from k10_daily_rank where time <= %s group by symbol order by time desc limit 1" % (start_second * 1e9)
+        sql = "select time, symbol, market_cap_usd, rank from k10_daily_rank where time <= %d group by symbol order by time desc limit 1" % (start_second * 1e9)
         this.logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
         #print('++++++++++', result['series'][0]['values'][0])
@@ -174,7 +174,7 @@ class collector(object):
         return result['series']
 
     def query_previous_min_price(this, symbol_name_usdt, symbol_name_btc, start_second):
-        sql = "select time, market, symbol, high, low, open, close, volume, amount from market_ticks where (symbol = '%s' or symbol = '%s') and time >= %s and time < %s  group by market, symbol order by time desc limit 1" % (symbol_name_usdt, symbol_name_btc, start_second * 1e9, (start_second + 60) * 1e9)
+        sql = "select time, market, symbol, high, low, open, close, volume, amount from market_ticks where (symbol = '%s' or symbol = '%s') and time >= %d and time < %d  group by market, symbol order by time desc limit 1" % (symbol_name_usdt, symbol_name_btc, start_second * 1e9, (start_second + 60) * 1e9)
         #this.logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
         if len(result) == 0 or not result.has_key('series') or result['series'][0]['values'][0][1] == None:
@@ -183,7 +183,7 @@ class collector(object):
         return result['series']
 
     def query_latest_price_exist(this, symbol_name_usdt, symbol_name_btc, market, start_second):
-        sql = "select time, market, symbol, high, low, open, close, volume, amount from market_ticks where (symbol = '%s' or symbol = '%s') and market = '%s' and time < %s order by time desc limit 1" % (symbol_name_usdt, symbol_name_btc, market, start_second * 1e9)
+        sql = "select time, market, symbol, high, low, open, close, volume, amount from market_ticks where (symbol = '%s' or symbol = '%s') and market = '%s' and time < %d order by time desc limit 1" % (symbol_name_usdt, symbol_name_btc, market, start_second * 1e9)
         #this.logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
         if len(result) == 0 or not result.has_key('series') or result['series'][0]['values'][0][1] == None:
@@ -192,25 +192,25 @@ class collector(object):
         return result['series']
 
     def query_market_ticks_for_validation(this, start_second, end_second, key, generic_symbol):
-        sql = "select time, market, symbol, high, low, open, close, volume, period, timezone_offset from market_ticks where time >= %s and time <= %s and market = '%s' and symbol = '%s' order by time asc" % (start_second, end_second, key, generic_symbol)
+        sql = "select time, market, symbol, high, low, open, close, volume, period, timezone_offset from market_ticks where time >= %d and time <= %d and market = '%s' and symbol = '%s' order by time asc" % (start_second, end_second, key, generic_symbol)
         this.validation_logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
         if len(result) == 0 or not result.has_key('series'):
-            this.validation_logger.error('validation Error - market_ticks table has no price for time range: %s , %s ', start_second, end_second)
+            this.validation_logger.error('validation Error - market_ticks table has no price for time range: %d , %d ', start_second, end_second)
             return None
         return result['series']
 
     def query_ticks_table_for_validation(this, table_name, time_second, key, generic_symbol):
-        sql = "select time, market, symbol, high, low, open, close, volume, period, timezone_offset from %s where time = %s and market = '%s' and (symbol = '%s' or symbol = 'btcusdt')" % (table_name, time_second, key, generic_symbol)
+        sql = "select time, market, symbol, high, low, open, close, volume, period, timezone_offset from %s where time = %d and market = '%s' and (symbol = '%s' or symbol = 'btcusdt')" % (table_name, time_second, key, generic_symbol)
         this.validation_logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
         if len(result) == 0 or not result.has_key('series'):
-            this.validation_logger.error('validation Error - ticks table has no price for time: %s , %s, %s, %s ', table_name, time_second, key, generic_symbol)
+            this.validation_logger.error('validation Error - ticks table has no price for time: %s , %d, %s, %s ', table_name, time_second, key, generic_symbol)
             return None
         return result['series']
 
     def save_validation(this, validation):
-        sql = "select time, market, symbole, table from validation where time = %s and market = '%s' and symbol = '%s' and table = '%s' order by time desc limit 1" % (validation.time * 1e9, validation.market, validation.symbol, validation.table)
+        sql = "select time, market, symbole, table from validation where time = %d and market = '%s' and symbol = '%s' and table = '%s' order by time desc limit 1" % (validation.time * 1e9, validation.market, validation.symbol, validation.table)
         this.validation_logger.debug(sql)
         ret = this.db_adapter.query(sql, epoch = 's')
         if ret and ret.has_key('series'):
