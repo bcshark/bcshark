@@ -17,6 +17,7 @@ class collector(object):
         this.settings = settings
         this.market_settings = market_settings
         this.logger = settings['logger']
+        this.proxies = settings['proxies']
         this.validation_logger = settings['validation_logger']
         this.db_adapter = settings['db_adapter']
         this.cache_manager = settings['cache_manager']
@@ -88,7 +89,7 @@ class collector(object):
         this.logger.info('Requesting \033[32;1m%s\033[0m rest interface, url: \033[32;1m%s\033[0m' % (this.market_name, url))
 
         try:
-            res = requests.get(url, headers = headers, cookies = cookies, timeout = this.DEFAULT_TIMEOUT_IN_SECONDS, allow_redirects = True)
+            res = requests.get(url, proxies = this.proxies, headers = headers, cookies = cookies, timeout = this.DEFAULT_TIMEOUT_IN_SECONDS, allow_redirects = True)
 
             return res.json()
         except Exception, e:
