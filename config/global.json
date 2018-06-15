@@ -111,9 +111,16 @@
 				"rest": ""
 			}
 		},
+		"k30_index_calc": {
+			"title": "k30_index_calc",
+			"order": 12,
+			"api": {
+				"rest": ""
+			}
+		},
 		"market_ticks_validator": {
 			"title": "market_ticks_validator",
-			"order": 12,
+			"order": 13,
 			"api": {
 				"rest": ""
 			}
