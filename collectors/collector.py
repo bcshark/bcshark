@@ -120,14 +120,14 @@ class collector(object):
         this.internal_save_tick(current_minute, symbol_name, tick)
 
     def internal_save_tick(this, current_minute, symbol_name, tick):
-        if symbol_name == this.symbols_default[0]:
+        if symbol_name == this.symbols_default[0] or symbol_name == 'ethusdt':
             this.update_cache(symbol_name, tick)
 
         this.db_adapter.save_tick(this.table_market_ticks, this.market_name, symbol_name, tick)
 
         # calculate usd prices except btc-usd pair
         if not this.is_usd_price(symbol_name):
-            tick = this.calculate_usd_prices(current_minute, tick)
+            tick = this.calculate_usd_prices(current_minute, tick, symbol_name)
 
         if tick:
             #this.logger.info('+++++: %s,%d,%s,%s,open: %f, close: %f, high: %f, low: %f, volume: %f', time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(time.time())), tick.time, this.market_name, symbol_name, tick.open, tick.close, tick.high, tick.low, tick.volume)
@@ -240,20 +240,26 @@ class collector(object):
 
         return None
     
-    def calculate_usd_prices(this, current_minute, tick):
+    def calculate_usd_prices(this, current_minute, tick, symbol_name):
         if (not isinstance(tick, market_tick)) and (not isinstance(tick, dict)):
             return None
 
         if this.cache_manager:
+            symbol_temp = ''
+            if 'eth' in symbol_name and symbol_name != 'ethbtc':
+                symbol_temp = 'ethusdt'
+            else:
+                symbol_temp = 'btcusdt'
+
             if tick.time < current_minute:
                 # get btc-usdt price by record timestamp
                 current_minute = tick.time - tick.time % 60 + 60
-                sql = "select time, open, close, high, low from %s where symbol = '%s' and time < %d order by time desc limit 1" % (this.table_market_ticks, this.symbols_default[0], current_minute * 1e9)
+                sql = "select time, open, close, high, low from %s where symbol = '%s' and time < %d order by time desc limit 1" % (this.table_market_ticks, symbol_temp, current_minute * 1e9)
                 ret = this.db_adapter.query(sql, epoch = 's')
                 cached_prices = ret['series'][0]['values'][0][:5]
             else:
                 # get latest btc-usdt price
-                cached_prices = this.cache_manager.load_market_symbol_tick(this.market_name, this.symbols_default[0])
+                cached_prices = this.cache_manager.load_market_symbol_tick(this.market_name, symbol_temp)
 
             if cached_prices:
                 if isinstance(tick, market_tick):
