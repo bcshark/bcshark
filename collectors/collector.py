@@ -18,6 +18,7 @@ class collector(object):
         this.market_settings = market_settings
         this.logger = settings['logger']
         this.proxies = settings['proxies']
+        this.k30_logger = settings['k30_logger']
         this.validation_logger = settings['validation_logger']
         this.db_adapter = settings['db_adapter']
         this.cache_manager = settings['cache_manager']
@@ -176,19 +177,19 @@ class collector(object):
 
     def query_previous_min_price(this, symbol_name_usdt, symbol_name_btc, symbol_name_eth, start_second):
         sql = "select time, market, symbol, high, low, open, close, volume, amount from market_ticks where (symbol = '%s' or symbol = '%s' or symbol = '%s') and time >= %d and time < %d  group by market, symbol order by time desc limit 1" % (symbol_name_usdt, symbol_name_btc, symbol_name_eth, start_second * 1e9, (start_second + 60) * 1e9)
-        this.logger.debug(sql)
+        #this.logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
         if len(result) == 0 or not result.has_key('series') or result['series'][0]['values'][0][1] == None:
-            this.logger.warn('index calc Warning - All exchanges miss previous minute price for this symbol: %s , %s, %s ', symbol_name_usdt, symbol_name_btc, symbol_name_eth)
+            #this.logger.warn('index calc Warning - All exchanges miss previous minute price for this symbol: %s , %s, %s ', symbol_name_usdt, symbol_name_btc, symbol_name_eth)
             return None
         return result['series']
 
     def query_latest_price_exist(this, symbol_name_usdt, symbol_name_btc, symbol_name_eth, market, start_second):
         sql = "select time, market, symbol, high, low, open, close, volume, amount from market_ticks where (symbol = '%s' or symbol = '%s' or symbol = '%s') and market = '%s' and time < %d order by time desc limit 1" % (symbol_name_usdt, symbol_name_btc, symbol_name_eth, market, start_second * 1e9)
-        this.logger.debug(sql)
+        #this.logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
         if len(result) == 0 or not result.has_key('series') or result['series'][0]['values'][0][1] == None:
-            this.logger.error('index calc Error - Exchange has no price for symbol: %s , %s, %s, %s ', market, symbol_name_usdt, symbol_name_btc, symbol_name_eth)
+            #this.logger.error('index calc Error - Exchange has no price for symbol: %s , %s, %s, %s ', market, symbol_name_usdt, symbol_name_btc, symbol_name_eth)
             return None
         return result['series']
 
@@ -225,7 +226,7 @@ class collector(object):
         this.logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
         if len(result) == 0 or not result.has_key('series'):
-            this.logger.error('k10 index Calc Error - re_generate_table has no date ')
+            this.logger.error('index Calc Error - re_generate_table has no date ')
             return None
         return result['series']
 

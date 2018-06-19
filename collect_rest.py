@@ -15,6 +15,7 @@ from adapters.influxdb_adapter import influxdb_adapter
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
+k30_logger = logging.getLogger('k30_logger')
 validation_logger = logging.getLogger('validation_logger')
 
 file_logger_handler = logging.handlers.TimedRotatingFileHandler(os.path.normpath(os.path.join(sys.path[0], 'logs/collect.log')), when = 'D', interval = 1, backupCount = 10)
@@ -22,6 +23,12 @@ file_logger_handler.suffix = "%Y-%m-%d_%H-%M-%S.log"
 file_logger_handler.setFormatter(formatter)
 file_logger_handler.setLevel(logging.DEBUG)
 logger.addHandler(file_logger_handler)
+
+file_logger_handler_k30 = logging.handlers.TimedRotatingFileHandler(os.path.normpath(os.path.join(sys.path[0], 'logs/k30_collect.log')), when = 'D', interval = 1, backupCount = 10)
+file_logger_handler_k30.suffix = "%Y-%m-%d_%H-%M-%S.log"
+file_logger_handler_k30.setFormatter(formatter)
+file_logger_handler_k30.setLevel(logging.DEBUG)
+k30_logger.addHandler(file_logger_handler_k30)
 
 file_logger_handler_validation = logging.handlers.TimedRotatingFileHandler(os.path.normpath(os.path.join(sys.path[0], 'logs/validation.log')), when = 'D', interval = 1, backupCount = 10)
 file_logger_handler_validation.suffix = "%Y-%m-%d_%H-%M-%S.log"
@@ -55,6 +62,7 @@ if __name__ == '__main__':
 
     settings = ConfigurationManager(os.path.normpath(os.path.join(sys.path[0], 'config/global.json')))
     settings['logger'] = logger
+    settings['k30_logger'] = k30_logger
     settings['validation_logger'] = validation_logger
     settings['db_adapter'] = influxdb_adapter(settings['influxdb'])
     #settings['db_adapter'] = mysqldb_adapter(settings['mysqldb'])
