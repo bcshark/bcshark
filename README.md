@@ -22,6 +22,19 @@ restore:
     docker run --name CoinMarket.Influx -d -p 8086:8086 -v `pwd`/influxdb:/var/lib/influxdb influxdb:latest
     docker run --name CoinMarket.Collector -it --link=CoinMarket.Influx:influxdb -p 5000:5000 -v `pwd`/CoinMarket:/home/ python:2 /bin/bash
 
+### Misc ###
+
+If you get error when using SignalR fetch data from bittrex `[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed`, change source code of SignalR.
+
+    sudo vim /usr/lib/python2.7/site-packages/signalr/transports/_ws_transport.py
+
+    -- line 38 --
+    self.ws = create_connection(ws_url,
+                                header=self.__get_headers(),
+                                cookie=self.__get_cookie_str(),
+                                enable_multithread=True,
+                                sslopt = { "cert_reqs" : ssl.CERT_NONE })
+
 ### Scripts included ###
 
 * Gentelella: https://github.com/puikinsh/gentelella

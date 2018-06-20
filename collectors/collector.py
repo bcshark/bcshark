@@ -2,6 +2,7 @@ import requests
 import json
 import time
 import threading
+import ssl
 
 from websocket import WebSocketApp
 from struct import pack_into, unpack_from
@@ -102,7 +103,7 @@ class collector(object):
 
         this.logger.info('Connecting to \033[32;1m%s\033[0m websocket interface, url: \033[32;1m%s\033[0m' % (this.market_name, url))
         this.websocket_client = WebSocketApp(url, on_open = listener.on_raw_open, on_close = listener.on_raw_close, on_message = listener.on_raw_message, on_error = listener.on_raw_error)
-        this.websocket_client.run_forever()
+        this.websocket_client.run_forever(sslopt = { "cert_reqs" : ssl.CERT_NONE })
 
     def stop_listen_websocket(this):
         if this.websocket_client:

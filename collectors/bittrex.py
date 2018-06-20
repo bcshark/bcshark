@@ -98,6 +98,8 @@ class collector_bittrex(collector):
 
     def collect_ws(this):
         with Session() as session:
+            session.Verify = False
+
             connection = Connection(this.WS_URL, session = session)
             hub = connection.register_hub('c2')
             connection.start()
