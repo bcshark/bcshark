@@ -91,7 +91,7 @@ class collector(object):
         this.logger.info('Requesting \033[32;1m%s\033[0m rest interface, url: \033[32;1m%s\033[0m' % (this.market_name, url))
 
         try:
-            res = requests.get(url, proxies = this.proxies, headers = headers, cookies = cookies, timeout = this.DEFAULT_TIMEOUT_IN_SECONDS, allow_redirects = True)
+            res = requests.get(url, proxies = this.proxies, headers = headers, cookies = cookies, timeout = this.DEFAULT_TIMEOUT_IN_SECONDS, allow_redirects = True, verify = False)
 
             return res.json()
         except Exception, e:
