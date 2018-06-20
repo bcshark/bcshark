@@ -10,6 +10,7 @@ from .bittrex import collector_bittrex
 from .gateio import collector_gateio
 from .k10_daily_rank import collector_k10_daily_rank
 from .k10_index_calc import collector_k10_index_calc
+from .k30_index_calc import collector_k30_index_calc
 from .market_ticks_validator import market_ticks_validator
 
 class collector_factory(object):
@@ -52,6 +53,8 @@ class collector_factory(object):
             collector = collector_k10_daily_rank(this.settings, market_settings)
         elif market_name == 'k10_index_calc':
             collector = collector_k10_index_calc(this.settings, market_settings)
+        elif market_name == 'k30_index_calc':
+            collector = collector_k30_index_calc(this.settings, market_settings)
         elif market_name == 'market_ticks_validator':
             collector = market_ticks_validator(this.settings, market_settings)
         return collector

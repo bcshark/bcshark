@@ -101,21 +101,21 @@ class influxdb_adapter(database_adapter):
 
         return [ point ]
 
-    def generate_points_by_k10_index(this, measurement_name, k10_index):
+    def generate_points_by_index(this, measurement_name, index):
         point = {
             'measurement': measurement_name,
             'tags': {
-                'symbol': 'k10',
+                'symbol': 'index',
             },
-            'time': get_timestamp_str(long(k10_index['time']), k10_index['timezone_offset']),
+            'time': get_timestamp_str(long(index['time']), index['timezone_offset']),
             'fields': {
-                'time': long(k10_index['time']) + k10_index['timezone_offset'],
-                'high': float(k10_index['high']),
-                'low': float(k10_index['low']),
-                'open': float(k10_index['open']),
-                'close': float(k10_index['close']),
-                'volume': float(k10_index['volume']),
-                'period': k10_index['period']
+                'time': long(index['time']) + index['timezone_offset'],
+                'high': float(index['high']),
+                'low': float(index['low']),
+                'open': float(index['open']),
+                'close': float(index['close']),
+                'volume': float(index['volume']),
+                'period': index['period']
             }
         }
 
@@ -160,10 +160,9 @@ class influxdb_adapter(database_adapter):
         points = this.generate_points_by_k10_rank(table_name, k10_rank)
         this.client.write_points(points)
 
-    def save_k10_index(this, k10_index):
-        measurement_name = 'k10_index'
+    def save_index(this, measurement_name, index):
 
-        points = this.generate_points_by_k10_index(measurement_name, k10_index)
+        points = this.generate_points_by_index(measurement_name, index)
         this.client.write_points(points)
 
     def save_validation(this, validation):

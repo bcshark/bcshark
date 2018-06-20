@@ -19,6 +19,7 @@ class collector(object):
         this.market_settings = market_settings
         this.logger = settings['logger']
         this.proxies = settings['proxies']
+        this.k30_logger = settings['k30_logger']
         this.validation_logger = settings['validation_logger']
         this.db_adapter = settings['db_adapter']
         this.cache_manager = settings['cache_manager']
@@ -121,14 +122,14 @@ class collector(object):
         this.internal_save_tick(current_minute, symbol_name, tick)
 
     def internal_save_tick(this, current_minute, symbol_name, tick):
-        if symbol_name == this.symbols_default[0]:
+        if symbol_name == this.symbols_default[0] or symbol_name == 'ethusdt':
             this.update_cache(symbol_name, tick)
 
         this.db_adapter.save_tick(this.table_market_ticks, this.market_name, symbol_name, tick)
 
         # calculate usd prices except btc-usd pair
         if not this.is_usd_price(symbol_name):
-            tick = this.calculate_usd_prices(current_minute, tick)
+            tick = this.calculate_usd_prices(current_minute, tick, symbol_name)
 
         if tick:
             #this.logger.info('+++++: %s,%d,%s,%s,open: %f, close: %f, high: %f, low: %f, volume: %f', time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(time.time())), tick.time, this.market_name, symbol_name, tick.open, tick.close, tick.high, tick.low, tick.volume)
@@ -152,8 +153,8 @@ class collector(object):
             this.internal_save_tick(current_minute, symbol_name, tick)
         #this.db_adapter.save_market_ticks(this.market_name, symbol_name, ticks)
 
-    def save_k10_index(this, k10_index):
-        this.db_adapter.save_k10_index(k10_index)
+    def save_index(this, measurement, index):
+        this.db_adapter.save_index(measurement, index)
 
     def save_k10_daily_rank(this, rank):
         symbol_name = rank.symbol
@@ -175,21 +176,21 @@ class collector(object):
             return None
         return result['series']
 
-    def query_previous_min_price(this, symbol_name_usdt, symbol_name_btc, start_second):
-        sql = "select time, market, symbol, high, low, open, close, volume, amount from market_ticks where (symbol = '%s' or symbol = '%s') and time >= %d and time < %d  group by market, symbol order by time desc limit 1" % (symbol_name_usdt, symbol_name_btc, start_second * 1e9, (start_second + 60) * 1e9)
+    def query_previous_min_price(this, symbol_name_usdt, symbol_name_btc, symbol_name_eth, start_second):
+        sql = "select time, market, symbol, high, low, open, close, volume, amount from market_ticks where (symbol = '%s' or symbol = '%s' or symbol = '%s') and time >= %d and time < %d  group by market, symbol order by time desc limit 1" % (symbol_name_usdt, symbol_name_btc, symbol_name_eth, start_second * 1e9, (start_second + 60) * 1e9)
         #this.logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
         if len(result) == 0 or not result.has_key('series') or result['series'][0]['values'][0][1] == None:
-            this.logger.warn('k10 calc Warning - All exchanges miss previous minute price for this symbol: %s , %s ', symbol_name_usdt, symbol_name_btc)
+            #this.logger.warn('index calc Warning - All exchanges miss previous minute price for this symbol: %s , %s, %s ', symbol_name_usdt, symbol_name_btc, symbol_name_eth)
             return None
         return result['series']
 
-    def query_latest_price_exist(this, symbol_name_usdt, symbol_name_btc, market, start_second):
-        sql = "select time, market, symbol, high, low, open, close, volume, amount from market_ticks where (symbol = '%s' or symbol = '%s') and market = '%s' and time < %d order by time desc limit 1" % (symbol_name_usdt, symbol_name_btc, market, start_second * 1e9)
+    def query_latest_price_exist(this, symbol_name_usdt, symbol_name_btc, symbol_name_eth, market, start_second):
+        sql = "select time, market, symbol, high, low, open, close, volume, amount from market_ticks where (symbol = '%s' or symbol = '%s' or symbol = '%s') and market = '%s' and time < %d order by time desc limit 1" % (symbol_name_usdt, symbol_name_btc, symbol_name_eth, market, start_second * 1e9)
         #this.logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
         if len(result) == 0 or not result.has_key('series') or result['series'][0]['values'][0][1] == None:
-            this.logger.error('k10 calc Error - Exchange has no price for symbol: %s , %s, %s ', market, symbol_name_usdt, symbol_name_btc)
+            #this.logger.error('index calc Error - Exchange has no price for symbol: %s , %s, %s, %s ', market, symbol_name_usdt, symbol_name_btc, symbol_name_eth)
             return None
         return result['series']
 
@@ -226,7 +227,7 @@ class collector(object):
         this.logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
         if len(result) == 0 or not result.has_key('series'):
-            this.logger.error('k10 index Calc Error - re_generate_table has no date ')
+            this.logger.error('index Calc Error - re_generate_table has no date ')
             return None
         return result['series']
 
@@ -241,20 +242,26 @@ class collector(object):
 
         return None
     
-    def calculate_usd_prices(this, current_minute, tick):
+    def calculate_usd_prices(this, current_minute, tick, symbol_name):
         if (not isinstance(tick, market_tick)) and (not isinstance(tick, dict)):
             return None
 
         if this.cache_manager:
+            symbol_temp = ''
+            if 'eth' in symbol_name and symbol_name != 'ethbtc':
+                symbol_temp = 'ethusdt'
+            else:
+                symbol_temp = 'btcusdt'
+
             if tick.time < current_minute:
                 # get btc-usdt price by record timestamp
                 current_minute = tick.time - tick.time % 60 + 60
-                sql = "select time, open, close, high, low from %s where symbol = '%s' and time < %d order by time desc limit 1" % (this.table_market_ticks, this.symbols_default[0], current_minute * 1e9)
+                sql = "select time, open, close, high, low from %s where symbol = '%s' and time < %d order by time desc limit 1" % (this.table_market_ticks, symbol_temp, current_minute * 1e9)
                 ret = this.db_adapter.query(sql, epoch = 's')
                 cached_prices = ret['series'][0]['values'][0][:5]
             else:
                 # get latest btc-usdt price
-                cached_prices = this.cache_manager.load_market_symbol_tick(this.market_name, this.symbols_default[0])
+                cached_prices = this.cache_manager.load_market_symbol_tick(this.market_name, symbol_temp)
 
             if cached_prices:
                 if isinstance(tick, market_tick):
