@@ -1,6 +1,7 @@
 logs/
 node_modules/
 .vscode/
+data-files/
 
 .DS_Store
 *.pyc

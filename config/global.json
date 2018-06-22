@@ -23,7 +23,7 @@
 		"enabled": true,
 		"shared_memory": {
 			"path": "data-files/cache",
-			"symbols": [ "btcusdt" ]
+			"symbols": [ "btcusdt", "ethusdt" ]
 		}
 	},
 	"kline": {

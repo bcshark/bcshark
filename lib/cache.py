@@ -26,22 +26,26 @@ class cache_manager(object):
             item[0].close()
             item[1].close()
 
-    def get_market_file_path(this, market_name):
+    def get_cache_name(this, market_name, symbol_name):
+        return '%s.%s' % (market_name, symbol_name)
+
+    def get_market_file_path(this, market_name, symbol_name):
         if this.settings.has_key('abspath'):
             data_files_path = this.settings['abspath']
         elif this.settings.has_key('path'):
             shared_memory_path = this.settings['path']
             data_files_path = os.path.normpath(os.path.join(sys.path[0], shared_memory_path))
-        market_file_path = os.path.join(data_files_path, market_name)
+        market_file_path = os.path.join(data_files_path, this.get_cache_name(market_name, symbol_name))
         return market_file_path
 
     def get_mapping(this, market_name, symbol_name):
-        if this.mapping_collection.has_key(market_name):
-            return this.mapping_collection[market_name]
+        cache_name = this.get_cache_name(market_name, symbol_name)
+
+        if this.mapping_collection.has_key(cache_name):
+            return this.mapping_collection[cache_name]
         
-        # NOTE: not implement for multiple symbols
         if symbol_name in this.settings['symbols']:
-            market_file_path = this.get_market_file_path(market_name)
+            market_file_path = this.get_market_file_path(market_name, symbol_name)
 
             if not os.path.exists(market_file_path):
                 with open(market_file_path, "wb") as f:
@@ -50,7 +54,7 @@ class cache_manager(object):
             file_obj = open(market_file_path, "r+b")
             mmap_obj = mmap.mmap(file_obj.fileno(), this.DATA_LENGTH, mmap.MAP_SHARED)
 
-            this.mapping_collection[market_name] = (mmap_obj, file_obj)
+            this.mapping_collection[cache_name] = (mmap_obj, file_obj)
 
             return mmap_obj, file_obj
         else:
@@ -61,10 +65,11 @@ class cache_manager(object):
 
         if mmap_obj:
             mmap_obj.seek(0)
+            # struct: time, open, close, high, low
             mmap_obj.write(struct.pack(this.DATA_FORMAT, tick[0], tick[1], tick[2], tick[3], tick[4]))
 
     def load_market_symbol_tick(this, market_name, symbol_name):
-        if not os.path.exists(this.get_market_file_path(market_name)):
+        if not os.path.exists(this.get_market_file_path(market_name, symbol_name)):
             return None
 
         mmap_obj, file_obj = this.get_mapping(market_name, symbol_name)

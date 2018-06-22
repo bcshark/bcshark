@@ -122,7 +122,7 @@ class collector(object):
         this.internal_save_tick(current_minute, symbol_name, tick)
 
     def internal_save_tick(this, current_minute, symbol_name, tick):
-        if symbol_name == this.symbols_default[0] or symbol_name == 'ethusdt':
+        if symbol_name == 'btcusdt' or symbol_name == 'ethusdt':
             this.update_cache(symbol_name, tick)
 
         this.db_adapter.save_tick(this.table_market_ticks, this.market_name, symbol_name, tick)
@@ -248,9 +248,9 @@ class collector(object):
 
         if this.cache_manager:
             symbol_temp = ''
-            if 'eth' in symbol_name and symbol_name != 'ethbtc':
+            if symbol_name.endswith('eth'):
                 symbol_temp = 'ethusdt'
-            else:
+            elif symbol_name.endswith('btc'):
                 symbol_temp = 'btcusdt'
 
             if tick.time < current_minute:
