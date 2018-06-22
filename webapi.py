@@ -109,7 +109,7 @@ def tv_symbols():
     symbol = request.args.get('symbol', '')
     ret = None
 
-    if symbol and not symbol == 'Index':
+    if symbol and not symbol == 'Index' and not symbol == 'Innovation':
         support_symbols = settings['symbols']['default']
         support_symbols_title = settings['symbols']['_title']
 
@@ -141,26 +141,48 @@ def tv_symbols():
                 }
 
     if not ret:
-        ret = {
-            "name": "Index",
-            "exchange-traded": "Market",
-            "exchange-listed": "Market",
-            "timezone": "UTC",
-            "minmov": 1,
-            "minmov2": 0,
-            "pointvalue": 1,
-            "session": "0930-1630",
-            "has_intraday": True,
-            "has_daily": True,
-            "has_weekly_and_monthly": True,
-            "has_no_volume": False,
-            "description": "Index",
-            "type": "bitcoin",
-            "supported_resolutions": [ "1", "15", "30", "60", "D", "2D", "3D", "W", "3W", "M", "6M" ],
-            "intraday_multipliers": [ "1", "15", "30", "60" ],
-            "pricescale": 100,
-            "ticker": "Index"
-        }
+        if symbol == 'Innovation':
+            ret = {
+                "name": "Innovation",
+                "exchange-traded": "Market",
+                "exchange-listed": "Market",
+                "timezone": "UTC",
+                "minmov": 1,
+                "minmov2": 0,
+                "pointvalue": 1,
+                "session": "0930-1630",
+                "has_intraday": True,
+                "has_daily": True,
+                "has_weekly_and_monthly": True,
+                "has_no_volume": False,
+                "description": "Innovation",
+                "type": "bitcoin",
+                "supported_resolutions": [ "1", "15", "30", "60", "D", "2D", "3D", "W", "3W", "M", "6M" ],
+                "intraday_multipliers": [ "1", "15", "30", "60" ],
+                "pricescale": 100,
+                "ticker": "Innovation"
+            }
+        else:
+            ret = {
+                "name": "Index",
+                "exchange-traded": "Market",
+                "exchange-listed": "Market",
+                "timezone": "UTC",
+                "minmov": 1,
+                "minmov2": 0,
+                "pointvalue": 1,
+                "session": "0930-1630",
+                "has_intraday": True,
+                "has_daily": True,
+                "has_weekly_and_monthly": True,
+                "has_no_volume": False,
+                "description": "Index",
+                "type": "bitcoin",
+                "supported_resolutions": [ "1", "15", "30", "60", "D", "2D", "3D", "W", "3W", "M", "6M" ],
+                "intraday_multipliers": [ "1", "15", "30", "60" ],
+                "pricescale": 100,
+                "ticker": "Index"
+            }
 
     return json.dumps(ret)
 
