@@ -8,7 +8,43 @@ from .utility import *
 
 class collector_k30_index_calc(collector):
     DEFAULT_PERIOD = "1min"
-    MULTIPLY_RATIO = 1
+    MULTIPLY_RATIO = 100
+
+    BASIC_PRICE = {
+        'BASIC_ZIL':0.16476,
+        'BASIC_ONT':7.91225,
+        'BASIC_ELF':1.40215,
+        'BASIC_AE':3.8567,
+        'BASIC_KNC':2.25240,
+        'BASIC_AGI':0.16120,
+        'BASIC_MANA':0.14044,
+        'BASIC_POWR':0.45516,
+        'BASIC_ENG':2.92533,
+        'BASIC_THETA':0.2374,
+        'BASIC_IOST':0.05874,
+        'BASIC_BLZ':0.59014,
+        'BASIC_ELA':50.73065,
+        'BASIC_BRD':0.65636,
+        'BASIC_ICX':3.94713,
+        'BASIC_DDD':0.403732,
+        'BASIC_ZRX':1.54658,
+        'BASIC_CVC':0.40215,
+        'BASIC_WAN':6.92495,
+        'BASIC_AION':2.81827,
+        'BASIC_DRGN':0.85677,
+        'BASIC_RDN':1.69998,
+        'BASIC_MOBI':0.07828,
+        'BASIC_RUFF':0.11606,
+        'BASIC_GNX':0.403495,
+        'BASIC_LRC':0.643486,
+        'BASIC_SNT':0.125096,
+        'BASIC_VEN':5.09485,
+        'BASIC_NANO':5.92785,
+        'BASIC_WTC':12.62558,
+        'BASIC_GNT':0.62135,
+        'BASIC_LOOM':0.500592585
+    }
+
     #BASIC_SYMBOL = ['ipfs','ada','eos','zil','ont','elf','ae','knc','agi','mana','powr','eng','theta','iost','blz','ela','brd','icx','ddd','zrx','cvc','wan','aion','drgn','rdn','mobius','ruff','gnx','lrc','snt','ven','nano','wtc','gnt','loom']
     BASIC_SYMBOL = ['zil','ont','elf','ae','knc','agi','mana','powr','eng','theta','iost','blz','ela','brd','icx','ddd','zrx','cvc','wan','aion','drgn','rdn','mobi','ruff','gnx','lrc','snt','ven','nano','wtc','gnt','loom']
 
@@ -150,6 +186,10 @@ class collector_k30_index_calc(collector):
     def calculate_symbol_price(this, filtered_ticks, price_field, base_symbol):
 
         sum_price = 0
+        index_field = 'BASIC_' + base_symbol.upper()
+        base_price = this.BASIC_PRICE[index_field]
+        this.logger.debug('basic price name: %s, %s', index_field, base_price)
+
         for key in filtered_ticks.keys():
             tick = filtered_ticks[key]
             this.k30_logger.debug('filtered tick in calc avg price: %s, %s, %s, %s, %s, %s, %s ', key, tick.market, tick.symbol, tick.high, tick.low, tick.open, tick.close)
@@ -161,7 +201,7 @@ class collector_k30_index_calc(collector):
                 sum_price = sum_price + tick.open
             if price_field == 'close':
                 sum_price = sum_price + tick.close
-        avg_price = (sum_price / len(filtered_ticks))
+        avg_price = (sum_price / len(filtered_ticks) / base_price)
         this.k30_logger.debug('k30 calc - Calculated avg price %s Is: %s for symbol: %s', price_field, avg_price, base_symbol)
         return avg_price
 
