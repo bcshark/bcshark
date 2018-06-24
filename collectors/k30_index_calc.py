@@ -188,7 +188,7 @@ class collector_k30_index_calc(collector):
         sum_price = 0
         index_field = 'BASIC_' + base_symbol.upper()
         base_price = this.BASIC_PRICE[index_field]
-        this.logger.debug('basic price name: %s, %s', index_field, base_price)
+        this.k30_logger.debug('basic price name: %s, %s', index_field, base_price)
 
         for key in filtered_ticks.keys():
             tick = filtered_ticks[key]
