@@ -169,7 +169,7 @@ class collector_k30_index_calc(collector):
 
     def getStartSecondPreviousMinute(this):
         time_second = int(time.time())
-        time_second = time_second - (time_second % 60) - 600 + this.timezone_offset
+        time_second = time_second - (time_second % 60) - 3600 + this.timezone_offset
         this.k30_logger.debug('k30 calc - start second generated: %s', time_second)
         return time_second;
 
