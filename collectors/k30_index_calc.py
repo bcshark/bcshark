@@ -192,7 +192,7 @@ class collector_k30_index_calc(collector):
 
         for key in filtered_ticks.keys():
             tick = filtered_ticks[key]
-            this.k30_logger.debug('filtered tick in calc avg price: %s, %s, %s, %s, %s, %s, %s ', key, tick.market, tick.symbol, tick.high, tick.low, tick.open, tick.close)
+            this.k30_logger.debug('filtered tick in calc avg price: %s, %s, %s, %s, %s, %s, %s, %s ', key, tick.time, tick.market, tick.symbol, tick.high, tick.low, tick.open, tick.close)
             if price_field == 'high':
                 sum_price = sum_price + tick.high
             if price_field == 'low':
@@ -211,7 +211,7 @@ class collector_k30_index_calc(collector):
         for key in filtered_ticks.keys():
             tick = filtered_ticks[key]
             sum_volume = sum_volume + ((tick.high + tick.low) / 2 * tick.volume)
-            this.k30_logger.debug('filtered tick in calc total volumne: %s, %s, %s, %s, %s, %s, %s ', tick.market, tick.symbol, tick.high, tick.low, tick.open, tick.close, tick.volume)
+            this.k30_logger.debug('filtered tick in calc total volumne: %s, %s, %s, %s, %s, %s, %s, %s ', tick.market, tick.time, tick.symbol, tick.high, tick.low, tick.open, tick.close, tick.volume)
         this.k30_logger.debug('k30 calc volume - %s for symbol: %s', sum_volume, base_symbol)
         return sum_volume
 
