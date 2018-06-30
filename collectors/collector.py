@@ -63,9 +63,14 @@ class collector(object):
     def on_raw_close(this, websocket_client):
         print '\033[31;1m%s\033[0m websocket is \033[31;1mclosed\033[0m, reconnect in %d seconds.' % (this.market_name, this.DEFAULT_WS_RECONNECT_IN_SECONDS)
 
+        """
         if this.collect_ws:
             this.reconnect_timer = threading.Timer(this.DEFAULT_WS_RECONNECT_IN_SECONDS, this.collect_ws)
             this.reconnect_timer.start()
+        """
+        if this.collect_ws:
+            time.sleep(this.DEFAULT_WS_RECONNECT_IN_SECONDS)
+            this.collect_ws
 
     def on_raw_open(this, websocket_client):
         if this.on_open:
