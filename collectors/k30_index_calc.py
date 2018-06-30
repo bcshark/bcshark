@@ -42,11 +42,15 @@ class collector_k30_index_calc(collector):
         'BASIC_NANO':5.92785,
         'BASIC_WTC':12.62558,
         'BASIC_GNT':0.62135,
-        'BASIC_LOOM':0.500592585
+        'BASIC_LOOM':0.50059,
+        'BASIC_QKC':0.145144,
+        'BASIC_BTS':0.24249,
+        'BASIC_BTM':0.65429,
+        'BASIC_CTXC':1.3944
     }
 
     #BASIC_SYMBOL = ['ipfs','ada','eos','zil','ont','elf','ae','knc','agi','mana','powr','eng','theta','iost','blz','ela','brd','icx','ddd','zrx','cvc','wan','aion','drgn','rdn','mobius','ruff','gnx','lrc','snt','ven','nano','wtc','gnt','loom']
-    BASIC_SYMBOL = ['zil','ont','elf','ae','knc','agi','mana','powr','eng','theta','iost','blz','ela','brd','icx','ddd','zrx','cvc','wan','aion','drgn','rdn','mobi','ruff','gnx','lrc','snt','ven','nano','wtc','gnt','loom']
+    BASIC_SYMBOL = ['zil','ont','ae','knc','agi','powr','eng','theta','blz','ela','brd','icx','ddd','zrx','cvc','wan','aion','drgn','rdn','gnx','lrc','ven','nano','wtc','gnt','loom','qkc','bts','btm','ctxc']
 
     @property
     def market_name(this):

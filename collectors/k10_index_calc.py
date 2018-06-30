@@ -224,6 +224,7 @@ class collector_k10_index_calc(collector):
         base_symbol = rank.symbol[0].split('usdt')[0].upper()
         filtered_ticks = {}
         for tick in ticks:
+            #if tick.market != 'bittrex' and tick.market != 'bitstamp' and tick.market != 'bitfinex'
             tick_key = tick.market + base_symbol
             if tick_key not in filtered_ticks.keys():
                 filtered_ticks[tick_key] = tick
