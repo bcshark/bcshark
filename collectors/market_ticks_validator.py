@@ -43,7 +43,7 @@ class market_ticks_validator(collector):
         symbol_dict = this.symbols_all_market
         for key in symbol_dict:
             #if key != 'default' and key != '_title' and key != 'k10_daily_rank' and key != 'bittrex' and key != 'bitfinex' and key != 'bitstamp':
-            if key != 'default' and key != '_title' and key != 'k10_daily_rank' and key != 'bittrex':
+            if key != 'default' and key != '_title' and key != 'k10_daily_rank':
                 symbols = symbol_dict[key]
                 for symbol in symbols:
                     if symbol == '':
