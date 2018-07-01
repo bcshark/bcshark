@@ -201,7 +201,7 @@ def tv_time():
 
 @app.route('/tv/config', methods=['GET'])
 def tv_config():
-    support_markets = [market for market in settings['markets'].keys() if not market in ['default', '_title', 'k10_daily_rank', 'k10_index_calc', 'market_ticks_validator']]
+    support_markets = [market for market in settings['markets'].keys() if not market in ['default', '_title', 'k10_daily_rank', 'k10_index_calc', 'k30_index_calc', 'market_ticks_validator']]
     exchanges = [{ "value": "", "name": "All Exchanges", "desc": "" }]
     exchanges.extend([{
         "value": market,
@@ -246,7 +246,7 @@ def tv_search():
     if exchange:
         support_markets = [exchange]
     else:
-        support_markets = [market for market in settings['markets'].keys() if not market in ['default', '_title', 'k10_daily_rank', 'k10_index_calc', 'market_ticks_validator']]
+        support_markets = [market for market in settings['markets'].keys() if not market in ['default', '_title', 'k10_daily_rank', 'k10_index_calc', 'k30_index_calc', 'market_ticks_validator']]
 
     matches = []
 
