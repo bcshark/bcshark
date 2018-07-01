@@ -53,6 +53,6 @@ class collector_gdax(collector):
                 continue
 
             ticks = this.translate(data)
-            this.bulk_save_ticks(this.get_generic_symbol_name(symbol), ticks)
+            this.save_market_ticks(this.get_generic_symbol_name(symbol), ticks)
 
             this.logger.info('get response from gdax')

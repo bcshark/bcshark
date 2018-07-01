@@ -2,6 +2,7 @@ import requests
 import json
 import time
 import threading
+import ssl
 
 from websocket import WebSocketApp
 from struct import pack_into, unpack_from
@@ -17,6 +18,8 @@ class collector(object):
         this.settings = settings
         this.market_settings = market_settings
         this.logger = settings['logger']
+        this.proxies = settings['proxies']
+        this.k30_logger = settings['k30_logger']
         this.validation_logger = settings['validation_logger']
         this.db_adapter = settings['db_adapter']
         this.cache_manager = settings['cache_manager']
@@ -60,9 +63,14 @@ class collector(object):
     def on_raw_close(this, websocket_client):
         print '\033[31;1m%s\033[0m websocket is \033[31;1mclosed\033[0m, reconnect in %d seconds.' % (this.market_name, this.DEFAULT_WS_RECONNECT_IN_SECONDS)
 
+        """
         if this.collect_ws:
             this.reconnect_timer = threading.Timer(this.DEFAULT_WS_RECONNECT_IN_SECONDS, this.collect_ws)
             this.reconnect_timer.start()
+        """
+        if this.collect_ws:
+            time.sleep(this.DEFAULT_WS_RECONNECT_IN_SECONDS)
+            this.collect_ws
 
     def on_raw_open(this, websocket_client):
         if this.on_open:
@@ -88,7 +96,7 @@ class collector(object):
         this.logger.info('Requesting \033[32;1m%s\033[0m rest interface, url: \033[32;1m%s\033[0m' % (this.market_name, url))
 
         try:
-            res = requests.get(url, headers = headers, cookies = cookies, timeout = this.DEFAULT_TIMEOUT_IN_SECONDS, allow_redirects = True)
+            res = requests.get(url, proxies = this.proxies, headers = headers, cookies = cookies, timeout = this.DEFAULT_TIMEOUT_IN_SECONDS, allow_redirects = True, verify = False)
 
             return res.json()
         except Exception, e:
@@ -101,7 +109,7 @@ class collector(object):
 
         this.logger.info('Connecting to \033[32;1m%s\033[0m websocket interface, url: \033[32;1m%s\033[0m' % (this.market_name, url))
         this.websocket_client = WebSocketApp(url, on_open = listener.on_raw_open, on_close = listener.on_raw_close, on_message = listener.on_raw_message, on_error = listener.on_raw_error)
-        this.websocket_client.run_forever()
+        this.websocket_client.run_forever(sslopt = { "cert_reqs" : ssl.CERT_NONE })
 
     def stop_listen_websocket(this):
         if this.websocket_client:
@@ -114,26 +122,28 @@ class collector(object):
         this.db_adapter.save_trade(this.table_market_trades, this.market_name, symbol_name, trade)
 
     def save_tick(this, symbol_name, tick):
-        current_minute = int(time.time()) - int(time.time()) % 60
+        current_second = long(time.time())
+        current_minute = current_second - current_second % 60
         this.internal_save_tick(current_minute, symbol_name, tick)
 
     def internal_save_tick(this, current_minute, symbol_name, tick):
-        if symbol_name == this.symbols_default[0]:
+        if symbol_name == 'btcusdt' or symbol_name == 'ethusdt':
             this.update_cache(symbol_name, tick)
 
         this.db_adapter.save_tick(this.table_market_ticks, this.market_name, symbol_name, tick)
 
         # calculate usd prices except btc-usd pair
         if not this.is_usd_price(symbol_name):
-            tick = this.calculate_usd_prices(current_minute, tick)
+            tick = this.calculate_usd_prices(current_minute, tick, symbol_name)
 
         if tick:
-            this.logger.info('+++++: %s,%d,%s,%s,open: %f, close: %f, high: %f, low: %f, volume: %f', time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(time.time())), tick.time, this.market_name, symbol_name, tick.open, tick.close, tick.high, tick.low, tick.volume)
+            #this.logger.info('+++++: %s,%d,%s,%s,open: %f, close: %f, high: %f, low: %f, volume: %f', time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(time.time())), tick.time, this.market_name, symbol_name, tick.open, tick.close, tick.high, tick.low, tick.volume)
             this.db_adapter.save_tick(this.table_market_ticks_usd, this.market_name, symbol_name, tick)
             this.db_adapter.save_tick('market_ticks', this.market_name, symbol_name, tick)
 
-    def bulk_save_ticks(this, symbol_name, ticks):
-        current_minute = int(time.time()) - int(time.time()) % 60
+    def save_market_ticks(this, symbol_name, ticks):
+        current_second = long(time.time())
+        current_minute = current_second - current_second % 60
         sql = "select time, market, symbol, high, low, open, close from %s where market = '%s' and symbol = '%s' group by market, symbol order by time desc limit 1" % (this.table_market_ticks, this.market_name, symbol_name)
         ret = this.db_adapter.query(sql, epoch = 's')
         if ret and ret.has_key('series'):
@@ -146,10 +156,10 @@ class collector(object):
         for index in range(len(ticks)):
             tick = ticks[index]
             this.internal_save_tick(current_minute, symbol_name, tick)
-        #this.db_adapter.bulk_save_ticks(this.market_name, symbol_name, ticks)
+        #this.db_adapter.save_market_ticks(this.market_name, symbol_name, ticks)
 
-    def save_k10_index(this, k10_index):
-        this.db_adapter.save_k10_index(k10_index)
+    def save_index(this, measurement, index):
+        this.db_adapter.save_index(measurement, index)
 
     def save_k10_daily_rank(this, rank):
         symbol_name = rank.symbol
@@ -163,7 +173,7 @@ class collector(object):
         this.db_adapter.save_k10_daily_rank(this.market_name, rank)
 
     def query_k10_daily_rank(this, start_second):
-        sql = "select time, symbol, market_cap_usd, rank from k10_daily_rank where time <= %s group by symbol order by time desc limit 1" % (start_second * 1000000000)
+        sql = "select time, symbol, market_cap_usd, rank from k10_daily_rank where time <= %d group by symbol order by time desc limit 1" % (start_second * 1e9)
         this.logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
         #print('++++++++++', result['series'][0]['values'][0])
@@ -171,44 +181,44 @@ class collector(object):
             return None
         return result['series']
 
-    def query_previous_min_price(this, symbol_name_usdt, symbol_name_btc, start_second):
-        sql = "select time, market, symbol, high, low, open, close, volume, amount from market_ticks where (symbol = '%s' or symbol = '%s') and time >= %s and time < %s  group by market, symbol order by time desc limit 1" % (symbol_name_usdt, symbol_name_btc, start_second*1000000000, start_second*1000000000+60000000000)
-        this.logger.debug(sql)
+    def query_previous_min_price(this, symbol_name_usdt, symbol_name_btc, symbol_name_eth, start_second):
+        sql = "select time, market, symbol, high, low, open, close, volume, amount from market_ticks where (symbol = '%s' or symbol = '%s' or symbol = '%s') and time >= %d and time < %d  group by market, symbol order by time desc limit 1" % (symbol_name_usdt, symbol_name_btc, symbol_name_eth, start_second * 1e9, (start_second + 60) * 1e9)
+        #this.logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
         if len(result) == 0 or not result.has_key('series') or result['series'][0]['values'][0][1] == None:
-            this.logger.warn('k10 calc Warning - All exchanges miss previous minute price for this symbol: %s , %s ', symbol_name_usdt, symbol_name_btc)
+            #this.logger.warn('index calc Warning - All exchanges miss previous minute price for this symbol: %s , %s, %s ', symbol_name_usdt, symbol_name_btc, symbol_name_eth)
             return None
         return result['series']
 
-    def query_latest_price_exist(this, symbol_name_usdt, symbol_name_btc, market, start_second):
-        sql = "select time, market, symbol, high, low, open, close, volume, amount from market_ticks where (symbol = '%s' or symbol = '%s') and market = '%s' and time < %s order by time desc limit 1" % (symbol_name_usdt, symbol_name_btc, market, start_second*1000000000)
-        this.logger.debug(sql)
+    def query_latest_price_exist(this, symbol_name_usdt, symbol_name_btc, symbol_name_eth, market, start_second):
+        sql = "select time, market, symbol, high, low, open, close, volume, amount from market_ticks where (symbol = '%s' or symbol = '%s' or symbol = '%s') and market = '%s' and time < %d order by time desc limit 1" % (symbol_name_usdt, symbol_name_btc, symbol_name_eth, market, start_second * 1e9)
+        #this.logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
         if len(result) == 0 or not result.has_key('series') or result['series'][0]['values'][0][1] == None:
-            this.logger.error('k10 calc Error - Exchange has no price for symbol: %s , %s, %s ', market, symbol_name_usdt, symbol_name_btc)
+            #this.logger.error('index calc Error - Exchange has no price for symbol: %s , %s, %s, %s ', market, symbol_name_usdt, symbol_name_btc, symbol_name_eth)
             return None
         return result['series']
 
     def query_market_ticks_for_validation(this, start_second, end_second, key, generic_symbol):
-        sql = "select time, market, symbol, high, low, open, close, volume, period, timezone_offset from market_ticks where time >= %s and time <= %s and market = '%s' and symbol = '%s' order by time asc" % (start_second, end_second, key, generic_symbol)
+        sql = "select time, market, symbol, high, low, open, close, volume, period, timezone_offset from market_ticks where time >= %d and time <= %d and market = '%s' and symbol = '%s' order by time asc" % (start_second, end_second, key, generic_symbol)
         this.validation_logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
         if len(result) == 0 or not result.has_key('series'):
-            this.validation_logger.error('validation Error - market_ticks table has no price for time range: %s , %s ', start_second, end_second)
+            this.validation_logger.error('validation Error - market_ticks table has no price for time range: %d , %d ', start_second, end_second)
             return None
         return result['series']
 
     def query_ticks_table_for_validation(this, table_name, time_second, key, generic_symbol):
-        sql = "select time, market, symbol, high, low, open, close, volume, period, timezone_offset from %s where time = %s and market = '%s' and (symbol = '%s' or symbol = 'btcusdt')" % (table_name, time_second, key, generic_symbol)
+        sql = "select time, market, symbol, high, low, open, close, volume, period, timezone_offset from %s where time = %d and market = '%s' and (symbol = '%s' or symbol = 'btcusdt')" % (table_name, time_second, key, generic_symbol)
         this.validation_logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
         if len(result) == 0 or not result.has_key('series'):
-            this.validation_logger.error('validation Error - ticks table has no price for time: %s , %s, %s, %s ', table_name, time_second, key, generic_symbol)
+            this.validation_logger.error('validation Error - ticks table has no price for time: %s , %d, %s, %s ', table_name, time_second, key, generic_symbol)
             return None
         return result['series']
 
     def save_validation(this, validation):
-        sql = "select time, market, symbole, table from validation where time = %s and market = '%s' and symbol = '%s' and table = '%s' order by time desc limit 1" % (validation.time * 1000000000, validation.market, validation.symbol, validation.table)
+        sql = "select time, market, symbole, table from validation where time = %d and market = '%s' and symbol = '%s' and table = '%s' order by time desc limit 1" % (validation.time * 1e9, validation.market, validation.symbol, validation.table)
         this.validation_logger.debug(sql)
         ret = this.db_adapter.query(sql, epoch = 's')
         if ret and ret.has_key('series'):
@@ -222,7 +232,7 @@ class collector(object):
         this.logger.debug(sql)
         result = this.db_adapter.query(sql, epoch = 's')
         if len(result) == 0 or not result.has_key('series'):
-            this.logger.error('k10 index Calc Error - re_generate_table has no date ')
+            this.logger.error('index Calc Error - re_generate_table has no date ')
             return None
         return result['series']
 
@@ -237,20 +247,26 @@ class collector(object):
 
         return None
     
-    def calculate_usd_prices(this, current_minute, tick):
+    def calculate_usd_prices(this, current_minute, tick, symbol_name):
         if (not isinstance(tick, market_tick)) and (not isinstance(tick, dict)):
             return None
 
         if this.cache_manager:
+            symbol_temp = ''
+            if symbol_name.endswith('eth'):
+                symbol_temp = 'ethusdt'
+            elif symbol_name.endswith('btc'):
+                symbol_temp = 'btcusdt'
+
             if tick.time < current_minute:
                 # get btc-usdt price by record timestamp
                 current_minute = tick.time - tick.time % 60 + 60
-                sql = "select time, open, close, high, low from %s where symbol = '%s' and time < %d order by time desc limit 1" % (this.table_market_ticks, this.symbols_default[0], current_minute * 1e9)
+                sql = "select time, open, close, high, low from %s where symbol = '%s' and time < %d order by time desc limit 1" % (this.table_market_ticks, symbol_temp, current_minute * 1e9)
                 ret = this.db_adapter.query(sql, epoch = 's')
                 cached_prices = ret['series'][0]['values'][0][:5]
             else:
                 # get latest btc-usdt price
-                cached_prices = this.cache_manager.load_market_symbol_tick(this.market_name, this.symbols_default[0])
+                cached_prices = this.cache_manager.load_market_symbol_tick(this.market_name, symbol_temp)
 
             if cached_prices:
                 if isinstance(tick, market_tick):

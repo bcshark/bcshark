@@ -1,6 +1,10 @@
 { 
 	"timezone_offset": 0,
 	"rest_api_timeout": 1500,
+	"proxies": {
+		"http": "",
+		"https": ""
+	},
 	"influxdb": {
 		"host": "influxdb",
 		"port": 8086,
@@ -19,7 +23,7 @@
 		"enabled": true,
 		"shared_memory": {
 			"path": "data-files/cache",
-			"symbols": [ "btcusdt" ]
+			"symbols": [ "btcusdt", "ethusdt" ]
 		}
 	},
 	"kline": {
@@ -107,9 +111,16 @@
 				"rest": ""
 			}
 		},
+		"k30_index_calc": {
+			"title": "k30_index_calc",
+			"order": 12,
+			"api": {
+				"rest": ""
+			}
+		},
 		"market_ticks_validator": {
 			"title": "market_ticks_validator",
-			"order": 12,
+			"order": 13,
 			"api": {
 				"rest": ""
 			}

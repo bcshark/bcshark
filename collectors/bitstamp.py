@@ -79,7 +79,9 @@ class collector_bitstamp(collector):
         this.logger.info('bitstamp websocket connection established')
 
     def on_message(this, websocket_client, raw_message):
-        this.logger.info('receive message from bitstamp websocket: %s', raw_message)
+        #this.logger.info('receive message from bitstamp websocket: %s', raw_message)
+        this.logger.info('receive message from bitstamp websocket: (hide)')
+
         message_json = json.loads(raw_message)
 
         event = message_json['event']

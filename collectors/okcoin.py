@@ -45,7 +45,7 @@ class collector_okcoin(collector):
                 this.logger.error('cannot get response from okcoin (%s)' % symbol)
                 continue
 
-            this.bulk_save_ticks(this.get_generic_symbol_name(symbol), [ this.translate(tick) for tick in ticks ])
+            this.save_market_ticks(this.get_generic_symbol_name(symbol), [ this.translate(tick) for tick in ticks ])
 
             this.logger.info('get response from okcoin')
 
