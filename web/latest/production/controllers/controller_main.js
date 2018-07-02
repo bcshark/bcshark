@@ -6,6 +6,7 @@ angular.module('MarketIndex', ['ngResource'])
 .service('SymbolService', SymbolService)
 .service('KlineService', KlineService)
 .controller('TvKlineController', TvKlineController)
+.controller('TvKlineInnovationController', TvKlineInnovationController)
 .controller('IndexNewsController', IndexNewsController)
 .controller('IndexTopCoinsController', IndexTopCoinsController)
 .controller('IndexTopCoinsTableController', IndexTopCoinsTableController);
