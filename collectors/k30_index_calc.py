@@ -78,19 +78,19 @@ class collector_k30_index_calc(collector):
         return ticks
 
     def collect_rest(this):
-        db_re_gen_flag = this.query_db_re_gen_table()
+        db_re_gen_flag = this.query_db_re_gen_table_k30()
         if db_re_gen_flag is not None and db_re_gen_flag[0]['values'][0][1] == 'true':
             this.k30_logger.info('start to RE Generate k30 index !')
             this.re_generate_index()
-            this.update_db_re_gen_table_false()
+            this.update_db_re_gen_table_false_k30()
         else:
             this.k30_logger.info('start to Calculate k30 index !')
             start_second = this.getStartSecondPreviousMinute()
             this.generate_index(start_second)
 
     def re_generate_index(this):
-        re_gen_start = 1526371200  # start from GMT 2018-05-15 08:00
-        re_gen_end = this.getStartSecondPreviousMinute()  # current server time second - 10 minutes
+        re_gen_start = 1530460800  # start from GMT 2018-07-01 16:00
+        re_gen_end = this.getStartSecondPreviousMinute() + 1800  # current server time second - 30 minutes
         while re_gen_start <= re_gen_end:
             this.k30_logger.info('++++++ generating index for time second: %s', re_gen_start)
             this.generate_index(re_gen_start)
@@ -222,11 +222,14 @@ class collector_k30_index_calc(collector):
     def get_filtered_ticks(this, ticks, base_symbol):
         filtered_ticks = {}
         for tick in ticks:
-            tick_key = tick.market + base_symbol
-            if tick_key not in filtered_ticks.keys():
-                filtered_ticks[tick_key] = tick
-            elif 'usdt' in tick.symbol or ('usdt' not in filtered_ticks[tick_key].symbol and 'btc' in tick.symbol):
-                filtered_ticks[tick_key] = tick
+            if tick.market == 'bittrex' or tick.market == 'bitstamp' or (tick.market == 'bitfinex' and ('agi' not in tick.symbol)):
+                continue
+            else:
+                tick_key = tick.market + base_symbol
+                if tick_key not in filtered_ticks.keys():
+                    filtered_ticks[tick_key] = tick
+                elif 'usdt' in tick.symbol or ('usdt' not in filtered_ticks[tick_key].symbol and 'btc' in tick.symbol):
+                    filtered_ticks[tick_key] = tick
         return filtered_ticks
 
     def find_miss_price_market(this, symbols, ticks):
