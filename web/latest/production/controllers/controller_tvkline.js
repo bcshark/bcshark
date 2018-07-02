@@ -1,6 +1,7 @@
 "use strict";
 
-var TvKlineController = ['$scope', '$http', '$interval', '$window', 'MarketService', 'SymbolService', 'KlineService', function($scope, $http, $interval, $window, marketService, symbolService, klineService) {
+var TvKlineController = ['$scope', '$http', '$interval', '$window', 'MarketService', 'SymbolService', 'KlineService', 'ConfigService', 
+	function($scope, $http, $interval, $window, marketService, symbolService, klineService, configService) {
 	var ENABLE_MOVING_AVERAGE = true;
 
 	var upColor = '#ec0000';
@@ -77,13 +78,13 @@ var TvKlineController = ['$scope', '$http', '$interval', '$window', 'MarketServi
 				symbol_search_request_delay: 1000,
 				interval: '1',
 				container_id: "kline-chart",
-				datafeed: new Datafeeds.UDFCompatibleDatafeed("http://18.218.165.228:5000/tv"),
+				datafeed: new Datafeeds.UDFCompatibleDatafeed(configService.trading_view),
 				library_path: "public/javascript/charting_library/",
 				locale: getParameterByName('lang') || "en",
 				drawings_access: { type: 'black', tools: [ { name: "Regression Trend" } ] },
 				disabled_features: [ "study_templates", "left_toolbar", "control_bar", "timeframes_toolbar", "header_settings", "header_undo_redo", "header_interval_dialog_button", "header_screenshot", "header_saveload", "display_market_status", "use_localstorage_for_settings", "volume_force_overlay" ],
 				// enabled_features: [ "use_localstorage_for_settings" ],
-				charts_storage_url: 'http://18.218.165.228:5000/tv',
+				charts_storage_url: configService.trading_view,
 				charts_storage_api_version: "1.1",
 				client_id: 'market_index',
 				user_id: 'market_index',
