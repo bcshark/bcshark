@@ -8,7 +8,7 @@ from .utility import *
 
 class collector_k30_index_calc(collector):
     DEFAULT_PERIOD = "1min"
-    MULTIPLY_RATIO = 100
+    MULTIPLY_RATIO = 1000
 
     BASIC_PRICE = {
         'BASIC_ZIL':0.16476,
@@ -136,14 +136,15 @@ class collector_k30_index_calc(collector):
             this.k30_logger.error('k30 calc Error - validated symbol weight is 0 ! program exit')
             return
         index.timezone_offset = this.timezone_offset
-        index.high = total_high_weight * this.MULTIPLY_RATIO
-        index.low = total_low_weight * this.MULTIPLY_RATIO
-        index.open = total_open_weight * this.MULTIPLY_RATIO
-        index.close = total_close_weight * this.MULTIPLY_RATIO
+        index.high = total_high_weight / cal_length * this.MULTIPLY_RATIO
+        index.low = total_low_weight / cal_length * this.MULTIPLY_RATIO
+        index.open = total_open_weight / cal_length * this.MULTIPLY_RATIO
+        index.close = total_close_weight / cal_length * this.MULTIPLY_RATIO
         index.volume = total_volume_weight
         index.time = start_second
         index.period = '1min'
 
+        this.k30_logger.debug('k30 calc - calc length: %s', cal_length)
         this.k30_logger.debug('k30 calc - index.timezone_offset: %s', index.timezone_offset)
         this.k30_logger.debug('k30 calc - index.high: %s', index.high)
         this.k30_logger.debug('k30 calc - index.low: %s', index.low)
