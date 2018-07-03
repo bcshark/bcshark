@@ -132,12 +132,26 @@
 										</div>
 									</div>
 									<div class="x_content" ng-controller="TvKlineController">
-						<div id="kline-chart" class="demo-placeholder" style="height:500px"></div>
+										<div id="kline-chart" class="demo-placeholder" style="height:500px"></div>
 									</div>
 								</div>
 							</div>
 						</div>
 
+						<div class="row">
+							<div class="col-md-12 col-sm-12 col-xs-12">
+								<div class="dashboard_graph x_panel" style="padding: 7px 0px;">
+									<div class="row x_title" style="margin-left: 6px; margin-right: 6px; margin-bottom: 0px;">
+										<div class="col-md-12">
+											<h3>KCII <small>The Kuang's Innovation Index</small></h3>
+										</div>
+									</div>
+									<div class="x_content" ng-controller="TvKlineInnovationController">
+										<div id="kline-innovation-chart" class="demo-placeholder" style="height:500px"></div>
+									</div>
+								</div>
+							</div>
+						</div>
 
 						<div class="row">
 							<div class="col-md-6 col-sm-6 col-xs-12 widget_tally_box">
@@ -273,6 +287,7 @@
 		<script src="controllers/controller_topcoins.js"></script>
 		<script src="controllers/controller_topcoins_table.js"></script>
 		<script src="controllers/controller_tvkline.js"></script>
+		<script src="controllers/controller_tvkline_innovation.js"></script>
 		<script src="controllers/controller_main.js"></script>
 
 	</body>

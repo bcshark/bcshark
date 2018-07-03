@@ -63,9 +63,14 @@ class collector(object):
     def on_raw_close(this, websocket_client):
         print '\033[31;1m%s\033[0m websocket is \033[31;1mclosed\033[0m, reconnect in %d seconds.' % (this.market_name, this.DEFAULT_WS_RECONNECT_IN_SECONDS)
 
+        """
         if this.collect_ws:
             this.reconnect_timer = threading.Timer(this.DEFAULT_WS_RECONNECT_IN_SECONDS, this.collect_ws)
             this.reconnect_timer.start()
+        """
+        if this.collect_ws:
+            time.sleep(this.DEFAULT_WS_RECONNECT_IN_SECONDS)
+            this.collect_ws
 
     def on_raw_open(this, websocket_client):
         if this.on_open:
@@ -234,6 +239,19 @@ class collector(object):
     def update_db_re_gen_table_false(this):
         this.db_adapter.update_db_re_gen_table_false()
         this.logger.info('table re generate flag updated to false!')
+
+    def query_db_re_gen_table_k30(this):
+        sql = "select flag from re_generate_table_k30"
+        this.logger.debug(sql)
+        result = this.db_adapter.query(sql, epoch = 's')
+        if len(result) == 0 or not result.has_key('series'):
+            this.logger.error('index Calc Error - re_generate_table k30 has no date ')
+            return None
+        return result['series']
+
+    def update_db_re_gen_table_false_k30(this):
+        this.db_adapter.update_db_re_gen_table_false_k30()
+        this.logger.info('table re generate k30 flag updated to false!')
 
     def get_generic_symbol_name(this, symbol_name):
         for symbol_index in range(len(this.symbols_market)):

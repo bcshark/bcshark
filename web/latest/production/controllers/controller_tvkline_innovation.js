@@ -1,6 +1,6 @@
 "use strict";
 
-var TvKlineController = ['$scope', '$http', '$interval', '$window', 'MarketService', 'SymbolService', 'KlineService', 'ConfigService', 
+var TvKlineInnovationController = ['$scope', '$http', '$interval', '$window', 'MarketService', 'SymbolService', 'KlineService', 'ConfigService', 
 	function($scope, $http, $interval, $window, marketService, symbolService, klineService, configService) {
 	var ENABLE_MOVING_AVERAGE = true;
 
@@ -73,11 +73,11 @@ var TvKlineController = ['$scope', '$http', '$interval', '$window', 'MarketServi
 				fullscreen: false,
 				height: 500,
 				width: '100%',
-				symbol: 'Index',
+				symbol: 'Innovation',
 				allow_symbol_change: true,
 				symbol_search_request_delay: 1000,
 				interval: '1',
-				container_id: "kline-chart",
+				container_id: "kline-innovation-chart",
 				datafeed: new Datafeeds.UDFCompatibleDatafeed(configService.trading_view),
 				library_path: "public/javascript/charting_library/",
 				locale: getParameterByName('lang') || "en",

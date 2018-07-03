@@ -176,7 +176,7 @@ class collector_k10_index_calc(collector):
 
     def getStartSecondPreviousMinute(this):
         time_second = int(time.time())
-        time_second = time_second - (time_second % 60) - 600 + this.timezone_offset
+        time_second = time_second - (time_second % 60) - 3600 + this.timezone_offset
         this.logger.debug('k10 calc - start second generated: %s', time_second)
         return time_second;
 
@@ -224,11 +224,12 @@ class collector_k10_index_calc(collector):
         base_symbol = rank.symbol[0].split('usdt')[0].upper()
         filtered_ticks = {}
         for tick in ticks:
-            tick_key = tick.market + base_symbol
-            if tick_key not in filtered_ticks.keys():
-                filtered_ticks[tick_key] = tick
-            elif 'usdt' in tick.symbol:
-                filtered_ticks[tick_key] = tick
+            if tick.market != 'bittrex' and tick.market != 'bitstamp' and tick.market != 'bitfinex':
+                tick_key = tick.market + base_symbol
+                if tick_key not in filtered_ticks.keys():
+                    filtered_ticks[tick_key] = tick
+                elif 'usdt' in tick.symbol:
+                    filtered_ticks[tick_key] = tick
         return filtered_ticks;
 
     def find_miss_price_market(this, symbols, ticks):
@@ -261,7 +262,7 @@ class collector_k10_index_calc(collector):
         symbol_dict = this.symbols_all_market
         for key in symbol_dict:
             #if key != 'default' and key != '_title' and key != 'k10_daily_rank' and key != 'bittrex' and key != 'bitfinex' and key != 'bitstamp':
-            if key != 'default' and key != '_title' and key != 'k10_daily_rank' and key != 'bittrex':
+            if key != 'default' and key != '_title' and key != 'k10_daily_rank':
                 valid_markets.append(key)
         return valid_markets
 

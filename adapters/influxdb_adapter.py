@@ -180,3 +180,13 @@ class influxdb_adapter(database_adapter):
             }
         }
         this.client.write_points([ point ])
+
+    def update_db_re_gen_table_false_k30(this):
+        point = {
+            'measurement': 're_generate_table_k30',
+            'time': get_timestamp_str(1526371200, 0),
+            'fields': {
+                'flag':  'false'
+            }
+        }
+        this.client.write_points([ point ])

@@ -8,9 +8,49 @@ from .utility import *
 
 class collector_k30_index_calc(collector):
     DEFAULT_PERIOD = "1min"
-    MULTIPLY_RATIO = 1
+    MULTIPLY_RATIO = 100
+
+    BASIC_PRICE = {
+        'BASIC_ZIL':0.16476,
+        'BASIC_ONT':7.91225,
+        'BASIC_ELF':1.40215,
+        'BASIC_AE':3.8567,
+        'BASIC_KNC':2.25240,
+        'BASIC_AGI':0.16120,
+        'BASIC_MANA':0.14044,
+        'BASIC_POWR':0.45516,
+        'BASIC_ENG':2.92533,
+        'BASIC_THETA':0.2374,
+        'BASIC_IOST':0.05874,
+        'BASIC_BLZ':0.59014,
+        'BASIC_ELA':50.73065,
+        'BASIC_BRD':0.65636,
+        'BASIC_ICX':3.94713,
+        'BASIC_DDD':0.403732,
+        'BASIC_ZRX':1.54658,
+        'BASIC_CVC':0.40215,
+        'BASIC_WAN':6.92495,
+        'BASIC_AION':2.81827,
+        'BASIC_DRGN':0.85677,
+        'BASIC_RDN':1.69998,
+        'BASIC_MOBI':0.07828,
+        'BASIC_RUFF':0.11606,
+        'BASIC_GNX':0.403495,
+        'BASIC_LRC':0.643486,
+        'BASIC_SNT':0.125096,
+        'BASIC_VEN':5.09485,
+        'BASIC_NANO':5.92785,
+        'BASIC_WTC':12.62558,
+        'BASIC_GNT':0.62135,
+        'BASIC_LOOM':0.50059,
+        'BASIC_QKC':0.145144,
+        'BASIC_BTS':0.24249,
+        'BASIC_BTM':0.65429,
+        'BASIC_CTXC':1.3944
+    }
+
     #BASIC_SYMBOL = ['ipfs','ada','eos','zil','ont','elf','ae','knc','agi','mana','powr','eng','theta','iost','blz','ela','brd','icx','ddd','zrx','cvc','wan','aion','drgn','rdn','mobius','ruff','gnx','lrc','snt','ven','nano','wtc','gnt','loom']
-    BASIC_SYMBOL = ['zil','ont','elf','ae','knc','agi','mana','powr','eng','theta','iost','blz','ela','brd','icx','ddd','zrx','cvc','wan','aion','drgn','rdn','mobi','ruff','gnx','lrc','snt','ven','nano','wtc','gnt','loom']
+    BASIC_SYMBOL = ['zil','ont','ae','knc','agi','powr','eng','theta','blz','ela','brd','icx','ddd','zrx','cvc','wan','aion','drgn','rdn','gnx','lrc','ven','nano','wtc','gnt','loom','qkc','bts','btm','ctxc']
 
     @property
     def market_name(this):
@@ -38,19 +78,19 @@ class collector_k30_index_calc(collector):
         return ticks
 
     def collect_rest(this):
-        db_re_gen_flag = this.query_db_re_gen_table()
+        db_re_gen_flag = this.query_db_re_gen_table_k30()
         if db_re_gen_flag is not None and db_re_gen_flag[0]['values'][0][1] == 'true':
             this.k30_logger.info('start to RE Generate k30 index !')
             this.re_generate_index()
-            this.update_db_re_gen_table_false()
+            this.update_db_re_gen_table_false_k30()
         else:
             this.k30_logger.info('start to Calculate k30 index !')
             start_second = this.getStartSecondPreviousMinute()
             this.generate_index(start_second)
 
     def re_generate_index(this):
-        re_gen_start = 1526371200  # start from GMT 2018-05-15 08:00
-        re_gen_end = this.getStartSecondPreviousMinute()  # current server time second - 10 minutes
+        re_gen_start = 1530460800  # start from GMT 2018-07-01 16:00
+        re_gen_end = this.getStartSecondPreviousMinute() + 1800  # current server time second - 30 minutes
         while re_gen_start <= re_gen_end:
             this.k30_logger.info('++++++ generating index for time second: %s', re_gen_start)
             this.generate_index(re_gen_start)
@@ -133,7 +173,7 @@ class collector_k30_index_calc(collector):
 
     def getStartSecondPreviousMinute(this):
         time_second = int(time.time())
-        time_second = time_second - (time_second % 60) - 600 + this.timezone_offset
+        time_second = time_second - (time_second % 60) - 3600 + this.timezone_offset
         this.k30_logger.debug('k30 calc - start second generated: %s', time_second)
         return time_second;
 
@@ -150,9 +190,13 @@ class collector_k30_index_calc(collector):
     def calculate_symbol_price(this, filtered_ticks, price_field, base_symbol):
 
         sum_price = 0
+        index_field = 'BASIC_' + base_symbol.upper()
+        base_price = this.BASIC_PRICE[index_field]
+        this.k30_logger.debug('basic price name: %s, %s', index_field, base_price)
+
         for key in filtered_ticks.keys():
             tick = filtered_ticks[key]
-            this.k30_logger.debug('filtered tick in calc avg price: %s, %s, %s, %s, %s, %s, %s ', key, tick.market, tick.symbol, tick.high, tick.low, tick.open, tick.close)
+            this.k30_logger.debug('filtered tick in calc avg price: %s, %s, %s, %s, %s, %s, %s, %s ', key, tick.time, tick.market, tick.symbol, tick.high, tick.low, tick.open, tick.close)
             if price_field == 'high':
                 sum_price = sum_price + tick.high
             if price_field == 'low':
@@ -161,7 +205,7 @@ class collector_k30_index_calc(collector):
                 sum_price = sum_price + tick.open
             if price_field == 'close':
                 sum_price = sum_price + tick.close
-        avg_price = (sum_price / len(filtered_ticks))
+        avg_price = (sum_price / len(filtered_ticks) / base_price)
         this.k30_logger.debug('k30 calc - Calculated avg price %s Is: %s for symbol: %s', price_field, avg_price, base_symbol)
         return avg_price
 
@@ -171,18 +215,21 @@ class collector_k30_index_calc(collector):
         for key in filtered_ticks.keys():
             tick = filtered_ticks[key]
             sum_volume = sum_volume + ((tick.high + tick.low) / 2 * tick.volume)
-            this.k30_logger.debug('filtered tick in calc total volumne: %s, %s, %s, %s, %s, %s, %s ', tick.market, tick.symbol, tick.high, tick.low, tick.open, tick.close, tick.volume)
+            this.k30_logger.debug('filtered tick in calc total volumne: %s, %s, %s, %s, %s, %s, %s, %s ', tick.market, tick.time, tick.symbol, tick.high, tick.low, tick.open, tick.close, tick.volume)
         this.k30_logger.debug('k30 calc volume - %s for symbol: %s', sum_volume, base_symbol)
         return sum_volume
 
     def get_filtered_ticks(this, ticks, base_symbol):
         filtered_ticks = {}
         for tick in ticks:
-            tick_key = tick.market + base_symbol
-            if tick_key not in filtered_ticks.keys():
-                filtered_ticks[tick_key] = tick
-            elif 'usdt' in tick.symbol or ('usdt' not in filtered_ticks[tick_key].symbol and 'btc' in tick.symbol):
-                filtered_ticks[tick_key] = tick
+            if tick.market == 'bittrex' or tick.market == 'bitstamp' or (tick.market == 'bitfinex' and ('agi' not in tick.symbol)):
+                continue
+            else:
+                tick_key = tick.market + base_symbol
+                if tick_key not in filtered_ticks.keys():
+                    filtered_ticks[tick_key] = tick
+                elif 'usdt' in tick.symbol or ('usdt' not in filtered_ticks[tick_key].symbol and 'btc' in tick.symbol):
+                    filtered_ticks[tick_key] = tick
         return filtered_ticks
 
     def find_miss_price_market(this, symbols, ticks):
@@ -220,7 +267,7 @@ class collector_k30_index_calc(collector):
         symbol_dict = this.symbols_all_market
         for key in symbol_dict:
             #if key != 'default' and key != '_title' and key != 'k10_daily_rank' and key != 'bittrex' and key != 'bitfinex' and key != 'bitstamp':
-            if key != 'default' and key != '_title' and key != 'k10_daily_rank' and key != 'bittrex':
+            if key != 'default' and key != '_title' and key != 'k10_daily_rank':
                 valid_markets.append(key)
         return valid_markets
 
