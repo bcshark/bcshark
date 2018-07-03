@@ -31,7 +31,7 @@ class kline_service(object):
         #NOTE: ignore limits as tradingview will alwasy send from_time and to_time in a reasonable range
         symbol = symbol.lower()
         if not symbol == 'index' and not symbol == 'innovation':
-            sql = "select time, first(open) as open, last(close) as close, min(low) as low, max(high) as high, sum(volume) as volume from market_ticks where symbol = '%s' and time >= %d and time <= %d group by time(%s) order by time desc" % (symbol, from_time * 1e9, to_time * 1e9, this.get_influx_timegroup_by_resolution(resolution))
+            sql = "select time, first(open) as open, last(close) as close, min(low) as low, max(high) as high, sum(volume) as volume from market_ticks where symbol = '%s' and market = 'binance' and time >= %d and time <= %d group by time(%s) order by time desc" % (symbol, from_time * 1e9, to_time * 1e9, this.get_influx_timegroup_by_resolution(resolution))
         elif symbol == 'innovation':
             sql = "select time, first(open) as open, last(close) as close, min(low) as low, max(high) as high, sum(volume) as volume from k30_index where time >= %d and time <= %d group by time(%s) order by time desc" % (from_time * 1e9, to_time * 1e9, this.get_influx_timegroup_by_resolution(resolution))
         else:
