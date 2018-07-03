@@ -76,20 +76,6 @@
 				"ws": "wss://api.bitfinex.com/ws/2"
 			}
 		},
-		"bitstamp": {
-			"title": "Bitstamp",
-			"order": 7,
-			"api": {
-				"ws": "wss://ws.pusherapp.com/app/0ea60078504a5d9773ab?protocol=6&client=js&version=2.1.2&flash=false"
-			}
-		},
-		"bittrex": {
-			"title": "Bittrex",
-			"order": 8,
-			"api": {
-				"ws": "https://beta.bittrex.com/signalr"
-			}
-		},
 		"gateio": {
 			"title": "gateio",
 			"order": 9,
