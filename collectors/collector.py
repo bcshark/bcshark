@@ -11,7 +11,8 @@ from model.market_tick import market_tick
 from .utility import *
 
 class collector(object):
-    DEFAULT_TIMEOUT_IN_SECONDS = 10
+    DEFAULT_CONNECT_TIMEOUT_IN_SECONDS = 10
+    DEFAULT_READ_TIMEOUT_IN_SECONDS = 60
     DEFAULT_WS_RECONNECT_IN_SECONDS = 10
 
     def __init__(this, settings, market_settings):
@@ -96,7 +97,7 @@ class collector(object):
         this.logger.info('Requesting \033[32;1m%s\033[0m rest interface, url: \033[32;1m%s\033[0m' % (this.market_name, url))
 
         try:
-            res = requests.get(url, proxies = this.proxies, headers = headers, cookies = cookies, timeout = this.DEFAULT_TIMEOUT_IN_SECONDS, allow_redirects = True, verify = False)
+            res = requests.get(url, proxies = this.proxies, headers = headers, cookies = cookies, timeout = (this.DEFAULT_CONNECT_TIMEOUT_IN_SECONDS, this.DEFAULT_READ_TIMEOUT_IN_SECONDS), allow_redirects = True, verify = False)
 
             return res.json()
         except Exception, e:
