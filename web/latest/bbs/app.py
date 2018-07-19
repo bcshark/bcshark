@@ -78,7 +78,7 @@ def create_app(config=None, instance_path=None):
     """
 
     app = Flask(
-        "flaskbb", instance_path=instance_path, instance_relative_config=True
+        "flaskbb", instance_path=instance_path, instance_relative_config=True, static_folder='', static_url_path=''
     )
 
     # instance folders are not automatically created by flask
