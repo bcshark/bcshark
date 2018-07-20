@@ -24,8 +24,9 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='static/css/pygments.css') }}">
         <!-- bootstrap & aurora theme -->
         <link rel="stylesheet" href="{{ url_for('static', filename='static/css/styles.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='static/css/coinmarket.css') }}">
         <!-- lato font -->
-        <link href="{{ url_for('static', filename='static/css/google-fonts.css') }}" rel="stylesheet" type="text/css">
+		<link rel="stylesheet" href="{{ url_for('static', filename='static/css/google-fonts.css') }}">
         <!-- emoji -->
         <script src="{{ url_for('static', filename='static/js/twemoji.min.js') }}"></script>
         {% endblock %}
@@ -39,24 +40,24 @@
         {% endblock %}
     </head>
 
-    <body>
+    <body class="cm_body">
         <!-- main forum layout -->
         <div class="flaskbb-layout">
             <div class="container">
 
                 <!-- forum header - place for the project title and subtitle -->
                 {% block header %}
-                <div class="flaskbb-header">
+                <div class="row flaskbb-header cm_header">
                     <div class="flaskbb-meta">
-                        <div class="flaskbb-title">{{ flaskbb_config["PROJECT_TITLE"] }}</div>
-                        <div class="flaskbb-subtitle">{{ flaskbb_config["PROJECT_SUBTITLE"] }}</div>
+                        <div class="flaskbb-title">CoinMarket Forum</div>
+                        <div class="flaskbb-subtitle">BlockChain &amp; CryptoCurriencies Forum</div>
                     </div>
                 </div>
                 {% endblock %}
 
                 <!-- forum menu - contains all the navigation items -->
                 {% block navigation %}
-                <div class="navbar navbar-default" role="navigation">
+                <div class="row navbar navbar-default" role="navigation">
                     <!-- Brand and toggle get grouped for better mobile display -->
                     <div class="navbar-header">
                       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
@@ -139,31 +140,26 @@
 
                 <!-- Place for all the (flashed) messages -->
                 {% block messages %}
-                <div id="flashed-messages">
+                <div id="flashed-messages" class="row">
                     {% include theme('flashed_messages.html') %}
                 </div>
                 {% endblock %}
 
                 <!-- the actual content block -->
-                {% block content %}
+				<div class="row">{% block content %}</div>
                 {% endblock %}
             </div> <!-- end container -->
 
             <!-- the forum footer -->
             {% block footer %}
-            <footer class="flaskbb-footer">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                            <div class="text-muted text-left">{{ flaskbb_config["PROJECT_COPYRIGHT"] | safe }}</div>
-                        </div>
-                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                            <div class="text-muted text-right">powered by <a href="https://flaskbb.org">FlaskBB</a></div>
-                            <div class="text-muted text-right">&copy; 2013 - {{ now.year }} <a href="https://flaskbb.org">FlaskBB Team</a></div>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            <div class="row flaskbb-footer" style="left: 15px">
+				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+					<div class="cm_copyright text-left">© Copyright 2018 CoinMarket Team.</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+					<div class="cm_poweredby text-muted text-right">powered by <a href="https://flaskbb.org">FlaskBB</a></div>
+				</div>
+            </div>
             {% endblock %}
 
         </div> <!-- end flaskbb-layout -->
