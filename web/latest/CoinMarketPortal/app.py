@@ -16,6 +16,8 @@ import time
 from datetime import datetime
 from functools import partial
 
+from babel import Locale
+
 from flask import Flask, request
 from flask_login import current_user
 from sqlalchemy import event
@@ -336,11 +338,14 @@ def configure_translations(app):
     @babel.localeselector
     def get_locale():
         # if a user is logged in, use the locale from the user settings
+        return  Locale.parse('zh-CN', sep='-')
+        """
         if current_user and \
                 current_user.is_authenticated and current_user.language:
             return current_user.language
         # otherwise we will just fallback to the default language
         return flaskbb_config["DEFAULT_LANGUAGE"]
+        """
 
 
 def configure_logging(app):

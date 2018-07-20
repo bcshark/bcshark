@@ -6,6 +6,16 @@
 	background-color: #333333;
 }
 
+.cm_header .cm_title {
+	color: #fff;
+	font-size: 3em;
+}
+
+.cm_header .cm_subtitle {
+	color: #E8F1F2;
+	font-size: 1.1em;
+}
+
 .cm_copyright {
 	color: #E8F1F2;
 	font-size: 12px;
@@ -14,3 +24,4 @@
 .cm_poweredby {
 	font-size: 12px;
 }
+
