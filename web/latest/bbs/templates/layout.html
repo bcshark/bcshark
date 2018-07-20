@@ -7,7 +7,7 @@
         <meta name="description" content="FlaskBB is a forum software written in Flask">
         <meta name="author" content="FlaskBB Team">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <link rel="shortcut icon" href="/bbs{{ url_for('static', filename='static/favicon.ico') }}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='static/favicon.ico') }}">
 
         <title>
         {% block title %}
@@ -21,9 +21,9 @@
 
         {% block stylesheets %}
         <!-- syntax highlighting -->
-        <link rel="stylesheet" href="/bbs{{ url_for('static', filename='static/css/pygments.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='static/css/pygments.css') }}">
         <!-- bootstrap & aurora theme -->
-        <link rel="stylesheet" href="/bbs{{ url_for('static', filename='static/css/styles.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='static/css/styles.css') }}">
         <!-- lato font -->
         <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
         <!-- emoji -->
@@ -165,7 +165,7 @@
 
         {% block javascript %}
         <!-- jquery and bootstrap and flaskbb.js -->
-        <script src="/bbs{{ url_for('static', filename='static/js/scripts.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='static/js/scripts.min.js') }}"></script>
         <!-- Enable tooltips in all templates -->
         <script>
         $(function () {

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="MarketIndex">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<!-- Meta, title, CSS, favicons, etc. -->
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<title>Market Index</title>
+
+		<!-- Bootstrap -->
+		<link href="vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+		<!-- Font Awesome -->
+		<link href="vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+		<!-- NProgress -->
+		<link href="vendors/nprogress/nprogress.css" rel="stylesheet">
+		<!-- bootstrap-progressbar -->
+		<link href="vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+		<!-- bootstrap-daterangepicker -->
+		<link href="vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+		
+		<!-- Custom Theme Style -->
+		<link href="build/css/custom.dark.min.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="public/stylesheet/site.css">
+	</head>
+
+	<body class="nav-md">
+		<div class="container body">
+			<div class="main_container">
+				<div class="col-md-3 left_col menu_fixed">
+					<div class="left_col scroll-view">
+						<div class="navbar nav_title" style="border: 0;">
+							<a href="index.html" class="site_title"><i class="fa fa-bitcoin"></i> <span>Market Index</span></a>
+						</div>
+
+						<div class="clearfix"></div>
+						<br />
+
+						<!-- sidebar menu -->
+						<div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+							<div class="menu_section">
+								<h3>General</h3>
+								<ul class="nav side-menu">
+									<li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
+										<ul class="nav child_menu">
+											<li><a href="index.html">Exchange</a></li>
+										</ul>
+									</li>
+									<li><a><i class="fa fa-edit"></i> News <span class="label label-success pull-right">Coming Soon</span></a>
+										<ul class="nav child_menu">
+											<li><a href="form.html">General Form</a></li>
+										</ul>
+									</li>
+									<li><a><i class="fa fa-desktop"></i> Articles <span class="label label-success pull-right">Coming Soon</span></a>
+										<ul class="nav child_menu">
+											<li><a href="general_elements.html">The Kuang's</a></li>
+										</ul>
+									</li>
+									<li><a><i class="fa fa-table"></i> Forum <span class="label label-success pull-right">Coming Soon</span></a>
+										<ul class="nav child_menu">
+											<li><a href="tables.html">Bitcoin</a></li>
+											<li><a href="tables.html">BlockChain</a></li>
+										</ul>
+									</li>
+								</ul>
+							</div>
+							<div class="menu_section">
+								<h3>About</h3>
+								<ul class="nav side-menu">
+									<li><a><i class="fa fa-windows"></i> About Us <span class="fa fa-chevron-down"></span></a>
+										<ul class="nav child_menu">
+											<li><a href="projects.html">Projects</a></li>
+										</ul>
+									</li>
+									<li><a href="contacts.html"><i class="fa fa-laptop"></i> Contact Us </a></li>
+								</ul>
+							</div>
+
+						</div>
+						<!-- /sidebar menu -->
+
+						<!-- /menu footer buttons -->
+						<div class="sidebar-footer hidden-small">
+							<a data-toggle="tooltip" data-placement="top" title="Help" style="width: 100%">
+								<span class="fa fa-question-circle-o" aria-hidden="true"></span>
+							</a>
+						</div>
+						<!-- /menu footer buttons -->
+					</div>
+				</div>
+
+				<!-- top navigation -->
+				<div class="top_nav">
+					<div class="nav_menu">
+						<nav>
+							<div class="nav toggle">
+								<a id="menu_toggle"><i class="fa fa-bars"></i></a>
+							</div>
+
+							<ul class="nav navbar-nav navbar-right">
+								<li class="">
+									<a href="javascript:;" class="user-profile dropdown-toggle" aria-expanded="false">
+						<img src="images/user.png" alt=""><strong>Sign in</strong> or <strong>Sign up</strong>
+									</a>
+								</li>
+							</ul>
+						</nav>
+					</div>
+				</div>
+				<!-- /top navigation -->
+
+				<!-- page content -->
+				<div class="right_col" role="main">
+					<div class="">
+						<div class="row top_tiles" style="margin: 10px 0;" ng-controller="IndexTopCoinsController">
+							<div class="col-md-3 col-sm-3 col-xs-6 tile" ng-repeat="coin in top_coins" style="background-color: #282828; border: 2px solid #141414; padding-top: 5px; padding-bottom: 5px;">
+								<span>{{ coin.name }}</span>
+								<h2>{{ coin.latest_price | currency }}</h2>
+								<canvas id="{{ 'coin_chart_' + coin.symbol }}" style="display: inline-block; vertical-align: top; width: 100%; height: 125px;"></canvas>
+							</div>
+						</div>
+
+						<br />
+
+						<div class="row">
+							<div class="col-md-12 col-sm-12 col-xs-12">
+								<div class="dashboard_graph x_panel" style="padding: 7px 0px;">
+									<div class="row x_title" style="margin-left: 6px; margin-right: 6px; margin-bottom: 0px;">
+										<div class="col-md-12">
+											<h3>KCI <small>The Kuang's Index</small></h3>
+										</div>
+									</div>
+									<div class="x_content" ng-controller="TvKlineController">
+										<div id="kline-chart" class="demo-placeholder" style="height:500px"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-md-12 col-sm-12 col-xs-12">
+								<div class="dashboard_graph x_panel" style="padding: 7px 0px;">
+									<div class="row x_title" style="margin-left: 6px; margin-right: 6px; margin-bottom: 0px;">
+										<div class="col-md-12">
+											<h3>KCII <small>The Kuang's Innovation Index</small></h3>
+										</div>
+									</div>
+									<div class="x_content" ng-controller="TvKlineInnovationController">
+										<div id="kline-innovation-chart" class="demo-placeholder" style="height:500px"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-md-6 col-sm-6 col-xs-12 widget_tally_box">
+								<div class="x_panel fixed_height_480" ng-controller="IndexTopCoinsTableController">
+									<div class="x_title">
+										<h2>Top 10</h2>
+										<ul class="nav navbar-right panel_toolbox">
+											<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+											<li><a ng-click="getTopCoins()"><i class="fa fa-refresh"></i></a></li>
+											<li><a class="close-link"><i class="fa fa-close"></i></a>
+											</li>
+										</ul>
+										<div class="clearfix"></div>
+									</div>
+									<div class="x_content">
+										<table class="table">
+										  <thead>
+											<tr>
+											  <th>#</th>
+											  <th>Name</th>
+											  <th>Symbol</th>
+											  <th style="text-align: right;">24H (%)</th>
+											</tr>
+										  </thead>
+										  <tbody>
+											<tr ng-repeat="coin in top_coins">
+											  <th scope="row">{{ $index + 1 }}</th>
+											  <td>{{ coin.fullname }}</td>
+											  <td>{{ coin.name }}</td>
+											  <td ng-style='{ "color": coin.percent_change_24h >= 0 ? "green": "red", "text-align": "right" } '>{{ coin.percent_change_24h }}</td>
+											</tr>
+										  </tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-md-6 col-sm-6 col-xs-12 widget_tally_box">
+								<div class="x_panel fixed_height_480" ng-controller="IndexNewsController">
+									<div class="x_title">
+										<h2>News</h2>
+										<ul class="nav navbar-right panel_toolbox">
+											<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+											<li><a ng-click="getTopNews()"><i class="fa fa-refresh"></i></a></li>
+											<li><a class="close-link"><i class="fa fa-close"></i></a></li>
+										</ul>
+										<div class="clearfix"></div>
+									</div>
+									<div class="x_content">
+										<div class="ns-item" ng-repeat="item in top_news">
+											<div class="ns-item-title">
+												<a target="_blank" href="{{ item.link }}">{{ item.title }}</a>
+											</div>	
+											<div class="ns-item-content">{{ item.shortDescription }}</div>
+											<div class="ns-item-desc">{{ item.published * 1000 | date: 'yyyy-MM-dd' }}</div>
+										</div>	
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /page content -->
+
+				<!-- footer content -->
+				<footer>
+					<div class="pull-right">
+			 copyright &copy; 2018
+			</div>
+					<div class="clearfix"></div>
+				</footer>
+				<!-- /footer content -->
+			</div>
+		</div>
+
+		<!-- jQuery -->
+		<script src="vendors/jquery/dist/jquery.min.js"></script>
+		<!-- Angularjs -->
+		<script src="public/javascript/angular.min.js"></script>
+		<script src="public/javascript/angular-resource.min.js"></script>
+		<!-- Bootstrap -->
+		<script src="vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+		<!-- FastClick -->
+		<script src="vendors/fastclick/lib/fastclick.js"></script>
+		<!-- NProgress -->
+		<script src="vendors/nprogress/nprogress.js"></script>
+		<!-- Chart.js -->
+		<script src="vendors/Chart.js/dist/Chart.min.js"></script>
+		<!-- jQuery Sparklines -->
+		<script src="vendors/jquery-sparkline/dist/jquery.sparkline.min.js"></script>
+		<!-- morris.js -->
+		<script src="vendors/raphael/raphael.min.js"></script>
+		<script src="vendors/morris.js/morris.min.js"></script>
+		<!-- gauge.js -->
+		<script src="vendors/gauge.js/dist/gauge.min.js"></script>
+		<!-- bootstrap-progressbar -->
+		<script src="vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+		<!-- Skycons -->
+		<script src="vendors/skycons/skycons.js"></script>
+		<!-- Flot -->
+		<script src="vendors/Flot/jquery.flot.js"></script>
+		<script src="vendors/Flot/jquery.flot.pie.js"></script>
+		<script src="vendors/Flot/jquery.flot.time.js"></script>
+		<script src="vendors/Flot/jquery.flot.stack.js"></script>
+		<script src="vendors/Flot/jquery.flot.resize.js"></script>
+		<!-- Flot plugins -->
+		<script src="vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+		<script src="vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+		<script src="vendors/flot.curvedlines/curvedLines.js"></script>
+		<!-- DateJS -->
+		<script src="vendors/DateJS/build/date.js"></script>
+		<!-- bootstrap-daterangepicker -->
+		<script src="vendors/moment/min/moment.min.js"></script>
+		<script src="vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+		<!-- Trading View -->
+		<script src="public/javascript/charting_library/charting_library.min.js"></script>
+		<script src="public/javascript/datafeeds/polyfills.js"></script>
+		<script src="public/javascript/datafeeds/bundle.js"></script>
+
+		<!-- ECharts -->
+		<script src="vendors/echarts/dist/echarts.min.js"></script>
+		<script src="vendors/echarts/theme/dark.js"></script>
+		<script src="vendors/echarts/map/js/world.js"></script>
+
+		<!-- Custom Theme Scripts -->
+		<script src="build/js/custom.min.js"></script>
+		<script src="config/config.js"></script>
+		<script src="services/service_market.js"></script>
+		<script src="services/service_symbol.js"></script>
+		<script src="services/service_kline.js"></script>
+		<script src="controllers/controller_news.js"></script>
+		<script src="controllers/controller_topcoins.js"></script>
+		<script src="controllers/controller_topcoins_table.js"></script>
+		<script src="controllers/controller_tvkline.js"></script>
+		<script src="controllers/controller_tvkline_innovation.js"></script>
+		<script src="controllers/controller_main.js"></script>
+
+	</body>
+</html>
