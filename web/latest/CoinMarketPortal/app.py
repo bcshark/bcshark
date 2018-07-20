@@ -337,9 +337,10 @@ def configure_translations(app):
 
     @babel.localeselector
     def get_locale():
-        # if a user is logged in, use the locale from the user settings
-        return  Locale.parse('zh-CN', sep='-')
+        return Locale.parse('zh-CN', sep='-')
+
         """
+        # if a user is logged in, use the locale from the user settings
         if current_user and \
                 current_user.is_authenticated and current_user.language:
             return current_user.language
