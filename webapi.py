@@ -286,6 +286,8 @@ def api_topcoins():
 def api_kline():
     market = request.args.get('m', '')
     symbol = request.args.get('s', '')
+    size = request.args.get('w', '')
+    resolution = request.args.get('r', '')
 
     client = settings['db_adapter']
     support_markets = settings['markets'].keys()
@@ -294,8 +296,16 @@ def api_kline():
     if (not market == 'market_index') and (not market in support_markets or not symbol in support_symbols):
         return 'not supported'
 
+    if (not size or size == ''):
+        size = int(settings['kline']['size'])
+    else:
+        size = int(size)
+
+    if (not resolution or resolution == ''):
+        resolution = '1'
+
     service = kline_service(client, settings)
-    kline = service.get_kline_by_market_symbol(market, symbol, '1', settings['kline']['size'])
+    kline = service.get_kline_by_market_symbol(market, symbol, resolution, size)
 
     if kline and kline.has_key('series'):
         columns = kline['series'][0]['columns']
