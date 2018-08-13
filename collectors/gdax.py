@@ -1,3 +1,4 @@
+import time
 import requests
 import datetime
 
@@ -56,3 +57,4 @@ class collector_gdax(collector):
             this.save_market_ticks(this.get_generic_symbol_name(symbol), ticks)
 
             this.logger.info('get response from gdax')
+            time.sleep(0.5)

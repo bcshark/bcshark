@@ -60,6 +60,7 @@ from .auth import views as auth_views
 from .forum import views as forum_views
 from .management import views as management_views
 from .user import views as user_views
+from .api import views as api_views
 
 logger = logging.getLogger(__name__)
 

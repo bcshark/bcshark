@@ -44,7 +44,7 @@ install_requires = get_requirements()
 
 
 setup(
-    name='CoinMarketBBS',
+    name='CoinMarket',
     version="1.0.0",
     url='http://18.218.165.228',
     project_urls={
@@ -64,7 +64,7 @@ setup(
     platforms='any',
     entry_points='''
         [console_scripts]
-        flaskbb=bbs.cli:flaskbb
+        coinmarket=CoinMarketPortal.cli:flaskbb
     ''',
     python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
     install_requires=install_requires,
