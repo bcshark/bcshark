@@ -41,8 +41,10 @@ class kline_service(object):
         return rows 
 
     def get_kline_by_market_symbol(this, market, symbol, resolution, size):
-        if market == 'market_index':
+        if symbol == 'index':
             sql = "select time, first(open) as open, last(close) as close, min(low) as low, max(high) as high, sum(volume) as volume from k10_index group by time(%s) order by time desc limit %d" % (this.get_influx_timegroup_by_resolution(resolution), size)
+        elif symbol == 'innovation':
+            sql = "select time, first(open) as open, last(close) as close, min(low) as low, max(high) as high, sum(volume) as volume from k30_index group by time(%s) order by time desc limit %d" % (this.get_influx_timegroup_by_resolution(resolution), size)
         else:
             sql = "select time, first(open) as open, last(close) as close, min(low) as low, max(high) as high, sum(volume) as volume from %s_ticks where market = '%s' and symbol = '%s' group by time(%s) order by time desc limit %d" % (market, market, symbol, this.get_influx_timegroup_by_resolution(resolution), size)
         rows = this.client.query(sql, epoch = 's')
@@ -67,3 +69,13 @@ class kline_service(object):
         ranks.sort(lambda x, y: cmp(x[3], y[3]))
 
         return ranks[:count]
+
+    def query_latest_index(this, index_type, size):
+        if index_type == 'k30' or index_type == 'K30':
+            sql = "select time, open, close, low, high, volume from k30_index order by time desc limit %d" % (size)
+        else:
+            sql = "select time, open, close, low, high, volume from k10_index order by time desc limit %d" % (size)
+        rows = this.client.query(sql, epoch = 's')
+
+        return rows 
+
