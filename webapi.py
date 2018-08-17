@@ -282,20 +282,50 @@ def api_topcoins():
     else:
         return json.dumps({})
 
+@app.route('/api/index', methods=['GET'])
+def api_index():
+    index_type = request.args.get('t', '')
+    size = request.args.get('w', '')
+
+    client = settings['db_adapter']
+    service = kline_service(client, settings)
+
+    data = service.query_latest_index(index_type, int(size))
+    series = data['series'][0]
+    values = []
+
+    for row_index in range(len(series['values'])):
+        value = {}
+        for column_index in range(len(series['columns'])):
+            value[series['columns'][column_index]] = series['values'][row_index][column_index]
+        values.append(value)
+
+    return json.dumps(values)
+
 @app.route('/api/kline', methods=['GET'])
 def api_kline():
     market = request.args.get('m', '')
     symbol = request.args.get('s', '')
+    size = request.args.get('w', '')
+    resolution = request.args.get('r', '')
 
     client = settings['db_adapter']
     support_markets = settings['markets'].keys()
     support_symbols = settings['symbols']['default']
 
-    if (not market == 'market_index') and (not market in support_markets or not symbol in support_symbols):
+    if (not symbol == 'index' and not symbol == 'innovation') and (not market in support_markets or not symbol in support_symbols):
         return 'not supported'
 
+    if (not size or size == ''):
+        size = int(settings['kline']['size'])
+    else:
+        size = int(size)
+
+    if (not resolution or resolution == ''):
+        resolution = '1'
+
     service = kline_service(client, settings)
-    kline = service.get_kline_by_market_symbol(market, symbol, '1', settings['kline']['size'])
+    kline = service.get_kline_by_market_symbol(market, symbol, resolution, size)
 
     if kline and kline.has_key('series'):
         columns = kline['series'][0]['columns']
