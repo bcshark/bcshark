@@ -77,5 +77,28 @@ class kline_service(object):
             sql = "select time, open, close, low, high, volume from k10_index order by time desc limit %d" % (size)
         rows = this.client.query(sql, epoch = 's')
 
-        return rows 
+        return rows
 
+    def query_monitor(this):
+        sql = "select time, market, symbol, update_time from monitor"
+        print('Monitor SQL: %s', sql)
+        result = this.client.query(sql, epoch = 's')
+        if len(result) == 0 or not result.has_key('series'):
+            return None
+
+        monitors = result['series'][0]['values']
+        return monitors
+
+    def query_validation(this, start, end, market, symbol):
+        sql = "select time, market, symbol, msg from validation where time >= %s and time <= %s" % (start * 1000000000, end * 1000000000)
+        if market != '':
+            sql = sql + " and market = '%s'" % (market)
+        if symbol != '':
+            sql = sql + " and symbol = '%s'" % (symbol)
+        print('Validation SQL: %s', sql)
+        result = this.client.query(sql, epoch = 's')
+        if len(result) == 0 or not result.has_key('series'):
+            return None
+
+        validations = result['series'][0]['values']
+        return validations

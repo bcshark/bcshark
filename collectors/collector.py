@@ -157,7 +157,18 @@ class collector(object):
         for index in range(len(ticks)):
             tick = ticks[index]
             this.internal_save_tick(current_minute, symbol_name, tick)
+        this.updateDashboard('monitor', this.market_name, symbol_name, ticks[len(ticks)-1])
         #this.db_adapter.save_market_ticks(this.market_name, symbol_name, ticks)
+
+    def updateDashboard(this, measurement, market_name, symbol_name, tick):
+        sql = "select time, market, symbol, update_time from %s where market='%s' and symbol='%s' order by time desc limit 1" % (measurement, market_name, symbol_name)
+        this.logger.debug(sql)
+        latest_time = tick.time
+        ret = this.db_adapter.query(sql, epoch = 's')
+        if ret and ret.has_key('series'):
+            latest_time = ret['series'][0]['values'][0][0]
+        this.logger.debug('tick.time: %s, latest_time: %s ', tick.time, latest_time)
+        this.db_adapter.update_dashboard(measurement, market_name, symbol_name, latest_time, tick)
 
     def save_index(this, measurement, index):
         this.db_adapter.save_index(measurement, index)

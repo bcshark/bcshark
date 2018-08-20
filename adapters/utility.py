@@ -23,3 +23,9 @@ def current_timestamp_str():
 
 def current_timestamp_int():
     return time.time()
+
+def get_timestamp_str_hms(time_in_seconds, timezone_offset):
+    if isinstance(time_in_seconds, str) or isinstance(time_in_seconds, unicode):
+        return time_in_seconds
+    ret = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time_in_seconds + timezone_offset))
+    return ret

@@ -282,6 +282,65 @@ def api_topcoins():
     else:
         return json.dumps({})
 
+@app.route('/api/monitor', methods=['GET'])
+def api_monitor():
+    client = settings['db_adapter']
+    service = kline_service(client, settings)
+
+    result = []
+    result.append(settings['symbols'])
+    monitors = service.query_monitor()
+    if monitors:
+        monitor_item = [
+            { "time": monitor[0], "market": monitor[1], "symbol": monitor[2], "update_time": monitor[3] }
+            for monitor in monitors
+        ]
+        result.append(monitor_item)
+        return json.dumps(result)
+    else:
+        return json.dumps(result)
+
+@app.route('/api/validate', methods=['GET'])
+def api_validate():
+    start_time = request.args.get('s', '')
+    end_time = request.args.get('e', '')
+    market = request.args.get('m', '')
+    symbol = request.args.get('b', '')
+    client = settings['db_adapter']
+    service = kline_service(client, settings)
+
+    validates = service.query_validation(long(start_time), long(end_time), market, symbol)
+    if validates:
+        validate_item = [
+            { "time": validate[0], "market": validate[1], "symbol": validate[2] }
+            for validate in validates
+        ]
+        result = []
+        for val in validate_item:
+            if len(result) == 0:
+                result.append({'market':val['market'], 'symbol':val['symbol'], 'count':1})
+            else:
+                match = None
+                for itm in result:
+                    if(itm['market'] == val['market'] and itm['symbol'] == val['symbol']):
+                        match = itm
+                        break
+                if match is None:
+                    result.append({'market':val['market'], 'symbol':val['symbol'], 'count':1})
+                else:
+                    match['count'] = match['count'] + 1
+        return json.dumps(result)
+    else:
+        return json.dumps([{}])
+
+@app.route('/api/fillMktSymbolValue', methods=['GET'])
+def api_fillMktSymbolValue():
+    client = settings['db_adapter']
+    # service = kline_service(client, settings)
+    result = []
+    result.append(settings['symbols'])
+    return json.dumps(result)
+
 @app.route('/api/index', methods=['GET'])
 def api_index():
     index_type = request.args.get('t', '')

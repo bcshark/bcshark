@@ -190,3 +190,17 @@ class influxdb_adapter(database_adapter):
             }
         }
         this.client.write_points([ point ])
+
+    def update_dashboard(this, measurement_name, market_name, symbol_name, latest_time, tick):
+        point = {
+            'measurement': measurement_name,
+            'time': get_timestamp_str(long(latest_time) + tick.timezone_offset, tick.timezone_offset),
+            'tags': {
+                'market': market_name,
+                'symbol': symbol_name
+            },
+            'fields': {
+                'update_time':  get_timestamp_str_hms(long(tick.time), tick.timezone_offset)
+            }
+        }
+        this.client.write_points([ point ])
