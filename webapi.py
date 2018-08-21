@@ -355,6 +355,7 @@ def api_index():
 
     for row_index in range(len(series['values'])):
         value = {}
+        value['direction'] = 'up'
         for column_index in range(len(series['columns'])):
             value[series['columns'][column_index]] = series['values'][row_index][column_index]
         values.append(value)
