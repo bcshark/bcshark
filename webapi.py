@@ -333,6 +333,42 @@ def api_validate():
     else:
         return json.dumps([{}])
 
+@app.route('/api/datasync', methods=['GET'])
+def api_datasync():
+    table = request.args.get('tb', '')
+    start = request.args.get('st', '')
+    end = request.args.get('et', '')
+    client = settings['db_adapter']
+    service = kline_service(client, settings)
+
+    result = []
+    datasyncs = service.query_datasync(table, long(start), long(end))
+    if datasyncs:
+        datasync_item = []
+        if table == "market_ticks":
+            datasync_item = [
+                { "time": datasync[0], "amount": datasync[1], "close": datasync[2], "count": datasync[3], "high": datasync[4], "low": datasync[5], "market": datasync[6], "open": datasync[7], "period": datasync[8], "symbol": datasync[9], "timezone_offset": datasync[10], "volume": datasync[11] }
+                for datasync in datasyncs
+            ]
+        elif table == "k10_index":
+            datasync_item = [
+                { "time": datasync[0], "close": datasync[1], "high": datasync[2], "low": datasync[3], "open": datasync[4], "period": datasync[5], "symbol": datasync[6], "volume": datasync[7] }
+                for datasync in datasyncs
+            ]
+        elif table == "k30_index":
+            datasync_item = [
+                { "time": datasync[0], "close": datasync[1], "high": datasync[2], "low": datasync[3], "open": datasync[4], "period": datasync[5], "symbol": datasync[6], "volume": datasync[7] }
+                for datasync in datasyncs
+            ]
+        elif table == "k10_daily_rank":
+            datasync_item = [
+                { "time": datasync[0], "id": datasync[1], "market_cap_usd": datasync[2], "max_supply": datasync[3], "name": datasync[4], "percent_change_1h": datasync[5], "percent_change_24h": datasync[6], "percent_change_7d": datasync[7], "period": datasync[8], "price_usd": datasync[9], "rank": datasync[10], "symbol": datasync[11], "total_supply": datasync[12], "volume_usd_24h": datasync[13] }
+                for datasync in datasyncs
+            ]
+        return json.dumps(datasync_item)
+    else:
+        return json.dumps(result)
+
 @app.route('/api/fillMktSymbolValue', methods=['GET'])
 def api_fillMktSymbolValue():
     client = settings['db_adapter']

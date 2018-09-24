@@ -1,4 +1,5 @@
 import re
+import time
 
 class kline_service(object):
     def __init__(this, client, settings):
@@ -90,7 +91,7 @@ class kline_service(object):
         return monitors
 
     def query_validation(this, start, end, market, symbol):
-        sql = "select time, market, symbol, msg from validation where time >= %s and time <= %s" % (start * 1000000000, end * 1000000000)
+        sql = "select time, market, symbol, msg from validation where time >= %d and time <= %d" % (start * 1e9, end * 1e9)
         if market != '':
             sql = sql + " and market = '%s'" % (market)
         if symbol != '':
@@ -102,3 +103,24 @@ class kline_service(object):
 
         validations = result['series'][0]['values']
         return validations
+
+    def query_datasync(this, table, start, end):
+        sql = ""
+        if table == "market_ticks":
+            cur_time = time.time()
+            base_time1 = int(cur_time - cur_time % 86400) + 28800
+            base_time2 = base_time1 - 60
+            sql = "select time, amount, close, count, high, low, market, open, period, symbol, timezone_offset, volume from market_ticks where time >= %d and time <= %d" % (base_time2 * 1e9, base_time1 * 1e9)
+        elif table == "k10_index":
+            sql = "select time, close, high, low, open, period, symbol, volume from k10_index where time >= %d and time <= %d" % (start * 1e9, end * 1e9)
+        elif table == "k30_index":
+            sql = "select time, close, high, low, open, period, symbol, volume from k30_index where time >= %d and time <= %d" % (start * 1e9, end * 1e9)
+        elif table == "k10_daily_rank":
+            sql = "select time, id, market_cap_usd, max_supply, \"name\", percent_change_1h, percent_change_24h, percent_change_7d, period, price_usd, rank, symbol, total_supply, volume_usd_24h from k10_daily_rank where time >= %d and time <= %d" % (start * 1e9, end * 1e9)
+        print('datasync SQL: %s', sql)
+        result = this.client.query(sql, epoch = 's')
+        if len(result) == 0 or not result.has_key('series'):
+            return None
+
+        datasyncs = result['series'][0]['values']
+        return datasyncs
