@@ -1,5 +1,5 @@
 var ConfigService = function($resource, $http) {
-	var webapi_url = "http://127.0.0.1:5000"
+	var webapi_url = "http://18.218.165.228:5000"
 
 	var config = {
 		"markets": 				webapi_url + "/api/markets",
