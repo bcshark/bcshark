@@ -20,9 +20,9 @@ var ValidateController = ['$scope', '$http', '$interval', '$location', '$window'
             alert('Error! please enter end time');
             return;
         }
-        var timezone_offset = new Date().getTimezoneOffset() * 60;
-        var start_time = parseInt($scope.validate_start.getTime()/1000) + timezone_offset;
-        var end_time = parseInt($scope.validate_end.getTime()/1000) + timezone_offset;
+//        var timezone_offset = new Date().getTimezoneOffset() * 60;
+        var start_time = parseInt($scope.validate_start.getTime()/1000);
+        var end_time = parseInt($scope.validate_end.getTime()/1000);
 		validateService.validate(start_time, end_time, $scope.validate_market, $scope.validate_symbol,
 			function(resp) {
 				if (resp && resp instanceof Array) {
