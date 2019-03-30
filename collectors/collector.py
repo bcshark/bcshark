@@ -4,11 +4,14 @@ import time
 import threading
 import ssl
 
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from websocket import WebSocketApp
 from struct import pack_into, unpack_from
 
 from model.market_tick import market_tick
 from .utility import *
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class collector(object):
     DEFAULT_CONNECT_TIMEOUT_IN_SECONDS = 10
@@ -157,8 +160,8 @@ class collector(object):
         for index in range(len(ticks)):
             tick = ticks[index]
             this.internal_save_tick(current_minute, symbol_name, tick)
-        this.updateDashboard('monitor', this.market_name, symbol_name, ticks[len(ticks)-1])
-        #this.db_adapter.save_market_ticks(this.market_name, symbol_name, ticks)
+        #this.updateDashboard('monitor', this.market_name, symbol_name, ticks[len(ticks)-1])
+        this.db_adapter.save_market_ticks(this.market_name, symbol_name, ticks)
 
     def updateDashboard(this, measurement, market_name, symbol_name, tick):
         sql = "select time, market, symbol, update_time from %s where market='%s' and symbol='%s' order by time desc limit 1" % (measurement, market_name, symbol_name)
@@ -276,6 +279,8 @@ class collector(object):
         if (not isinstance(tick, market_tick)) and (not isinstance(tick, dict)):
             return None
 
+        cached_prices = None
+
         if this.cache_manager:
             symbol_temp = ''
             if symbol_name.endswith('eth'):
@@ -288,7 +293,9 @@ class collector(object):
                 current_minute = tick.time - tick.time % 60 + 60
                 sql = "select time, open, close, high, low from %s where symbol = '%s' and time < %d order by time desc limit 1" % (this.table_market_ticks, symbol_temp, current_minute * 1e9)
                 ret = this.db_adapter.query(sql, epoch = 's')
-                cached_prices = ret['series'][0]['values'][0][:5]
+
+                if ret and ret.has_key('series'):
+                    cached_prices = ret['series'][0]['values'][0][:5]
             else:
                 # get latest btc-usdt price
                 cached_prices = this.cache_manager.load_market_symbol_tick(this.market_name, symbol_temp)

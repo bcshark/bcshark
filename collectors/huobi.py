@@ -81,7 +81,7 @@ class collector_huobi(collector):
             if symbol == '':
                 continue
 
-            url = "kline?peroid=%s&size=%s&symbol=%s" % (this.DEFAULT_PERIOD, this.DEFAULT_SIZE, symbol)
+            url = "kline?period=%s&size=%s&symbol=%s" % (this.DEFAULT_PERIOD, this.DEFAULT_SIZE, symbol)
             url = this.REST_URL + url
             ticks = this.http_request_json(url, None)
         
