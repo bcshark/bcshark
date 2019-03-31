@@ -1,9 +1,16 @@
-FROM python:2
+FROM bityun.azurecr.io/coinmarket-collector-base:1.0
 LABEL author="igouzy@live.com"
 
-RUN pip install flask flask_cors influxdb requests signalr-client
-
 RUN mkdir -p /apps/logs /apps/data-files /apps/config-files
-COPY adapters collectors config lib services tools *.py /apps
+
+ADD adapters /apps/adapters/
+ADD collectors /apps/collectors/
+ADD config /apps/config/
+ADD lib /apps/lib/
+ADD services /apps/services/
+ADD tools /apps/tools/
+ADD config-files /apps/config-files/
+
+ADD *.py /apps/
 
 WORKDIR /apps

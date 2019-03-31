@@ -13,7 +13,7 @@
 		"database": "market_index"
 	},
 	"mysqldb": {
-		"host": "127.0.0.1",
+		"host": "mysqldb",
 		"port": 3306,
 		"username": "root",
 		"password": "76f4dd9b",
