@@ -1,7 +1,7 @@
 FROM bityun.azurecr.io/coinmarket-collector-base:1.0
 LABEL author="igouzy@live.com"
 
-RUN mkdir -p /apps/logs /apps/data-files /apps/config-files
+RUN mkdir -p /apps/logs /apps/data-files/cache /apps/config-files
 
 ADD adapters /apps/adapters/
 ADD collectors /apps/collectors/
