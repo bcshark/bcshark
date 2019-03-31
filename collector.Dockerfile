@@ -15,6 +15,7 @@ ADD config-files /apps/config-files/
 
 ADD *.py /apps/
 ADD *.sh /apps/
+RUN chmod +x /apps/*.sh
 
 WORKDIR /apps
 
