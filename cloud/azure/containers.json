@@ -29,7 +29,7 @@
     "container1image": "influxdb:latest",
     "container2name": "webapi",
     "container2image": "bityun.azurecr.io/coinmarket-webapi:1.0",
-    "container3name": "collector-huobi",
+    "container3name": "collector",
     "container3image": "bityun.azurecr.io/coinmarket-collector:1.0"
   },
   "resources": [
@@ -37,7 +37,7 @@
       "name": "[parameters('containerGroupName')]",
       "type": "Microsoft.ContainerInstance/containerGroups",
       "apiVersion": "2018-10-01",
-      "location": "[resourceGroup().location]",
+      "location": "eastus",
       "properties": {
         "containers": [
           {
@@ -80,7 +80,7 @@
             "properties": {
               "image": "[variables('container3image')]",
               "command": [
-                "-m",
+                "/apps/start_collect.sh",
                 "huobi"
               ],
               "resources": {
