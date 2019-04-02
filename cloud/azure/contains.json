@@ -1,0 +1,131 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "containerGroupName": {
+      "type": "string",
+      "defaultValue": "coinmarket-group",
+      "metadata": {
+        "description": "CoinMarket Container Group"
+      }
+    },
+    "collectorCpuCores": {
+      "type": "string",
+      "metadata": {
+        "description": "The number of CPU cores to allocate to the container. Must be an integer."
+      },
+      "defaultValue": "1.0"
+    },
+    "collectorMemoryInGb": {
+      "type": "string",
+      "metadata": {
+        "description": "The amount of memory to allocate to the container in gigabytes."
+      },
+      "defaultValue": "0.5"
+    }
+  },
+  "variables": {
+    "container1name": "influxdb",
+    "container1image": "influxdb:latest",
+    "container2name": "webapi",
+    "container2image": "bityun.azurecr.io/coinmarket-webapi:1.0",
+    "container3name": "collector-huobi",
+    "container3image": "bityun.azurecr.io/coinmarket-collector:1.0"
+  },
+  "resources": [
+    {
+      "name": "[parameters('containerGroupName')]",
+      "type": "Microsoft.ContainerInstance/containerGroups",
+      "apiVersion": "2018-10-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "containers": [
+          {
+            "name": "[variables('container1name')]",
+            "properties": {
+              "image": "[variables('container1image')]",
+              "resources": {
+                "requests": {
+                  "cpu": 1,
+                  "memoryInGb": 1.5
+                }
+              },
+              "volumeMounts": [
+                {
+                  "name": "coinmarket-influx-storage",
+                  "mountPath": "/var/lib/influxdb"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('container2name')]",
+            "properties": {
+              "image": "[variables('container2image')]",
+              "resources": {
+                "requests": {
+                  "cpu": 1,
+                  "memoryInGb": 1.5
+                }
+              },
+              "ports": [
+                {
+                  "port": 5000
+                }
+              ]
+            }
+          },
+          {
+            "name": "[concat(variables('container3name'), '-huobi')]",
+            "properties": {
+              "image": "[variables('container3image')]",
+              "command": [
+                "-m",
+                "huobi"
+              ],
+              "resources": {
+                "requests": {
+                  "cpu": "[parameters('collectorCpuCores')]",
+                  "memoryInGB": "[parameters('collectorMemoryInGb')]"
+                }
+              }
+            }
+          }
+        ],
+        "osType": "Linux",
+        "imageRegistryCredentials": [
+          {
+            "server": "bityun.azurecr.io",
+            "username": "bitYun",
+            "password": "rdwaWGpOyKN0OYz3HRr7EdY3mGUa=Vem"
+          }
+        ],
+        "ipAddress": {
+          "type": "Public",
+          "ports": [
+            {
+              "protocol": "tcp",
+              "port": "5000"
+            }
+          ]
+        },
+        "volumes": [
+          {
+            "name": "coinmarket-influx-storage",
+            "azureFile": {
+              "shareName": "coinmarket-influx",
+              "storageAccountName": "bityunstore",
+              "storageAccountKey": "eCHLMoEfO2XiH+yT3h7WHj0gg9nURTkh3wVW31ogwY1WP71FbskEhXq4hZf9EAwELvL/i5J+waE5rQyfZAbgNQ=="
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+    "containerIPv4Address": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.ContainerInstance/containerGroups/', parameters('containerGroupName'))).ipAddress.ip]"
+    }
+  }
+}
