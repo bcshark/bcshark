@@ -1,7 +1,7 @@
 FROM bityun.azurecr.io/coinmarket-collector-base:1.0
 LABEL author="igouzy@live.com"
 
-RUN echo "*/1 * * * * root python /apps/collect_rest.py -m #MARKET_NAME# 2>&1" >> /etc/crontab
+RUN echo "*/3 * * * * root python /apps/collect_rest.py -m #MARKET_NAME# 2>&1" >> /etc/crontab
 
 RUN mkdir -p /apps/logs /apps/data-files/cache /apps/config-files
 
