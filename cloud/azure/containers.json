@@ -25,12 +25,12 @@
     }
   },
   "variables": {
-    "container1name": "influxdb",
-    "container1image": "influxdb:latest",
-    "container2name": "webapi",
-    "container2image": "bityun.azurecr.io/coinmarket-webapi:1.0",
-    "container3name": "collector",
-    "container3image": "bityun.azurecr.io/coinmarket-collector:1.0"
+    "influxdbname": "influxdb",
+    "influxdbimage": "influxdb:latest",
+    "webapiname": "webapi",
+    "webapiimage": "bityun.azurecr.io/coinmarket-webapi:1.0",
+    "collectorname": "collector",
+    "collectorimage": "bityun.azurecr.io/coinmarket-collector:1.0"
   },
   "resources": [
     {
@@ -41,9 +41,9 @@
       "properties": {
         "containers": [
           {
-            "name": "[variables('container1name')]",
+            "name": "[variables('influxdbname')]",
             "properties": {
-              "image": "[variables('container1image')]",
+              "image": "[variables('influxdbimage')]",
               "resources": {
                 "requests": {
                   "cpu": 1,
@@ -59,13 +59,13 @@
             }
           },
           {
-            "name": "[variables('container2name')]",
+            "name": "[variables('webapiname')]",
             "properties": {
-              "image": "[variables('container2image')]",
+              "image": "[variables('webapiimage')]",
               "resources": {
                 "requests": {
                   "cpu": 1,
-                  "memoryInGb": 1.5
+                  "memoryInGb": 1.0
                 }
               },
               "ports": [
@@ -76,9 +76,41 @@
             }
           },
           {
-            "name": "[concat(variables('container3name'), '-huobi')]",
+            "name": "[concat(variables('collectorname'), '-k10_index_calc')]",
             "properties": {
-              "image": "[variables('container3image')]",
+              "image": "[variables('collectorimage')]",
+              "command": [
+                "/apps/start_collect.sh",
+                "k10_index_calc"
+              ],
+              "resources": {
+                "requests": {
+                  "cpu": "[parameters('collectorCpuCores')]",
+                  "memoryInGB": "[parameters('collectorMemoryInGb')]"
+                }
+              }
+            }
+          },
+          {
+            "name": "[concat(variables('collectorname'), '-k10_daily_rank')]",
+            "properties": {
+              "image": "[variables('collectorimage')]",
+              "command": [
+                "/apps/start_collect.sh",
+                "k10_daily_rank"
+              ],
+              "resources": {
+                "requests": {
+                  "cpu": "[parameters('collectorCpuCores')]",
+                  "memoryInGB": "[parameters('collectorMemoryInGb')]"
+                }
+              }
+            }
+          },
+          {
+            "name": "[concat(variables('collectorname'), '-huobi')]",
+            "properties": {
+              "image": "[variables('collectorimage')]",
               "command": [
                 "/apps/start_collect.sh",
                 "huobi"
