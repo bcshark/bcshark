@@ -14,14 +14,14 @@
       "metadata": {
         "description": "The number of CPU cores to allocate to the container. Must be an integer."
       },
-      "defaultValue": "1.0"
+      "defaultValue": "0.2"
     },
     "collectorMemoryInGb": {
       "type": "string",
       "metadata": {
         "description": "The amount of memory to allocate to the container in gigabytes."
       },
-      "defaultValue": "0.5"
+      "defaultValue": "0.1"
     }
   },
   "variables": {
@@ -30,7 +30,11 @@
     "webapiname": "webapi",
     "webapiimage": "bityun.azurecr.io/coinmarket-webapi:1.0",
     "collectorname": "collector",
-    "collectorimage": "bityun.azurecr.io/coinmarket-collector:1.0"
+    "collectorimage": "bityun.azurecr.io/coinmarket-collector:1.0",
+    "mysqlname": "mysql",
+    "mysqlimage": "mysql:5",
+    "portalname": "alpha-hunter",
+    "portalimage": "bityun.azurecr.io/alpha-hunter:v5"
   },
   "resources": [
     {
@@ -47,7 +51,7 @@
               "resources": {
                 "requests": {
                   "cpu": 1,
-                  "memoryInGb": 1.5
+                  "memoryInGb": 1.0
                 }
               },
               "volumeMounts": [
@@ -59,13 +63,59 @@
             }
           },
           {
+            "name": "[variables('mysqlname')]",
+            "properties": {
+              "image": "[variables('mysqlimage')]",
+              "resources": {
+                "requests": {
+                  "cpu": 0.5,
+                  "memoryInGb": 0.5
+                }
+              },
+              "environmentVariables": [
+                {
+                    "name": "MYSQL_ROOT_PASSWORD",
+                    "value": "1q2w#E$R17q4"
+                }
+              ],
+              "volumeMounts": [
+                {
+                  "name": "coinmarket-mysql-storage",
+                  "mountPath": "/var/lib/mysql"
+                }
+              ],
+              "ports": [
+                {
+                  "port": 3306
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('portalname')]",
+            "properties": {
+              "image": "[variables('portalimage')]",
+              "resources": {
+                "requests": {
+                  "cpu": 0.5,
+                  "memoryInGb": 0.5
+                }
+              },
+              "ports": [
+                {
+                  "port": 80
+                }
+              ]
+            }
+          },
+          {
             "name": "[variables('webapiname')]",
             "properties": {
               "image": "[variables('webapiimage')]",
               "resources": {
                 "requests": {
-                  "cpu": 1,
-                  "memoryInGb": 1.0
+                  "cpu": 0.5,
+                  "memoryInGb": 0.5
                 }
               },
               "ports": [
@@ -76,7 +126,7 @@
             }
           },
           {
-            "name": "[concat(variables('collectorname'), '-k10_index_calc')]",
+            "name": "[concat(variables('collectorname'), '-k10-index-calc')]",
             "properties": {
               "image": "[variables('collectorimage')]",
               "command": [
@@ -92,7 +142,7 @@
             }
           },
           {
-            "name": "[concat(variables('collectorname'), '-k10_daily_rank')]",
+            "name": "[concat(variables('collectorname'), '-k10-daily-rank')]",
             "properties": {
               "image": "[variables('collectorimage')]",
               "command": [
@@ -137,7 +187,15 @@
           "ports": [
             {
               "protocol": "tcp",
+              "port": "3306"
+            },
+            {
+              "protocol": "tcp",
               "port": "5000"
+            },
+            {
+              "protocol": "tcp",
+              "port": "80"
             }
           ]
         },
@@ -148,6 +206,14 @@
               "shareName": "coinmarket-influx",
               "storageAccountName": "bityunstore",
               "storageAccountKey": "eCHLMoEfO2XiH+yT3h7WHj0gg9nURTkh3wVW31ogwY1WP71FbskEhXq4hZf9EAwELvL/i5J+waE5rQyfZAbgNQ=="
+            }
+          },
+          {
+            "name": "coinmarket-mysql-storage",
+            "azureFile": {
+              "shareName": "coinmarket-mysql",
+              "storageAccountName": "bityunmysql",
+              "storageAccountKey": "3qAqRGEhoBE6LtKG5IRls1edXiR8+iZcRHdP2wSsWjxW2XPbXyFMj6UnNEIEb/l3cBd8sGf1iSrwtzEIHEnnPQ=="
             }
           }
         ]
