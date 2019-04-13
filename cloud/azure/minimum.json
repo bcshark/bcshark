@@ -30,11 +30,7 @@
     "webapiname": "webapi",
     "webapiimage": "bityun.azurecr.io/coinmarket-webapi:1.0",
     "collectorname": "collector",
-    "collectorimage": "bityun.azurecr.io/coinmarket-collector:1.0",
-    "mysqlname": "mysql",
-    "mysqlimage": "mysql:5",
-    "portalname": "alpha-hunter",
-    "portalimage": "bityun.azurecr.io/alpha-hunter:v5.1"
+    "collectorimage": "bityun.azurecr.io/coinmarket-collector:1.0"
   },
   "resources": [
     {
@@ -58,56 +54,6 @@
                 {
                   "name": "coinmarket-influx-storage",
                   "mountPath": "/var/lib/influxdb"
-                }
-              ]
-            }
-          },
-          {
-            "name": "[variables('mysqlname')]",
-            "properties": {
-              "image": "[variables('mysqlimage')]",
-              "resources": {
-                "requests": {
-                  "cpu": 1,
-                  "memoryInGb": 0.5
-                }
-              },
-              "environmentVariables": [
-                {
-                    "name": "MYSQL_ROOT_PASSWORD",
-                    "value": "1q2w#E$R17q4"
-                },
-                {
-                    "name": "MYSQL_DATABASE",
-                    "value": "alpha_hunter"
-                }
-              ],
-              "volumeMounts": [
-                {
-                  "name": "coinmarket-mysql-storage",
-                  "mountPath": "/var/lib/mysql"
-                }
-              ],
-              "ports": [
-                {
-                  "port": 3306
-                }
-              ]
-            }
-          },
-          {
-            "name": "[variables('portalname')]",
-            "properties": {
-              "image": "[variables('portalimage')]",
-              "resources": {
-                "requests": {
-                  "cpu": 0.5,
-                  "memoryInGb": 0.5
-                }
-              },
-              "ports": [
-                {
-                  "port": 80
                 }
               ]
             }
@@ -192,15 +138,7 @@
           "ports": [
             {
               "protocol": "tcp",
-              "port": "3306"
-            },
-            {
-              "protocol": "tcp",
               "port": "5000"
-            },
-            {
-              "protocol": "tcp",
-              "port": "80"
             }
           ]
         },
@@ -211,14 +149,6 @@
               "shareName": "coinmarket-influx",
               "storageAccountName": "bityunstore",
               "storageAccountKey": "eCHLMoEfO2XiH+yT3h7WHj0gg9nURTkh3wVW31ogwY1WP71FbskEhXq4hZf9EAwELvL/i5J+waE5rQyfZAbgNQ=="
-            }
-          },
-          {
-            "name": "coinmarket-mysql-storage",
-            "azureFile": {
-              "shareName": "coinmarket-mysql",
-              "storageAccountName": "bityunmysql",
-              "storageAccountKey": "3qAqRGEhoBE6LtKG5IRls1edXiR8+iZcRHdP2wSsWjxW2XPbXyFMj6UnNEIEb/l3cBd8sGf1iSrwtzEIHEnnPQ=="
             }
           }
         ]
