@@ -64,30 +64,6 @@ class collector(object):
     def table_market_ticks_usd(this):
         return '%s_ticks_usd' % this.market_name
 
-    def on_raw_close(this, websocket_client):
-        print '\033[31;1m%s\033[0m websocket is \033[31;1mclosed\033[0m, reconnect in %d seconds.' % (this.market_name, this.DEFAULT_WS_RECONNECT_IN_SECONDS)
-
-        """
-        if this.collect_ws:
-            this.reconnect_timer = threading.Timer(this.DEFAULT_WS_RECONNECT_IN_SECONDS, this.collect_ws)
-            this.reconnect_timer.start()
-        """
-        if this.collect_ws:
-            time.sleep(this.DEFAULT_WS_RECONNECT_IN_SECONDS)
-            this.collect_ws
-
-    def on_raw_open(this, websocket_client):
-        if this.on_open:
-            this.on_open(websocket_client)
-
-    def on_raw_message(this, websocket_client, raw_message):
-        if this.on_message:
-            this.on_message(websocket_client, raw_message)
-
-    def on_raw_error(this, websocket_client, error):
-        print 'on error'
-        print error
-
     def send_ws_message_json(this, json_obj):
         message = json.dumps(json_obj)
         this.send_ws_message(message)
@@ -111,8 +87,36 @@ class collector(object):
         if not this.websocket_client:
             this.stop_listen_websocket()
 
+        def on_raw_close(websocket_client):
+            print '\033[31;1m%s\033[0m websocket is \033[31;1mclosed\033[0m, reconnect in %d seconds.' % (this.market_name, this.DEFAULT_WS_RECONNECT_IN_SECONDS)
+
+            """
+            if this.collect_ws:
+                this.reconnect_timer = threading.Timer(this.DEFAULT_WS_RECONNECT_IN_SECONDS, this.collect_ws)
+                this.reconnect_timer.start()
+            """
+            if this.collect_ws:
+                time.sleep(this.DEFAULT_WS_RECONNECT_IN_SECONDS)
+                this.collect_ws
+
+        def on_raw_open(websocket_client):
+            if this.on_open:
+                this.on_open(websocket_client)
+
+        def on_raw_message(websocket_client, raw_message):
+            if this.on_message:
+                this.on_message(websocket_client, raw_message)
+
+        def on_raw_error(websocket_client, error):
+            print 'on error'
+            print error
+
         this.logger.info('Connecting to \033[32;1m%s\033[0m websocket interface, url: \033[32;1m%s\033[0m' % (this.market_name, url))
-        this.websocket_client = WebSocketApp(url, on_open = listener.on_raw_open, on_close = listener.on_raw_close, on_message = listener.on_raw_message, on_error = listener.on_raw_error)
+        this.websocket_client = WebSocketApp(url,
+                on_open = on_raw_open,
+                on_close = on_raw_close,
+                on_message = on_raw_message,
+                on_error = on_raw_error)
         this.websocket_client.run_forever(sslopt = { "cert_reqs" : ssl.CERT_NONE })
 
     def stop_listen_websocket(this):

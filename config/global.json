@@ -45,7 +45,8 @@
 			"title": "Binance",
 			"order": 1,
 			"api": { 
-				"rest": "https://api.binance.com/api/v1/" 
+				"rest": "https://api.binance.com/api/v1/" ,
+				"ws": "wss://stream.binance.com:9443"
 			} 
 		},
 		"okex": { 

@@ -46,7 +46,7 @@ class collector_huobi(collector):
         with gzip.GzipFile(fileobj = StringIO.StringIO(raw_message), mode = 'rb') as f:
             message = f.read()
 
-        this.logger.info('receive message from huobi websocket: %s', message)
+        this.logger.debug('receive message from huobi websocket: %s', message)
         message_json = json.loads(message)
 
         if message_json.has_key('ping'):

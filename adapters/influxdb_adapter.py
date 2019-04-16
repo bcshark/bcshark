@@ -161,7 +161,6 @@ class influxdb_adapter(database_adapter):
         this.client.write_points(points)
 
     def save_index(this, measurement_name, index):
-
         points = this.generate_points_by_index(measurement_name, index)
         this.client.write_points(points)
 
