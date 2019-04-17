@@ -84,8 +84,7 @@ class collector(object):
             return None
 
     def start_listen_websocket(this, url, listener):
-        if not this.websocket_client:
-            this.stop_listen_websocket()
+        this.stop_listen_websocket()
 
         def on_raw_close(websocket_client):
             print '\033[31;1m%s\033[0m websocket is \033[31;1mclosed\033[0m, reconnect in %d seconds.' % (this.market_name, this.DEFAULT_WS_RECONNECT_IN_SECONDS)
