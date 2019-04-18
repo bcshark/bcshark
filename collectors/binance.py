@@ -45,8 +45,8 @@ class collector_binance(collector):
         tick.close = float(obj['c'])
         tick.low = float(obj['l'])
         tick.high = float(obj['h'])
-        tick.amount = float(obj['v'])
-        tick.volume = float(obj['n'])
+        tick.amount = 0.0
+        tick.volume = float(obj['v'])
         tick.count = 0.0
         tick.period = this.get_generic_period_name(this.period)
 
@@ -70,13 +70,12 @@ class collector_binance(collector):
         if message_json.has_key('ping'):
             this.send_ws_message(json.dumps({ 'pong': message_json['ping'] }))
         elif message_json.has_key('stream'):
-            if "@" in message_json['stream']:
-                channel = message_json['stream']
-                match = re.search(this.PATTERN_TICK, channel)
+            channel = message_json['stream']
+            match = re.search(this.PATTERN_TICK, channel)
 
-                if match:
-                    symbol_name = match.group(1)
-                    this.save_tick(this.get_generic_symbol_name(symbol_name.upper()), this.translate_ws(message_json['data']['k']))
+            if match:
+                symbol_name = match.group(1)
+                this.save_tick(this.get_generic_symbol_name(symbol_name.upper()), this.translate_ws(message_json['data']['k']))
 
     def collect_rest(this):
         for symbol in this.symbols_market:
