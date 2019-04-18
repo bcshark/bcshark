@@ -9,7 +9,8 @@ from .utility import *
 class collector_binance(collector):
     DEFAULT_PERIOD = "1m"
     DEFAULT_SIZE = 60
-    PATTERN_TICK = "([a-zA-Z]+)@kline_[0-9]+\w"
+    PATTERN_KLINE = "([a-zA-Z]+)@kline_[0-9]+\w"
+    PATTERN_TRADE = "([a-zA-Z]+)@trade"
 
     is_subscription_sent = False
 
@@ -52,8 +53,29 @@ class collector_binance(collector):
 
         return tick
 
+    def translate_trade_ws(this, obj):
+        trade = {}
+
+        print (str(obj['m']), str(obj['m']) == 'true')
+
+        trade['timezone_offset'] = this.timezone_offset
+        trade['time'] = long(obj['T'] / 1000)
+        trade['id'] = obj['t']
+        trade['amount'] = obj['q']
+        trade['price'] = obj['p']
+        trade['type'] = (0 if str(obj['m']) == 'True' else 1)
+        trade['timestamp'] = long(obj['T'] / 1000)
+        trade['microtimestamp'] = long(obj['T'])
+        trade['buy_order_id'] = obj['b']
+        trade['sell_order_id'] = obj['a']
+
+        return trade
+
     def collect_ws(this):
-        streams = "/".join(["%s@kline_1m" % symbol.lower() for symbol in this.symbols_market if symbol != ""])
+        #streams = "/".join(["%s@kline_1m" % symbol.lower() for symbol in this.symbols_market if symbol != ""])
+        #ws_url = "%s/stream?streams=%s" % (this.WS_URL, streams)
+
+        streams = "/".join(["%s@trade" % symbol.lower() for symbol in this.symbols_market if symbol != ""])
         ws_url = "%s/stream?streams=%s" % (this.WS_URL, streams)
 
         this.start_listen_websocket(ws_url, this)
@@ -71,11 +93,19 @@ class collector_binance(collector):
             this.send_ws_message(json.dumps({ 'pong': message_json['ping'] }))
         elif message_json.has_key('stream'):
             channel = message_json['stream']
-            match = re.search(this.PATTERN_TICK, channel)
 
-            if match:
-                symbol_name = match.group(1)
-                this.save_tick(this.get_generic_symbol_name(symbol_name.upper()), this.translate_ws(message_json['data']['k']))
+            if "kline" in channel:
+                match = re.search(this.PATTERN_KLINE, channel)
+
+                if match:
+                    symbol_name = match.group(1)
+                    this.save_tick(this.get_generic_symbol_name(symbol_name.upper()), this.translate_ws(message_json['data']['k']))
+            elif "trade" in channel:
+                match = re.search(this.PATTERN_TRADE, channel)
+
+                if match:
+                    symbol_name = match.group(1)
+                    this.save_trade(this.get_generic_symbol_name(symbol_name.upper()), this.translate_trade_ws(message_json['data']))
 
     def collect_rest(this):
         for symbol in this.symbols_market:
