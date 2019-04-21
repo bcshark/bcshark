@@ -138,6 +138,21 @@ class influxdb_adapter(database_adapter):
 
         return [ point ]
 
+    def generate_points_by_check(this, measurement_name, market_name, checkpoint):
+        point = {
+            'measurement': measurement_name,
+            'tags': {
+                'market': market_name
+            },
+            'time': get_timestamp_str(long(checkpoint['time']), checkpoint['timezone_offset']),
+            'fields': {
+                'respond': checkpoint['respond'],
+                'elapse': checkpoint['elapse']
+            }
+        }
+
+        return [ point ]
+
     def query(this, sql, epoch = None):
         result_set = this.client.query(sql, epoch = epoch)
         return result_set.raw
@@ -158,6 +173,10 @@ class influxdb_adapter(database_adapter):
 
     def save_k10_daily_rank(this, table_name, k10_rank):
         points = this.generate_points_by_k10_rank(table_name, k10_rank)
+        this.client.write_points(points)
+
+    def save_check(this, measurement_name, market_name, checkpoint):
+        points = this.generate_points_by_check(measurement_name, market_name, checkpoint)
         this.client.write_points(points)
 
     def save_index(this, measurement_name, index):

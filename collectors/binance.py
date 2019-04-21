@@ -48,15 +48,13 @@ class collector_binance(collector):
         tick.high = float(obj['h'])
         tick.amount = 0.0
         tick.volume = float(obj['v'])
-        tick.count = 0.0
+        tick.count = float(obj['n'])
         tick.period = this.get_generic_period_name(this.period)
 
         return tick
 
     def translate_trade_ws(this, obj):
         trade = {}
-
-        print (str(obj['m']), str(obj['m']) == 'true')
 
         trade['timezone_offset'] = this.timezone_offset
         trade['time'] = long(obj['T'] / 1000)
@@ -108,21 +106,31 @@ class collector_binance(collector):
                     this.save_trade(this.get_generic_symbol_name(symbol_name.upper()), this.translate_trade_ws(message_json['data']))
 
     def collect_rest(this):
-        for symbol in this.symbols_market:
-            if symbol == "":
-                continue
+        starttime = time.time()
+        url = this.REST_URL + 'ping'
+        ticks = this.http_request_json(url, None)
+        elapse = time.time() - starttime
 
-            url = "klines?symbol=%s&interval=%s&limit=%d" % (symbol.upper(), this.DEFAULT_PERIOD, this.DEFAULT_SIZE)
-            url = this.REST_URL + url
-            ticks = this.http_request_json(url, None)
+        if ticks or ticks == {}:
+            this.save_check(True, elapse)
 
-            if not ticks or not isinstance(ticks, list):
-                this.logger.error('cannot get ticks from binance (%s)' % symbol)
-                continue
+            for symbol in this.symbols_market:
+                if symbol == "":
+                    continue
 
-            this.save_market_ticks(this.get_generic_symbol_name(symbol), [ this.translate_rest(tick) for tick in ticks ])
+                url = "klines?symbol=%s&interval=%s&limit=%d" % (symbol.upper(), this.DEFAULT_PERIOD, this.DEFAULT_SIZE)
+                url = this.REST_URL + url
+                ticks = this.http_request_json(url, None)
 
-            this.logger.info('get ticks from binance')
+                if not ticks or not isinstance(ticks, list):
+                    this.logger.error('cannot get ticks from binance (%s)' % symbol)
+                    continue
+
+                this.save_market_ticks(this.get_generic_symbol_name(symbol), [ this.translate_rest(tick) for tick in ticks ])
+
+                this.logger.info('get ticks from binance')
+        else:
+            this.save_check(True, elapse)
 
     def get_generic_period_name(this, period_name):
         if period_name == '1m':

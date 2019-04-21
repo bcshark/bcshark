@@ -64,6 +64,10 @@ class collector(object):
     def table_market_ticks_usd(this):
         return '%s_ticks_usd' % this.market_name
 
+    @property
+    def table_market_checks(this):
+        return 'market_checks'
+
     def send_ws_message_json(this, json_obj):
         message = json.dumps(json_obj)
         this.send_ws_message(message)
@@ -127,6 +131,17 @@ class collector(object):
 
     def save_trade(this, symbol_name, trade):
         this.db_adapter.save_trade(this.table_market_trades, this.market_name, symbol_name, trade)
+
+    def save_check(this, respond, elapse):
+        timestamp = long(time.time())
+
+        checkpoint = {}
+        checkpoint['time'] = timestamp
+        checkpoint['timezone_offset'] = this.timezone_offset
+        checkpoint['respond'] = respond
+        checkpoint['elapse'] = elapse
+
+        this.db_adapter.save_check(this.table_market_checks, this.market_name, checkpoint)
 
     def save_tick(this, symbol_name, tick):
         current_second = long(time.time())
