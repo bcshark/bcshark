@@ -349,3 +349,7 @@ class collector(object):
                 tick_to_save = (long(tick['time']), float(tick['open']), float(tick['close']), float(tick['high']), float(tick['low']))
 
             this.cache_manager.save_market_symbol_tick(this.market_name, symbol_name, tick_to_save)
+
+    def save_market_info(this, market_info):
+        this.db_adapter.save_market_info(this.market_name, market_info)
+

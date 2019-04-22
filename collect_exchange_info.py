@@ -9,7 +9,7 @@ import csv
 from lib.config import ConfigurationManager
 from lib.cache import cache_manager_factory
 from collectors.collector_factory import collector_factory
-from adapters.mysqldb_adapter import mysqldb_adapter
+from adapters.mongodb_adapter import mongodb_adapter
 
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     settings = ConfigurationManager(os.path.normpath(os.path.join(sys.path[0], 'config/global.json')))
     settings['logger'] = logger
-    settings['db_adapter'] = mysqldb_adapter(settings['mysqldb'])
+    settings['db_adapter'] = mongodb_adapter(settings['mongodb'])
     settings['cache_manager'] = cache_manager_factory.create(settings['cache'])
     settings['symbols'] = get_symbols_from_csv(settings['symbols']['path'])
 

@@ -26,6 +26,7 @@ docker run --name CoinMarket.Influx -d -p 8086:8086 -v `pwd`/influxdb:/var/lib/i
 docker run --name CoinMarket.Collector -it --link=CoinMarket.Influx:influxdb -p 5000:5000 -v `pwd`/CoinMarket:/home/ python:2 /bin/bash
 docker run --name CoinMarket.Web -v `pwd`/CoinMarket/web/latest/:/home -p 80:80 -it python:2 /bin/bash
 docker run -d --name CoinMarket.MySQL -e MYSQL_ROOT_PASSWORD=76f4dd9b -e MYSQL_DATABASE=market_index -v /home/phoenix/data/mysql:/var/lib/mysql -p 3306:3306 mysql:5
+docker run -d --name CoinMarket.Mongo -p 27017:27017 -p 27018:27018 -p 27019:27019 -p 28017:28017 -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=76f4dd9b -e MONGO_INITDB_DATABASE=market_index -v /home/phoenix/data/mongo:/data/db mongo:4
 ```
 
 If you plan to use nginx as reverse proxy, create a nginx container with following command:

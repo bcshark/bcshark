@@ -133,8 +133,12 @@ class collector_binance(collector):
             this.save_check(True, elapse)
 
     def collect_exchange_info(this):
-        print 'collect_exchange_info'
-        pass
+        url = this.REST_URL + 'exchangeInfo'
+        market_info = this.http_request_json(url, None)
+
+        if market_info:
+            this.save_market_info(market_info)
+            this.logger.info('get market info from binance')
 
     def get_generic_period_name(this, period_name):
         if period_name == '1m':
