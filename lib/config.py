@@ -22,3 +22,6 @@ class ConfigurationManager(object):
 
     def __getitem__(this, key):
         return this.config_manager.settings[key]
+
+    def has_key(this, key):
+        return this.config_manager.settings.has_key(key)

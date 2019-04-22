@@ -132,6 +132,10 @@ class collector_binance(collector):
         else:
             this.save_check(True, elapse)
 
+    def collect_exchange_info(this):
+        print 'collect_exchange_info'
+        pass
+
     def get_generic_period_name(this, period_name):
         if period_name == '1m':
             return '1min'

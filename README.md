@@ -25,6 +25,7 @@ influxd restore -database market_index -datadir /var/lib/influxdb/data ./market_
 docker run --name CoinMarket.Influx -d -p 8086:8086 -v `pwd`/influxdb:/var/lib/influxdb influxdb:latest
 docker run --name CoinMarket.Collector -it --link=CoinMarket.Influx:influxdb -p 5000:5000 -v `pwd`/CoinMarket:/home/ python:2 /bin/bash
 docker run --name CoinMarket.Web -v `pwd`/CoinMarket/web/latest/:/home -p 80:80 -it python:2 /bin/bash
+docker run -d --name CoinMarket.MySQL -e MYSQL_ROOT_PASSWORD=76f4dd9b -e MYSQL_DATABASE=market_index -v /home/phoenix/data/mysql:/var/lib/mysql -p 3306:3306 mysql:5
 ```
 
 If you plan to use nginx as reverse proxy, create a nginx container with following command:

@@ -21,16 +21,21 @@ class collector(object):
     def __init__(this, settings, market_settings):
         this.settings = settings
         this.market_settings = market_settings
-        this.logger = settings['logger']
         this.proxies = settings['proxies']
-        this.k30_logger = settings['k30_logger']
-        this.validation_logger = settings['validation_logger']
         this.db_adapter = settings['db_adapter']
         this.cache_manager = settings['cache_manager']
         this.symbols = settings['symbols']
         this.symbols_default = this.symbols["default"]
         this.timezone_offset = settings['timezone_offset']
         this.websocket_client = None
+
+        this.logger = settings['logger']
+        # TODO: Move this logger to its module. begin
+        if settings.has_key('k30_logger'):
+            this.k30_logger = settings['k30_logger']
+        if settings.has_key('validation_logger'):
+            this.validation_logger = settings['validation_logger']
+        # TODO: Move this logger to its module. end
 
     @property
     def REST_URL(this):
