@@ -9,7 +9,7 @@ from websocket import WebSocketApp
 from struct import pack_into, unpack_from
 
 from model.market_tick import market_tick
-from .utility import *
+from lib.utility import *
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 

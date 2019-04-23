@@ -3,7 +3,7 @@ import datetime
 
 from model.k10_rank import k10_rank
 from .collector import collector
-from .utility import *
+from lib.utility import *
 
 class collector_k10_daily_rank(collector):
     DEFAULT_PERIOD = "1min"

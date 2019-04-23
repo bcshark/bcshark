@@ -1,7 +1,7 @@
 from influxdb import InfluxDBClient
 
 from .database_adapter import database_adapter
-from .utility import *
+from lib.utility import *
 
 class influxdb_adapter(database_adapter):
     def __init__(this, settings):

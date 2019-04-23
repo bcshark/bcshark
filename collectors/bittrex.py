@@ -9,7 +9,7 @@ from requests import Session
 from signalr import Connection
 from model.market_tick import  market_tick
 from .collector import collector
-from .utility import *
+from lib.utility import *
 
 class collector_bittrex(collector):
     DEFAULT_PERIOD = "1min"

@@ -5,7 +5,7 @@ from model.market_tick import market_tick
 from model.k10_rank import k10_rank
 from model.k10_index import k10_index
 from .collector import collector
-from .utility import *
+from lib.utility import *
 
 class collector_k10_index_calc(collector):
     DEFAULT_PERIOD = "1min"

@@ -9,7 +9,7 @@ import csv
 from lib.config import ConfigurationManager
 from adapters.influxdb_adapter import influxdb_adapter
 #from adapters.mysqldb_adapter import mysqldb_adapter
-from adapters.utility import *
+from lib.utility import *
 
 from flask import Flask, request
 from flask_cors import CORS

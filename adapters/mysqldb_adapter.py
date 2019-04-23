@@ -1,7 +1,7 @@
 import MySQLdb
 
 from .database_adapter import database_adapter
-from .utility import *
+from lib.utility import *
 
 class mysqldb_adapter(database_adapter):
     def __init__(this, settings):

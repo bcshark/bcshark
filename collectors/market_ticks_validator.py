@@ -3,7 +3,7 @@ import datetime
 
 from model.market_tick import  market_tick
 from .collector import collector
-from .utility import *
+from lib.utility import *
 from model.validation import validation
 
 class market_ticks_validator(collector):

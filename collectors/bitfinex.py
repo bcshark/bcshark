@@ -6,7 +6,7 @@ import re
 
 from model.market_tick import  market_tick
 from .collector import collector
-from .utility import *
+from lib.utility import *
 
 class collector_bitfinex(collector):
     DEFAULT_PERIOD = "1min"

@@ -29,3 +29,10 @@ def get_timestamp_str_hms(time_in_seconds, timezone_offset):
         return time_in_seconds
     ret = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time_in_seconds + timezone_offset))
     return ret
+
+def reciprocal(value):
+    value = float(value)
+    if value != 0:
+        value =  round(1.0 / value, 9)
+    return value
+

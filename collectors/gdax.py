@@ -4,7 +4,7 @@ import datetime
 
 from model.market_tick import  market_tick
 from .collector import collector
-from .utility import *
+from lib.utility import *
 
 class collector_gdax(collector):
     DEFAULT_SIZE = 60
