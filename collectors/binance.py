@@ -69,21 +69,25 @@ class collector_binance(collector):
 
         return trade
 
-    def collect_ws(this):
-        #streams = "/".join(["%s@kline_1m" % symbol.lower() for symbol in this.symbols_market if symbol != ""])
-        #ws_url = "%s/stream?streams=%s" % (this.WS_URL, streams)
+    def collect_ws(this, name = '*'):
+        if name == '*' or name == 'default':
+            streams = "/".join(["%s@kline_1m" % symbol.lower() for symbol in this.symbols_market if symbol != ""])
+            ws_url = "%s/stream?streams=%s" % (this.WS_URL, streams)
 
-        streams = "/".join(["%s@trade" % symbol.lower() for symbol in this.symbols_market if symbol != ""])
-        ws_url = "%s/stream?streams=%s" % (this.WS_URL, streams)
+            this.start_listen_websocket(ws_url, this, 'default')
 
-        this.start_listen_websocket(ws_url, this)
+        if name == '*' or name == 'trade':
+            streams = "/".join(["%s@trade" % symbol.lower() for symbol in this.symbols_market if symbol != ""])
+            ws_url = "%s/stream?streams=%s" % (this.WS_URL, streams)
 
-    def on_open(this, websocket_client):
+            this.start_listen_websocket(ws_url, this, 'trade')
+
+    def on_open(this, websocket_client, name):
         this.logger.info('binance websocket connection established')
 
         this.is_subscription_sent = False
 
-    def on_message(this, websocket_client, raw_message):
+    def on_message(this, websocket_client, raw_message, name):
         this.logger.debug('receive message from binance websocket: %s', raw_message)
         message_json = json.loads(raw_message)
 

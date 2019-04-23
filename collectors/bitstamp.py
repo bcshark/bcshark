@@ -75,10 +75,10 @@ class collector_bitstamp(collector):
 
         return ret
 
-    def on_open(this, websocket_client):
+    def on_open(this, websocket_client, name):
         this.logger.info('bitstamp websocket connection established')
 
-    def on_message(this, websocket_client, raw_message):
+    def on_message(this, websocket_client, raw_message, name):
         #this.logger.info('receive message from bitstamp websocket: %s', raw_message)
         this.logger.info('receive message from bitstamp websocket: (hide)')
 
@@ -113,5 +113,5 @@ class collector_bitstamp(collector):
             trade = this.translate_trade(long(data['timestamp']), data)
             this.save_trade(this.get_generic_symbol_name(symbol_name), trade)
 
-    def collect_ws(this):
-        this.start_listen_websocket(this.WS_URL, this)
+    def collect_ws(this, name = '*'):
+        this.start_listen_websocket(this.WS_URL, this, 'default')

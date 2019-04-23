@@ -37,12 +37,12 @@ class collector_huobi(collector):
 
         return tick
 
-    def on_open(this, websocket_client):
+    def on_open(this, websocket_client, name):
         this.logger.info('huobi websocket connection established')
 
         this.is_subscription_sent = False
 
-    def on_message(this, websocket_client, raw_message):
+    def on_message(this, websocket_client, raw_message, name):
         with gzip.GzipFile(fileobj = StringIO.StringIO(raw_message), mode = 'rb') as f:
             message = f.read()
 
@@ -71,8 +71,8 @@ class collector_huobi(collector):
                 symbol_name = match.group(1)
                 this.save_tick(this.get_generic_symbol_name(symbol_name), this.translate(message_json['ts'], message_json['tick']))
 
-    def collect_ws(this):
-        this.start_listen_websocket(this.WS_URL, this)
+    def collect_ws(this, name = '*'):
+        this.start_listen_websocket(this.WS_URL, this, 'default')
 
     def collect_rest(this):
         timestamp = current_timestamp_str() 

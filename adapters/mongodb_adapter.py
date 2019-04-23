@@ -4,6 +4,8 @@ from .database_adapter import database_adapter
 from lib.utility import *
 
 class mongodb_adapter(database_adapter):
+    COLLECTION_MARKET_INFO = 'market_info'
+
     def __init__(this, settings):
         super(mongodb_adapter, this).__init__(settings)
 
@@ -36,7 +38,7 @@ class mongodb_adapter(database_adapter):
         current_second = long(time.time())
         with this.client.start_session(causal_consistency = True) as session:
             db = this.client[this.database]
-            collection = db['market_info']
+            collection = db[this.COLLECTION_MARKET_INFO]
             market_info['market_name'] = market_name
             market_info['updated_at'] = current_second
             collection.replace_one(
@@ -52,7 +54,7 @@ class mongodb_adapter(database_adapter):
     def query_market_info(this, market_name):
         with this.client.start_session(causal_consistency = True) as session:
             db = this.client[this.database]
-            collection = db['market_info']
+            collection = db[this.COLLECTION_MARKET_INFO]
             result= collection.find_one(
                 filter = { 'market_name': market_name }, 
                 session = session

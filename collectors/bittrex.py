@@ -78,10 +78,10 @@ class collector_bittrex(collector):
 
         return ret
 
-    def on_open(this, websocket_client):
+    def on_open(this, websocket_client, name):
         this.logger.info('bittrex websocket connection established')
 
-    def on_message(this, raw_message):
+    def on_message(this, raw_message, name):
         try:
             raw_message = decompress(b64decode(raw_message), -MAX_WBITS)
         except SyntaxError:
@@ -96,7 +96,7 @@ class collector_bittrex(collector):
                 symbol_name = tick['M']
                 this.save_trade(this.get_generic_symbol_name(symbol_name), this.translate_trade(tick['T'], tick))
 
-    def collect_ws(this):
+    def collect_ws(this, name = '*'):
         with Session() as session:
             session.Verify = False
 

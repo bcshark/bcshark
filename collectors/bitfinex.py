@@ -39,10 +39,10 @@ class collector_bitfinex(collector):
 
         return tick
 
-    def on_open(this, websocket_client):
+    def on_open(this, websocket_client, name):
         this.logger.info('bitfinex websocket connection established')
 
-    def on_message(this, websocket_client, raw_message):
+    def on_message(this, websocket_client, raw_message, name):
         #this.logger.info('receive message from bitfinex websocket: %s', raw_message)
         this.logger.info('receive message from bitfinex websocket: (hide)')
         
@@ -84,8 +84,9 @@ class collector_bitfinex(collector):
                     tick = this.translate(data)
                     this.save_tick(this.get_generic_symbol_name(symbol_name), tick)
 
-    def collect_ws(this):
-        this.start_listen_websocket(this.WS_URL, this)
+    def collect_ws(this, name = '*'):
+        if name == '*' or name == 'default':
+            this.start_listen_websocket(this.WS_URL, this, 'default')
 
     def collect_rest(this):
         this.logger.info('bitfinex rest api by pass!')

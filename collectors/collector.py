@@ -27,7 +27,7 @@ class collector(object):
         this.symbols = settings['symbols']
         this.symbols_default = this.symbols["default"]
         this.timezone_offset = settings['timezone_offset']
-        this.websocket_client = None
+        this.websocket_clients = {}
 
         this.logger = settings['logger']
         # TODO: Move this logger to its module. begin
@@ -77,9 +77,9 @@ class collector(object):
         message = json.dumps(json_obj)
         this.send_ws_message(message)
 
-    def send_ws_message(this, message):
-        if this.websocket_client:
-            this.websocket_client.send(message)
+    def send_ws_message(this, message, name = 'default'):
+        if this.websocket_clients[name]:
+            this.websocket_clients[name].send(message)
 
     def http_request_json(this, url, headers, cookies = None):
         this.logger.info('Requesting \033[32;1m%s\033[0m rest interface, url: \033[32;1m%s\033[0m' % (this.market_name, url))
@@ -92,8 +92,8 @@ class collector(object):
             print e
             return None
 
-    def start_listen_websocket(this, url, listener):
-        this.stop_listen_websocket()
+    def start_listen_websocket(this, url, listener, name = 'default'):
+        this.stop_listen_websocket(name)
 
         def on_raw_close(websocket_client):
             print '\033[31;1m%s\033[0m websocket is \033[31;1mclosed\033[0m, reconnect in %d seconds.' % (this.market_name, this.DEFAULT_WS_RECONNECT_IN_SECONDS)
@@ -105,31 +105,31 @@ class collector(object):
             """
             if this.collect_ws:
                 time.sleep(this.DEFAULT_WS_RECONNECT_IN_SECONDS)
-                this.collect_ws
+                this.collect_ws(name)
 
         def on_raw_open(websocket_client):
             if this.on_open:
-                this.on_open(websocket_client)
+                this.on_open(websocket_client, name)
 
         def on_raw_message(websocket_client, raw_message):
             if this.on_message:
-                this.on_message(websocket_client, raw_message)
+                this.on_message(websocket_client, raw_message, name)
 
         def on_raw_error(websocket_client, error):
             print 'on error'
             print error
 
         this.logger.info('Connecting to \033[32;1m%s\033[0m websocket interface, url: \033[32;1m%s\033[0m' % (this.market_name, url))
-        this.websocket_client = WebSocketApp(url,
+        this.websocket_clients[name] = WebSocketApp(url,
                 on_open = on_raw_open,
                 on_close = on_raw_close,
                 on_message = on_raw_message,
                 on_error = on_raw_error)
-        this.websocket_client.run_forever(sslopt = { "cert_reqs" : ssl.CERT_NONE })
+        this.websocket_clients[name].run_forever(sslopt = { "cert_reqs" : ssl.CERT_NONE })
 
-    def stop_listen_websocket(this):
-        if this.websocket_client:
-            this.websocket_client.close()
+    def stop_listen_websocket(this, name = 'default'):
+        if this.websocket_clients.has_key(name) and this.websocket_clients[name]:
+            this.websocket_clients[name].close()
 
     def is_usd_price(this, symbol_name):
         return symbol_name == this.symbols_default[0] or symbol_name.endswith('usd') or symbol_name.endswith('usdt')
