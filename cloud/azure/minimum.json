@@ -148,7 +148,7 @@
             "azureFile": {
               "shareName": "coinmarket-influx",
               "storageAccountName": "bityunstore",
-              "storageAccountKey": "eCHLMoEfO2XiH+yT3h7WHj0gg9nURTkh3wVW31ogwY1WP71FbskEhXq4hZf9EAwELvL/i5J+waE5rQyfZAbgNQ=="
+              "storageAccountKey": "[storageAccountKey]"
             }
           }
         ]
