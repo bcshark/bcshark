@@ -45,7 +45,7 @@ msrest==0.6.6
 msrestazure==0.6.0
 MySQL-python==1.2.5
 ndg-httpsclient==0.5.1
-nltk==3.4
+nltk==3.4.5
 numpy==1.16.2
 oauthlib==3.0.1
 pandas==0.24.2
