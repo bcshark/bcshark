@@ -39,7 +39,7 @@ itsdangerous==1.1.0
 Jinja2==2.10
 jmespath==0.9.4
 jsonpickle==1.1
-lxml==4.3.3
+lxml==4.6.3
 MarkupSafe==1.1.1
 msrest==0.6.6
 msrestazure==0.6.0
